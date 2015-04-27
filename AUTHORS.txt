@@ -1,0 +1,12 @@
+Primary Authors:
+  * Michael Shepanski
+
+Contributors:
+  * Hannes Hapke
+  * Joe Hu
+  * Marco Braak
+  * Nathan Duthoit
+  * Rich Leland
+  * Toumhi (Bitbucket)
+  * Tobias McNulty
+  * Grant McConnaughey

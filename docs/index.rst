@@ -111,7 +111,7 @@ Other Resources
 
 Source code here:
 
-https://bitbucket.org/mjs7231/django-dbbackup/
+https://github.com/mjs7231/django-dbbackup
 
 PyPi project:
 

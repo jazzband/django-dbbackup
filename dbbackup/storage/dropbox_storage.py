@@ -51,7 +51,7 @@ class Storage(BaseStorage):
     ###################################
     #  DBBackup Storage Methods
     ###################################
-
+    @property
     def backup_dir(self):
         return self.DROPBOX_DIRECTORY
 

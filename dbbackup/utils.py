@@ -99,7 +99,7 @@ def create_spooled_temporary_file(filepath):
         - filepath: path of input file
         - filename: file of the spooled temporary file
     """
-    spooled_file = tempfile.SpooledTemporaryFile(max_size=500 * 1024 * 1024)
+    spooled_file = tempfile.SpooledTemporaryFile(max_size=10 * 1024 * 1024)
     tmpfile = open(filepath, 'r+b')
     try:
         while True:

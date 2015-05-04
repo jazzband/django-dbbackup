@@ -81,8 +81,7 @@ class Storage(BaseStorage):
         total_files = 0
         path = os.path.join(self.DROPBOX_DIRECTORY, filename)
         for chunk in self.chunked_file(filehandle):
-            self.run_dropbox_action(self.dropbox.put_file,
-                self.get_numbered_path(path, total_files), chunk)
+            self.run_dropbox_action(self.dropbox.put_file, self.get_numbered_path(path, total_files), chunk)
             total_files += 1
 
     def read_file(self, filepath):
@@ -127,10 +126,10 @@ class Storage(BaseStorage):
         # Get existing or new access token and use it for this session
         access_token = self.get_access_token(sess)
         sess.set_token(access_token.key, access_token.secret)
-        dropbox = DropboxClient(sess)
+        dropbox_client = DropboxClient(sess)
         # Test the connection by making call to get account_info
-        dropbox.account_info()
-        return dropbox
+        dropbox_client.account_info()
+        return dropbox_client
 
     def get_request_token(self, sess):
         """ Return Request Token. If not available, a new one will be created, saved

@@ -49,9 +49,10 @@ class Storage(BaseStorage):
             raise StorageError('%s storage requires DBBACKUP_DROPBOX_APP_SECRET to be specified.' % self.name)
 
     ###################################
-    #  DBBackup Storage Methods
+    #  DBBackup Storage Attributes
     ###################################
 
+    @property
     def backup_dir(self):
         return self.DROPBOX_DIRECTORY
 

@@ -165,10 +165,10 @@ class Storage(BaseStorage):
         # Get existing or new access token and use it for this session
         access_token = self.get_access_token(sess)
         sess.set_token(access_token.key, access_token.secret)
-        dropbox_client = DropboxClient(sess)
+        dropbox = DropboxClient(sess)
         # Test the connection by making call to get account_info
-        dropbox_client.account_info()
-        return dropbox_client
+        dropbox.account_info()
+        return dropbox
 
     def get_request_token(self, sess):
         """ Return Request Token. If not available, a new one will be created, saved

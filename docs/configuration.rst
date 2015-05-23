@@ -99,6 +99,16 @@ exception is received.
 
 Default: ``True``
 
+DBBACKUP_FAKE_HOST
+~~~~~~~~~~~~~~~~~~
+
+Fake host is needed by django-dbbackup uncaught exception email sender for
+well described error reporting. If you are using ``ALLOWED_HOSTS`` you should
+set ``DBBACKUP_FAKE_HOST`` to any host from ``ALLOWED_HOSTS`` setting. Otherwise
+djnago-dbbackup can not send email to the ``SERVER_EMAIL``.
+
+Default: ``'django-dbbackup'``
+
 **DBBACKUP\_CLEANUP\_KEEP (optional)** - The number of backups to keep
 when specifying the --clean flag. Defaults to keeping 10 + the first
 backup of each month.

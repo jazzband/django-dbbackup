@@ -7,6 +7,9 @@ DATABASES = getattr(settings, 'DBBACKUP_DATABASES', list(settings.DATABASES.keys
 
 BACKUP_DIRECTORY = getattr(settings, 'DBBACKUP_BACKUP_DIRECTORY', os.getcwd())
 
+# Fake host
+DBBACKUP_FAKE_HOST = getattr(settings, 'DBBACKUP_FAKE_HOST', 'django-dbbackup')
+
 # Days to keep backups
 CLEANUP_KEEP = getattr(settings, 'DBBACKUP_CLEANUP_KEEP', 10)
 

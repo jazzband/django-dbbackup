@@ -17,7 +17,6 @@ from dbbackup.storage.base import BaseStorage
 from dbbackup.storage.base import StorageError
 from dbbackup import settings as dbbackup_settings
 
-
 class Command(BaseCommand):
     help = "backup_media [--encrypt]"
     option_list = BaseCommand.option_list + (
@@ -124,9 +123,9 @@ class Command(BaseCommand):
             return datetime.strptime(datestr, dbbackup_settings.DATE_FORMAT)
 
         file_list = [
-            (get_datetime_from_filename(f), f)
+            (get_datetime_from_filename(os.path.basename(f)), f)
             for f in self.storage.list_directory()
-            if is_media_backup(f)
+            if is_media_backup(os.path.basename(f))
         ]
         return sorted(file_list, key=lambda v: v[0])
 

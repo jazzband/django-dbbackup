@@ -13,7 +13,7 @@ class StorageError(Exception):
 #  Abstract Storage Class
 ###################################
 
-class BaseStorage:
+class BaseStorage(object):
     """ Abstract storage class. """
     BACKUP_STORAGE = getattr(settings, 'DBBACKUP_STORAGE', 'dbbackup.storage.filesystem_storage')
 

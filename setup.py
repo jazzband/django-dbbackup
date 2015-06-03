@@ -23,15 +23,12 @@ for dirpath, dirnames, filenames in os.walk(package_dir):
 
 
 def get_requirements():
-    requirements = []
+    requirements = ['six', 'pysftp']
+    # Bundled with Python 2.7+
     try:
         import importlib  # @UnusedImport
     except ImportError:
         requirements.append('importlib')
-    try:
-        import pysftp  # @UnusedImport
-    except ImportError:
-        requirements.append('pysftp')
 
     return requirements
 

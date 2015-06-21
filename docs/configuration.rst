@@ -21,6 +21,14 @@ location module to use when performing a backup.
 
 Default: ``os.getcwd()`` (Current working directory)
 
+DBBACKUP_TMP_DIR
+~~~~~~~~~~~~~~~~
+
+Directory to be used for temporary files.
+
+
+Default: ``/tmp``
+
 DBBACKUP_CLEANUP_KEEP and DBBACKUP_CLEANUP_KEEP_MEDIA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

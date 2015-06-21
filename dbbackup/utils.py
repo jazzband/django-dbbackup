@@ -74,7 +74,7 @@ def email_uncaught_exception(func):
 def encrypt_file(inputfile):
     """ Encrypt the file using gpg. The input and the output are filelike objects. """
     import gnupg
-    tempdir = tempfile.mkdtemp()
+    tempdir = tempfile.mkdtemp(dir=settings.TMP_DIR)
     try:
         filename = '%s.gpg' % inputfile.name
         filepath = os.path.join(tempdir, filename)
@@ -100,7 +100,9 @@ def create_spooled_temporary_file(filepath):
         - filepath: path of input file
         - filename: file of the spooled temporary file
     """
-    spooled_file = tempfile.SpooledTemporaryFile(max_size=10 * 1024 * 1024)
+    spooled_file = tempfile.SpooledTemporaryFile(
+        max_size=10 * 1024 * 1024,
+        dir=settings.TMP_DIR)
     tmpfile = open(filepath, 'r+b')
     try:
         while True:

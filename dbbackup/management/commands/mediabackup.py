@@ -72,7 +72,7 @@ class Command(BaseCommand):
         return settings.DATABASES['default']['NAME']
 
     def create_backup_file(self, source_dir, backup_basename):
-        temp_dir = tempfile.mkdtemp()
+        temp_dir = tempfile.mkdtemp(dir = dbbackup_settings.TMP_DIR)
         try:
             backup_filename = os.path.join(temp_dir, backup_basename)
             try:

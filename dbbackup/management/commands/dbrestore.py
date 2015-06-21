@@ -107,7 +107,9 @@ class Command(LabelCommand):
 
     def uncompress_file(self, inputfile):
         """ Uncompress this file using gzip. The input and the output are filelike objects. """
-        outputfile = tempfile.SpooledTemporaryFile(max_size=500 * 1024 * 1024)
+        outputfile = tempfile.SpooledTemporaryFile(
+            max_size=500 * 1024 * 1024,
+            dir=dbbackup_settings.TMP_DIR)
         zipfile = gzip.GzipFile(fileobj=inputfile, mode="r")
         try:
             inputfile.seek(0)
@@ -123,7 +125,7 @@ class Command(LabelCommand):
             print('Input Passphrase: ')
             return input()
         
-        temp_dir = tempfile.mkdtemp()
+        temp_dir = tempfile.mkdtemp(dir=dbbackup_settings.TMP_DIR)
         try:
             inputfile.fileno()   # Convert inputfile from SpooledTemporaryFile to regular file (Fixes Issue #21)
             new_basename = os.path.basename(inputfile.name).replace('.gpg', '')
@@ -134,7 +136,9 @@ class Command(LabelCommand):
                 result = g.decrypt_file(file=inputfile, passphrase=get_passphrase(), output=temp_filename)
                 if not result:
                     raise Exception('Decryption failed; status: %s' % result.status)
-                outputfile = tempfile.SpooledTemporaryFile(max_size=10 * 1024 * 1024)
+                outputfile = tempfile.SpooledTemporaryFile(
+                    max_size=10 * 1024 * 1024,
+                    dir=dbbackup_settings.TMP_DIR)
                 outputfile.name = new_basename
                 f = open(temp_filename)
                 try:

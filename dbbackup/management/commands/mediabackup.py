@@ -18,11 +18,19 @@ from dbbackup.storage.base import StorageError
 from dbbackup import settings as dbbackup_settings
 
 class Command(BaseCommand):
-    help = "backup_media [--encrypt]"
+    help = "backup_media [--encrypt] [--clean] [--no-compress] " \
+    "--servername SERVER_NAME"
     option_list = BaseCommand.option_list + (
         make_option("-c", "--clean", help="Clean up old backup files", action="store_true", default=False),
         make_option("-s", "--servername", help="Specify server name to include in backup filename"),
         make_option("-e", "--encrypt", help="Encrypt the backup files", action="store_true", default=False),
+        make_option(
+            "-x",
+            "--no-compress",
+            help="Do not compress the archive",
+            action="store_true",
+            default=False
+        ),
     )
 
     @utils.email_uncaught_exception
@@ -31,7 +39,9 @@ class Command(BaseCommand):
             self.servername = options.get('servername')
             self.storage = BaseStorage.storage_factory()
 
-            self.backup_mediafiles(options.get('encrypt'))
+            self.backup_mediafiles(
+                options.get('encrypt'),
+                options.get('no_compress')^True)
 
             if options.get('clean'):
                 self.cleanup_old_backups()
@@ -39,13 +49,19 @@ class Command(BaseCommand):
         except StorageError as err:
             raise CommandError(err)
 
-    def backup_mediafiles(self, encrypt):
+    def backup_mediafiles(self, encrypt, compress):
         source_dir = self.get_source_dir()
         if not source_dir:
             print("No media source dir configured.")
             sys.exit(0)
         print("Backing up media files in %s" % source_dir)
-        output_file = self.create_backup_file(source_dir, self.get_backup_basename())
+        output_file = self.create_backup_file(
+            source_dir,
+            self.get_backup_basename(
+                compress=compress
+            ),
+            compress=compress
+        )
 
         if encrypt:
             encrypted_file = utils.encrypt_file(output_file)
@@ -53,30 +69,38 @@ class Command(BaseCommand):
 
         print("  Backup tempfile created: %s (%s)" % (output_file.name, utils.handle_size(output_file)))
         print("  Writing file to %s: %s" % (self.storage.name, self.storage.backup_dir))
-        self.storage.write_file(output_file, self.get_backup_basename())
+        self.storage.write_file(
+            output_file,
+            self.get_backup_basename(
+                compress=compress)
+        )
 
-    def get_backup_basename(self):
+    def get_backup_basename(self, **kwargs):
         # TODO: use DBBACKUP_FILENAME_TEMPLATE
         server_name = self.get_servername()
         if server_name:
             server_name = '-%s' % server_name
 
-        return '%s%s-%s.media.tar.gz' % (
+        return '%s%s-%s.media.tar%s' % (
             self.get_databasename(),
             server_name,
-            datetime.now().strftime(dbbackup_settings.DATE_FORMAT)
+            datetime.now().strftime(dbbackup_settings.DATE_FORMAT),
+            ('.gz' if kwargs.get('compress') else '')
         )
 
     def get_databasename(self):
         # TODO: WTF is this??
         return settings.DATABASES['default']['NAME']
 
-    def create_backup_file(self, source_dir, backup_basename):
+    def create_backup_file(self, source_dir, backup_basename, **kwargs):
         temp_dir = tempfile.mkdtemp(dir = dbbackup_settings.TMP_DIR)
         try:
             backup_filename = os.path.join(temp_dir, backup_basename)
             try:
-                tar_file = tarfile.open(backup_filename, 'w|gz')
+                tar_file = tarfile.open(backup_filename, 'w|gz') \
+                if kwargs.get('compress') \
+                else tarfile.open(backup_filename, 'w')
+
                 try:
                     tar_file.add(source_dir)
                 finally:
@@ -113,7 +137,7 @@ class Command(BaseCommand):
         if server_name:
             server_name = '-%s' % server_name
 
-        media_re = re.compile(r'^%s%s-(.*)\.media\.tar\.gz' % (self.get_databasename(), server_name))
+        media_re = re.compile(r'^%s%s-(.*)\.media\.tar' % (self.get_databasename(), server_name))
 
         def is_media_backup(filename):
             return media_re.search(filename)

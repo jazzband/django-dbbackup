@@ -6,7 +6,6 @@ from __future__ import (absolute_import, division,
 import pickle
 import os
 import tempfile
-import io
 from django.conf import settings
 from dropbox import session
 from dropbox.client import DropboxClient
@@ -16,7 +15,9 @@ from .base import BaseStorage, StorageError
 
 DEFAULT_ACCESS_TYPE = 'app_folder'
 MAX_SPOOLED_SIZE = 10 * 1024 * 1024
-FILE_SIZE_LIMIT = 145 * 1024 * 1024
+FILE_SIZE_LIMIT = 500 * 1024 * 1024
+CHUNK_SIZE = 10 * 1024 * 1024
+RETRY_COUNT = 2
 
 
 ################################
@@ -37,7 +38,7 @@ class Storage(BaseStorage):
     def __init__(self, server_name=None):
         self._check_settings()
         self.dropbox = self.get_dropbox_client()
-        BaseStorage.__init__(self)
+        super(Storage, self).__init__()
 
     def _check_settings(self):
         """ Check we have all the required settings defined. """
@@ -75,15 +76,52 @@ class Storage(BaseStorage):
     def get_numbered_path(self, path, number):
         return "{0}.{1}".format(path, number)
 
-    def write_file(self, filehandle, filename):
+    def write_file(self, file_object, filename):
         """ Write the specified file. """
-        filehandle.seek(0)
-        total_files = 0
-        path = os.path.join(self.DROPBOX_DIRECTORY, filename)
-        for chunk in self.chunked_file(filehandle):
-            self.run_dropbox_action(self.dropbox.put_file,
-                self.get_numbered_path(path, total_files), chunk)
-            total_files += 1
+
+        file_object.seek(0, os.SEEK_END)
+        file_size = file_object.tell()
+        file_object.seek(0)
+
+        file_path = os.path.join(self.DROPBOX_DIRECTORY, filename)
+        file_number = 0
+
+        while file_object.tell() < file_size:
+
+            upload_id = None
+            chunk = None
+            numbered_file_offset = 0
+
+            numbered_file_size = min(FILE_SIZE_LIMIT, file_size - file_object.tell())
+
+            while numbered_file_offset < numbered_file_size:
+                chunk_size = min(CHUNK_SIZE, numbered_file_size - numbered_file_offset)
+                if chunk is None:
+                    chunk = file_object.read(chunk_size)
+
+                for try_number in range(RETRY_COUNT + 1):
+                    try:
+                        numbered_file_offset, upload_id = self.dropbox.upload_chunk(chunk, chunk_size, numbered_file_offset, upload_id)
+                        chunk = None
+                    except ErrorResponse:
+                        print('    Chunk upload failed')
+                        if try_number == RETRY_COUNT:
+                            raise
+                        else:
+                            print('    Retry')
+                    else:
+                        break
+
+                upload_progress = file_object.tell() / file_size * 100
+                print('    Uploaded {:4.1f}%'.format(upload_progress))
+
+            numbered_file_path = self.get_numbered_path(file_path, file_number)
+            numbered_file_full_path = os.path.join(self.dropbox.session.root, numbered_file_path)
+
+            print('    Commit to {}'.format(numbered_file_path))
+            self.dropbox.commit_chunked_upload(numbered_file_full_path, upload_id)
+
+            file_number += 1
 
     def read_file(self, filepath):
         """ Read the specified file and return it's handle. """
@@ -187,21 +225,3 @@ class Storage(BaseStorage):
                 tokendata = pickle.load(tokenhandle)
             self._request_token = tokendata.get('request_token')
             self._access_token = tokendata.get('access_token')
-
-    @staticmethod
-    def chunked_file(filehandle, chunk_size=FILE_SIZE_LIMIT):
-        eof = False
-        while not eof:
-            tmpfile = io.BytesIO()
-            chunk_space = chunk_size
-            while chunk_space > 0:
-                data = filehandle.read(min(16384, chunk_space))
-                if not data:
-                    eof = True
-                    break
-                chunk_space -= len(data)
-                tmpfile.write(data)
-            if tmpfile.tell() > 0:
-                tmpfile.seek(0)
-                yield tmpfile
-            tmpfile.close()

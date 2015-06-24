@@ -137,13 +137,14 @@ class Command(BaseCommand):
         if server_name:
             server_name = '-%s' % server_name
 
-        media_re = re.compile(r'^%s%s-(.*)\.media\.tar' % (self.get_databasename(), server_name))
+        media_re = re.compile(r'^%s%s-(.*)\.media\.tar(?:\.gz)?$' %
+            re.escape(self.get_databasename()), re.escape(server_name))
 
         def is_media_backup(filename):
             return media_re.search(filename)
 
         def get_datetime_from_filename(filename):
-            datestr = re.findall(media_re, filename)[0]
+            datestr = media_re.findall(filename)[0]
             return datetime.strptime(datestr, dbbackup_settings.DATE_FORMAT)
 
         file_list = [

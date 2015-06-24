@@ -1,270 +1,57 @@
 --- dbbackup/dbcommands.py	(original)
 +++ dbbackup/dbcommands.py	(refactored)
-@@ -10,6 +10,7 @@
- from subprocess import Popen
- from django.conf import settings
+@@ -13,6 +13,7 @@
  from django.core.management.base import CommandError
+ from django.utils import timezone
+ from dbbackup import settings
 +import collections
  
- READ_FILE = '<READ_FILE>'
- WRITE_FILE = '<WRITE_FILE>'
-@@ -197,15 +198,15 @@
-             'extension': self.settings.EXTENSION,
+ 
+ class BaseEngineSettings:
+@@ -223,7 +224,7 @@
+             'extension': self.settings.extension,
              'wildcard': wildcard,
          }
--        if callable(FILENAME_TEMPLATE):
-+        if isinstance(FILENAME_TEMPLATE, collections.Callable):
-             filename = FILENAME_TEMPLATE(**params)
+-        if callable(settings.FILENAME_TEMPLATE):
++        if isinstance(settings.FILENAME_TEMPLATE, collections.Callable):
+             filename = settings.FILENAME_TEMPLATE(**params)
          else:
-             params['datetime'] = wildcard or params['timestamp'].strftime(DATE_FORMAT)
-             # if Python 2.6 is okay, this line can replace the 4 below it:
-             # filename = FILENAME_TEMPLATE.format(**params)
-             filename = FILENAME_TEMPLATE
--            for key, value in params.iteritems():
--                filename = filename.replace('{%s}' % key, unicode(value))
-+            for key, value in params.items():
-+                filename = filename.replace('{%s}' % key, str(value))
-             filename = filename.replace('--', '-')
-         return filename
- 
-@@ -216,7 +217,7 @@
-     def filter_filepaths(self, filepaths, servername=None):
-         """ Returns a list of backups file paths from the dropbox entries. """
-         regex = r'[\^\%s]%s' % (os.sep, self.filename_match(servername, '.*?'))
--        filepaths = filter(lambda path: re.search(regex, path), filepaths)
-+        filepaths = [path for path in filepaths if re.search(regex, path)]
-         return filepaths
- 
-     def translate_command(self, command):
-@@ -256,8 +257,8 @@
-         devnull = open(os.devnull, 'w')
-         pstdin = stdin if command[-1] == '<' else None
-         pstdout = stdout if command[-1] == '>' else devnull
--        command = filter(lambda arg: arg not in ['<', '>'], command)
--        print self._clean_passwd("  Running: %s" % ' '.join(command))
-+        command = [arg for arg in command if arg not in ['<', '>']]
-+        print(self._clean_passwd("  Running: %s" % ' '.join(command)))
-         process = Popen(command, stdin=pstdin, stdout=pstdout)
-         process.wait()
-         devnull.close()
-@@ -266,12 +267,12 @@
- 
-     def read_file(self, filepath, stdout):
-         """ Read the specified file to stdout. """
--        print "  Reading: %s" % filepath
-+        print("  Reading: %s" % filepath)
-         with open(filepath, "rb") as f:
-             copyfileobj(f, stdout)
- 
-     def write_file(self, filepath, stdin):
-         """ Write the specified file from stdin. """
--        print "  Writing: %s" % filepath
-+        print("  Writing: %s" % filepath)
-         with open(filepath, 'wb') as f:
-             copyfileobj(stdin, f)
---- dbbackup/management/commands/backup_media.py	(original)
-+++ dbbackup/management/commands/backup_media.py	(refactored)
-@@ -37,19 +37,19 @@
-             if options.get('clean'):
-                 self.cleanup_old_backups()
- 
--        except StorageError, err:
-+        except StorageError as err:
-             raise CommandError(err)
- 
-     def backup_mediafiles(self, encrypt):
--        print "Backing up media files"
-+        print("Backing up media files")
-         output_file = self.create_backup_file(self.get_source_dir(), self.get_backup_basename())
- 
-         if encrypt:
-             encrypted_file = utils.encrypt_file(output_file)
-             output_file = encrypted_file
- 
--        print "  Backup tempfile created: %s (%s)" % (output_file.name, utils.handle_size(output_file))
--        print "  Writing file to %s: %s" % (self.storage.name, self.storage.backup_dir())
-+        print("  Backup tempfile created: %s (%s)" % (output_file.name, utils.handle_size(output_file)))
-+        print("  Writing file to %s: %s" % (self.storage.name, self.storage.backup_dir()))
-         self.storage.write_file(output_file)
- 
-     def get_backup_basename(self):
-@@ -92,13 +92,13 @@
-         """ Cleanup old backups, keeping the number of backups specified by
-         DBBACKUP_CLEANUP_KEEP and any backups that occur on first of the month.
-         """
--        print "Cleaning Old Backups for media files"
-+        print("Cleaning Old Backups for media files")
- 
-         file_list = self.get_backup_file_list()
- 
-         for backup_date, filename in file_list[0:-CLEANUP_KEEP]:
-             if int(backup_date.strftime("%d")) != 1:
--                print "  Deleting: %s" % filename
-+                print("  Deleting: %s" % filename)
-                 self.storage.delete_file(filename)
- 
-     def get_backup_file_list(self):
---- dbbackup/management/commands/dbbackup.py	(original)
-+++ dbbackup/management/commands/dbbackup.py	(refactored)
-@@ -16,7 +16,7 @@
- from ...storage.base import BaseStorage
- from ...storage.base import StorageError
- 
--DATABASE_KEYS = getattr(settings, 'DBBACKUP_DATABASES', settings.DATABASES.keys())
-+DATABASE_KEYS = getattr(settings, 'DBBACKUP_DATABASES', list(settings.DATABASES.keys()))
- CLEANUP_KEEP = getattr(settings, 'DBBACKUP_CLEANUP_KEEP', 10)
- 
- 
-@@ -46,12 +46,12 @@
-                 self.dbcommands = DBCommands(database)
-                 self.save_new_backup(database)
-                 self.cleanup_old_backups(database)
--        except StorageError, err:
-+        except StorageError as err:
-             raise CommandError(err)
- 
-     def save_new_backup(self, database):
-         """ Save a new backup file. """
--        print "Backing Up Database: %s" % database['NAME']
-+        print("Backing Up Database: %s" % database['NAME'])
-         outputfile = tempfile.SpooledTemporaryFile(max_size=10 * 1024 * 1024)
-         outputfile.name = self.dbcommands.filename(self.servername)
-         self.dbcommands.run_backup_commands(outputfile)
-@@ -62,8 +62,8 @@
-         if self.encrypt:
-             encrypted_file = utils.encrypt_file(outputfile)
-             outputfile = encrypted_file
--        print "  Backup tempfile created: %s (%s)" % (outputfile.name, utils.handle_size(outputfile))
--        print "  Writing file to %s: /%s" % (self.storage.name, self.storage.backup_dir())
-+        print("  Backup tempfile created: %s (%s)" % (outputfile.name, utils.handle_size(outputfile)))
-+        print("  Writing file to %s: /%s" % (self.storage.name, self.storage.backup_dir()))
-         self.storage.write_file(outputfile)
- 
-     def cleanup_old_backups(self, database):
-@@ -71,7 +71,7 @@
-             DBBACKUP_CLEANUP_KEEP and any backups that occur on first of the month.
-         """
-         if self.clean:
--            print "Cleaning Old Backups for: %s" % database['NAME']
-+            print("Cleaning Old Backups for: %s" % database['NAME'])
-             filepaths = self.storage.list_directory()
-             filepaths = self.dbcommands.filter_filepaths(filepaths)
-             for filepath in sorted(filepaths[0:-CLEANUP_KEEP]):
-@@ -79,7 +79,7 @@
-                 datestr = re.findall(regex, filepath)[0]
-                 dateTime = datetime.datetime.strptime(datestr, DATE_FORMAT)
-                 if int(dateTime.strftime("%d")) != 1:
--                    print "  Deleting: %s" % filepath
-+                    print("  Deleting: %s" % filepath)
-                     self.storage.delete_file(filepath)
- 
-     def compress_file(self, inputfile):
+             params['datetime'] = wildcard or params['timestamp'].strftime(settings.DATE_FORMAT)
+@@ -270,7 +271,7 @@
+         print(self._clean_passwd("  Running: %s" % ' '.join(command)))
+         env = self.settings.get_env()
+         env.update(settings.BACKUP_ENVIRONMENT)
+-        for k, v in env.items():
++        for k, v in list(env.items()):
+             env[k] = self.translate_command(v)
+         updated_osenv = os.environ.copy()
+         updated_osenv.update(env)
 --- dbbackup/management/commands/dbrestore.py	(original)
 +++ dbbackup/management/commands/dbrestore.py	(refactored)
-@@ -39,7 +39,7 @@
-             if options.get('list'):
-                 return self.list_backups()
-             self.restore_backup()
--        except StorageError, err:
-+        except StorageError as err:
-             raise CommandError(err)
- 
-     def _get_database(self, options):
-@@ -50,22 +50,22 @@
-                 errmsg = "Because this project contains more than one database, you"
-                 errmsg += " must specify the --database option."
-                 raise CommandError(errmsg)
--            database_key = settings.DATABASES.keys()[0]
-+            database_key = list(settings.DATABASES.keys())[0]
-         return settings.DATABASES[database_key]
- 
-     def restore_backup(self):
-         """ Restore the specified database. """
--        print "Restoring backup for database: %s" % self.database['NAME']
-+        print("Restoring backup for database: %s" % self.database['NAME'])
-         # Fetch the latest backup if filepath not specified
+@@ -76,7 +76,7 @@
          if not self.filepath:
--            print "  Finding latest backup"
-+            print("  Finding latest backup")
+             print("  Finding latest backup")
              filepaths = self.storage.list_directory()
-             filepaths = self.dbcommands.filter_filepaths(filepaths, self.servername)
+-            filepaths = list(filter(lambda f: f.endswith('.' + self.backup_extension), filepaths))
++            filepaths = list([f for f in filepaths if f.endswith('.' + self.backup_extension)])
              if not filepaths:
-                 raise CommandError("No backup files found in: /%s" % self.storage.backup_dir())
+                 raise CommandError("No backup files found in: /%s" % self.storage.backup_dir)
              self.filepath = filepaths[-1]
-         # Restore the specified filepath backup
--        print "  Restoring: %s" % self.filepath
-+        print("  Restoring: %s" % self.filepath)
-         input_filename = self.filepath
-         inputfile = self.storage.read_file(input_filename)
-         if self.get_extension(input_filename) == '.gpg':
-@@ -77,7 +77,7 @@
-             uncompressed_file = self.uncompress_file(inputfile)
+@@ -94,7 +94,7 @@
              inputfile.close()
              inputfile = uncompressed_file
--        print "  Restore tempfile created: %s" % utils.handle_size(inputfile)
-+        print("  Restore tempfile created: %s" % utils.handle_size(inputfile))
-         self.dbcommands.run_restore_commands(inputfile)
- 
-     def get_extension(self, filename):
-@@ -99,8 +99,8 @@
-         """ Unencrypt this file using gpg. The input and the output are filelike objects. """
+         print("  Restore tempfile created: %s" % utils.handle_size(inputfile))
+-        cont = input("Are you sure you want to continue? [Y/n]")
++        cont = eval(input("Are you sure you want to continue? [Y/n]"))
+         if cont.lower() not in ('y', 'yes', ''):
+             print("Quitting")
+             sys.exit(0)
+@@ -123,7 +123,7 @@
          import gnupg
          def get_passphrase():
--            print 'Input Passphrase: '
--            return raw_input()
-+            print('Input Passphrase: ')
-+            return input()
+             print('Input Passphrase: ')
+-            return input()
++            return eval(input())
          
-         temp_dir = tempfile.mkdtemp()
+         temp_dir = tempfile.mkdtemp(dir=dbbackup_settings.TMP_DIR)
          try:
-@@ -129,7 +129,7 @@
- 
-     def list_backups(self):
-         """ List backups in the backup directory. """
--        print "Listing backups on %s in /%s:" % (self.storage.name, self.storage.backup_dir())
-+        print("Listing backups on %s in /%s:" % (self.storage.name, self.storage.backup_dir()))
-         for filepath in self.storage.list_directory():
--            print "  %s" % os.path.basename(filepath)
--            print utils.filename_details(filepath)
-+            print("  %s" % os.path.basename(filepath))
-+            print(utils.filename_details(filepath))
---- dbbackup/storage/dropbox_storage.py	(original)
-+++ dbbackup/storage/dropbox_storage.py	(refactored)
-@@ -4,7 +4,7 @@
- import pickle
- import os
- import tempfile
--import cStringIO
-+import io
- from django.conf import settings
- from dropbox import session
- from dropbox.client import DropboxClient
-@@ -105,7 +105,7 @@
-         ignore_404 = kwargs.pop("ignore_404", False)
-         try:
-             response = method(*args, **kwargs)
--        except ErrorResponse, e:
-+        except ErrorResponse as e:
-             if ignore_404 and e.status == 404:
-                 return None
-             errmsg = "ERROR %s" % (e,)
-@@ -189,7 +189,7 @@
-     def chunked_file(filehandle, chunk_size=FILE_SIZE_LIMIT):
-         eof = False
-         while not eof:
--            tmpfile = cStringIO.StringIO()
-+            tmpfile = io.StringIO()
-             chunk_space = chunk_size
-             while chunk_space > 0:
-                 data = filehandle.read(min(16384, chunk_space))
---- dbbackup/storage/s3_storage.py	(original)
-+++ dbbackup/storage/s3_storage.py	(refactored)
-@@ -4,7 +4,7 @@
- import os
- from boto.s3.key import Key
- from boto.s3.connection import S3Connection
--from cStringIO import StringIO
-+from io import StringIO
- from django.conf import settings
- from tempfile import SpooledTemporaryFile
- from .base import BaseStorage, StorageError

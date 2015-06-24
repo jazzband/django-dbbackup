@@ -56,7 +56,9 @@ class Storage(BaseStorage):
 
     def read_file(self, filepath):
         """ Read the specified file and return it's handle. """
-        outputfile = tempfile.SpooledTemporaryFile(max_size=10 * 1024 * 1024)
+        outputfile = tempfile.SpooledTemporaryFile(
+            max_size=10 * 1024 * 1024,
+            dir=dbbackup_settings.TMP_DIR)
         self.sftp.getfo(filepath, outputfile)
         return outputfile
 

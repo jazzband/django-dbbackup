@@ -59,7 +59,9 @@ class Command(LabelCommand):
         """ Save a new backup file. """
         print("Backing Up Database: %s" % database['NAME'])
         filename = self.dbcommands.filename(self.servername)
-        outputfile = tempfile.SpooledTemporaryFile(max_size=10 * 1024 * 1024)
+        outputfile = tempfile.SpooledTemporaryFile(
+            max_size=10 * 1024 * 1024,
+            dir=dbbackup_settings.TMP_DIR)
         self.dbcommands.run_backup_commands(outputfile)
         if self.compress:
             compressed_file = self.compress_file(outputfile)
@@ -92,7 +94,9 @@ class Command(LabelCommand):
         """ Compress this file using gzip.
             The input and the output are filelike objects.
         """
-        outputfile = tempfile.SpooledTemporaryFile(max_size=10 * 1024 * 1024)
+        outputfile = tempfile.SpooledTemporaryFile(
+            max_size=10 * 1024 * 1024,
+            dir=dbbackup_settings.TMP_DIR)
         outputfile.name = inputfile.name + '.gz'
         zipfile = gzip.GzipFile(fileobj=outputfile, mode="wb")
         # TODO: Why do we have an exception block without handling exceptions?

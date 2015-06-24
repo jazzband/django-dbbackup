@@ -126,7 +126,9 @@ class Storage(BaseStorage):
     def read_file(self, filepath):
         """ Read the specified file and return it's handle. """
         total_files = 0
-        filehandle = tempfile.SpooledTemporaryFile(max_size=MAX_SPOOLED_SIZE)
+        filehandle = tempfile.SpooledTemporaryFile(
+            max_size=MAX_SPOOLED_SIZE,
+            dir=dbbackup_settings.TMP_DIR)
         try:
             while True:
                 response = self.run_dropbox_action(self.dropbox.get_file,

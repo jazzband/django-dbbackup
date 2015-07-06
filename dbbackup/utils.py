@@ -113,3 +113,8 @@ def create_spooled_temporary_file(filepath):
     finally:
         tmpfile.close()
     return spooled_file
+
+
+def filename_details(filepath):
+    # TODO: What was this function made for ?
+    return ''

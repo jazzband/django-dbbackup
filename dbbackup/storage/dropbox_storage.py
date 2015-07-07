@@ -32,6 +32,7 @@ class Storage(BaseStorage):
     DBBACKUP_DROPBOX_APP_KEY = getattr(settings, 'DBBACKUP_DROPBOX_APP_KEY', None)
     DBBACKUP_DROPBOX_APP_SECRET = getattr(settings, 'DBBACKUP_DROPBOX_APP_SECRET', None)
     DBBACKUP_DROPBOX_ACCESS_TYPE = getattr(settings, 'DBBACKUP_DROPBOX_ACCESS_TYPE', DEFAULT_ACCESS_TYPE)
+    DBBACKUP_DROPBOX_FILE_SIZE_LIMIT = getattr(settings, 'DBBACKUP_DROPBOX_FILE_SIZE_LIMIT', FILE_SIZE_LIMIT)
     _request_token = None
     _access_token = None
 
@@ -92,7 +93,7 @@ class Storage(BaseStorage):
             chunk = None
             numbered_file_offset = 0
 
-            numbered_file_size = min(FILE_SIZE_LIMIT, file_size - file_object.tell())
+            numbered_file_size = min(self.DBBACKUP_DROPBOX_FILE_SIZE_LIMIT, file_size - file_object.tell())
 
             while numbered_file_offset < numbered_file_size:
                 chunk_size = min(CHUNK_SIZE, numbered_file_size - numbered_file_offset)

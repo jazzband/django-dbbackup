@@ -15,7 +15,7 @@ from .base import BaseStorage, StorageError
 
 DEFAULT_ACCESS_TYPE = 'app_folder'
 MAX_SPOOLED_SIZE = 10 * 1024 * 1024
-FILE_SIZE_LIMIT = 500 * 1024 * 1024
+FILE_SIZE_LIMIT = 10 * 1024 * 1024 * 1024
 CHUNK_SIZE = 10 * 1024 * 1024
 RETRY_COUNT = 2
 

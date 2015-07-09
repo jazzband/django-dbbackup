@@ -15,9 +15,11 @@ INSTALLED_APPS = (
     'testapp',
     'dbbackup',
 )
+GPG_RECIPIENT = "test@test"
 
 
 settings.configure(
+    ADMIN=('foo@bar'),
     MEDIA_ROOT=MEDIA_ROOT,
     MIDDLEWARE_CLASSES=(),
     # CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}},
@@ -26,6 +28,9 @@ settings.configure(
     ROOT_URLCONF='testapp.urls',
     SECRET_KEY="it's a secret to everyone",
     SITE_ID=1,
+    BASE_DIR=BASE_DIR,
+    DBBACKUP_GPG_RECIPIENT=GPG_RECIPIENT,
+    DBBACKUP_GPG_ALWAYS_TRUST=True
 )
 
 

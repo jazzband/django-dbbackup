@@ -20,6 +20,7 @@ class Storage(BaseStorage):
     S3_DOMAIN = getattr(settings, 'DBBACKUP_S3_DOMAIN', 's3.amazonaws.com')
     S3_IS_SECURE = getattr(settings, 'DBBACKUP_S3_USE_SSL', True)
     S3_DIRECTORY = getattr(settings, 'DBBACKUP_S3_DIRECTORY', "django-dbbackups/")
+    S3_SERVER_SIDE_ENCRYPTION = getattr(settings, 'DBBACKUP_S3_SERVER_SIDE_ENCRYPTION', False)
     if S3_DIRECTORY:
         S3_DIRECTORY = '%s/' % S3_DIRECTORY.strip('/')
 
@@ -53,7 +54,8 @@ class Storage(BaseStorage):
         # Use multipart upload because normal upload maximum is 5 GB.
         filepath = os.path.join(self.S3_DIRECTORY, filename)
         filehandle.seek(0)
-        handle = self.bucket.initiate_multipart_upload(filepath)
+        handle = self.bucket.initiate_multipart_upload(filepath,
+            encrypt_key=self.S3_SERVER_SIDE_ENCRYPTION)
         try:
             chunk = 1
             while True:

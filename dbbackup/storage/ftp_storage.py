@@ -44,6 +44,7 @@ class Storage(BaseStorage):
     #  DBBackup Storage Methods
     ###################################
 
+    @property
     def backup_dir(self):
         return self.FTP_PATH
 

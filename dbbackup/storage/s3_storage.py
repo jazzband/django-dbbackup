@@ -41,6 +41,7 @@ class Storage(BaseStorage):
         if not self.S3_SECRET_KEY:
             raise StorageError('Filesystem storage requires DBBACKUP_S3_SECRET_KEY to be defined in settings.')
 
+    @property
     def backup_dir(self):
         return self.S3_DIRECTORY
 

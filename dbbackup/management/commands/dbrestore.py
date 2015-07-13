@@ -157,4 +157,5 @@ class Command(LabelCommand):
         print("Listing backups on %s in /%s:" % (self.storage.name, self.storage.backup_dir))
         for filepath in self.storage.list_directory():
             print("  %s" % os.path.basename(filepath))
-            print(utils.filename_details(filepath))
+            # TODO: Implement filename_details method
+            # print(utils.filename_details(filepath))

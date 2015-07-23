@@ -1,5 +1,5 @@
 import os
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 from dbbackup import VERSION
 
@@ -8,29 +8,8 @@ def get_path(fname):
     return os.path.join(os.path.dirname(__file__), fname)
 
 
-packages = []
-package_dir = "dbbackup"
-for dirpath, dirnames, filenames in os.walk(package_dir):
-    # ignore dirnames that start with '.'
-    for i, dirname in enumerate(dirnames):
-        if dirname.startswith("."):
-            del dirnames[i]
-    if "__init__.py" in filenames:
-        pkg = dirpath.replace(os.path.sep, '.')
-        if os.path.altsep:
-            pkg = pkg.replace(os.path.altsep, '.')
-        packages.append(pkg)
-
-
 def get_requirements():
-    requirements = ['six', 'pysftp']
-    # Bundled with Python 2.7+
-    try:
-        import importlib  # @UnusedImport
-    except ImportError:
-        requirements.append('importlib')
-
-    return requirements
+    return open('requirements.txt').read().splitlines()
 
 
 setup(
@@ -40,8 +19,26 @@ setup(
     author='Michael Shepanski',
     author_email='mjs7231@gmail.com',
     install_requires=get_requirements(),
+    tests_require=('mock', 'python-gnupg'),
     license='BSD',
     url='https://github.com/mjs7231/django-dbbackup',
     keywords=['django', 'dropbox', 'database', 'backup', 'amazon', 's3'],
-    packages=packages
+    packages=find_packages(exclude=['tests.runtests.main']),
+    test_suite='tests.runtests.main',
+    classifiers=[
+        'Environment :: Web Environment',
+        'Environment :: Console',
+        'Framework :: Django',
+        'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
+        'Natural Language :: English',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+    ],
 )

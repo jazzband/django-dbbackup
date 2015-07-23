@@ -10,3 +10,4 @@ Contributors:
   * Toumhi (Bitbucket)
   * Tobias McNulty
   * Grant McConnaughey
+  * Anthony Monthe (ZuluPro)

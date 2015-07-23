@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 import copy
 import os
+import sys
 import re
 import six
 import shlex
@@ -282,12 +283,12 @@ class DBCommands:
 
     def read_file(self, filepath, stdout):
         """ Read the specified file to stdout. """
-        print("  Reading: %s" % filepath)
+        sys.stdout.write("  Reading: %s" % filepath)
         with open(filepath, "rb") as f:
             copyfileobj(f, stdout)
 
     def write_file(self, filepath, stdin):
         """ Write the specified file from stdin. """
-        print("  Writing: %s" % filepath)
+        sys.stdout.write("  Writing: %s" % filepath)
         with open(filepath, 'wb') as f:
             copyfileobj(stdin, f)

@@ -14,12 +14,14 @@ from dbbackup import utils
 from dbbackup.dbcommands import DBCommands
 from dbbackup.storage.base import BaseStorage, StorageError
 from dbbackup import settings as dbbackup_settings
+
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.core.management.base import LabelCommand
 from django.utils import six
 from django.db import connection
+
 from optparse import make_option
 
 input = raw_input if six.PY2 else input  # @ReservedAssignment
@@ -34,6 +36,7 @@ class Command(LabelCommand):
         make_option("-s", "--servername", help="Use a different servername backup"),
         make_option("-l", "--list", action='store_true', default=False, help="List backups in the backup directory"),
         make_option("-c", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),
+        make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
         make_option("-z", "--uncompress", help="Uncompress gzip data before restoring", action='store_true'),
     )
 
@@ -46,6 +49,7 @@ class Command(LabelCommand):
             self.servername = options.get('servername')
             self.decrypt = options.get('decrypt')
             self.uncompress = options.get('uncompress')
+            self.passphrase = options.get('passphrase')
             self.database = self._get_database(options)
             self.storage = BaseStorage.storage_factory()
             self.dbcommands = DBCommands(self.database)
@@ -120,7 +124,7 @@ class Command(LabelCommand):
         import gnupg
 
         def get_passphrase():
-            return getpass('Input Passphrase: ') or None
+            return self.passphrase or getpass('Input Passphrase: ') or None
 
         temp_dir = tempfile.mkdtemp(dir=dbbackup_settings.TMP_DIR)
         try:

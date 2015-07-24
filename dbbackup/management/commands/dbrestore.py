@@ -13,21 +13,16 @@ from ... import utils
 from ...dbcommands import DBCommands
 from ...storage.base import BaseStorage
 from ...storage.base import StorageError
+from dbbackup import settings as dbbackup_settings
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.core.management.base import LabelCommand
+from django.utils import six
 from django.db import connection
 from optparse import make_option
 
-from dbbackup import settings as dbbackup_settings
-
-
-# Fix Python 2.x.
-try:
-    input = raw_input  # @ReservedAssignment
-except NameError:
-    pass
+input = raw_input if six.PY2 else input  # @ReservedAssignment
 
 
 class Command(LabelCommand):
@@ -73,17 +68,17 @@ class Command(LabelCommand):
 
     def restore_backup(self):
         """ Restore the specified database. """
-        print("Restoring backup for database: %s" % self.database['NAME'])
+        self.stdout.write("Restoring backup for database: %s" % self.database['NAME'])
         # Fetch the latest backup if filepath not specified
         if not self.filepath:
-            print("  Finding latest backup")
+            self.stdout.write("  Finding latest backup")
             filepaths = self.storage.list_directory()
-            filepaths = list(filter(lambda f: f.endswith('.' + self.backup_extension), filepaths))
+            filepaths = [f for f in filepaths if f.endswith('.' + self.backup_extension)]
             if not filepaths:
                 raise CommandError("No backup files found in: /%s" % self.storage.backup_dir)
             self.filepath = filepaths[-1]
         # Restore the specified filepath backup
-        print("  Restoring: %s" % self.filepath)
+        self.stdout.write("  Restoring: %s" % self.filepath)
         input_filename = self.filepath
         inputfile = self.storage.read_file(input_filename)
         if self.decrypt:
@@ -95,10 +90,10 @@ class Command(LabelCommand):
             uncompressed_file = self.uncompress_file(inputfile)
             inputfile.close()
             inputfile = uncompressed_file
-        print("  Restore tempfile created: %s" % utils.handle_size(inputfile))
-        cont = input("Are you sure you want to continue? [Y/n]")
-        if cont.lower() not in ('y', 'yes', ''):
-            print("Quitting")
+        self.stdout.write("  Restore tempfile created: %s" % utils.handle_size(inputfile))
+        answer = input("Are you sure you want to continue? [Y/n]")
+        if answer.lower() not in ('y', 'yes', ''):
+            self.stdout.write("Quitting")
             sys.exit(0)
         inputfile.seek(0)
         self.dbcommands.run_restore_commands(inputfile)
@@ -112,7 +107,7 @@ class Command(LabelCommand):
         outputfile = tempfile.SpooledTemporaryFile(
             max_size=500 * 1024 * 1024,
             dir=dbbackup_settings.TMP_DIR)
-        zipfile = gzip.GzipFile(fileobj=inputfile, mode="r")
+        zipfile = gzip.GzipFile(fileobj=inputfile, mode="rb")
         try:
             inputfile.seek(0)
             outputfile.write(zipfile.read())
@@ -123,10 +118,10 @@ class Command(LabelCommand):
     def unencrypt_file(self, inputfile):
         """ Unencrypt this file using gpg. The input and the output are filelike objects. """
         import gnupg
+
         def get_passphrase():
-            print('Input Passphrase: ')
-            return input()
-        
+            return input('Input Passphrase: ')
+
         temp_dir = tempfile.mkdtemp(dir=dbbackup_settings.TMP_DIR)
         try:
             inputfile.fileno()   # Convert inputfile from SpooledTemporaryFile to regular file (Fixes Issue #21)
@@ -156,8 +151,8 @@ class Command(LabelCommand):
 
     def list_backups(self):
         """ List backups in the backup directory. """
-        print("Listing backups on %s in /%s:" % (self.storage.name, self.storage.backup_dir))
+        self.stdout.write("Listing backups on %s in /%s:" % (self.storage.name, self.storage.backup_dir))
         for filepath in self.storage.list_directory():
-            print("  %s" % os.path.basename(filepath))
+            self.stdout.write("  %s" % os.path.basename(filepath))
             # TODO: Implement filename_details method
             # print(utils.filename_details(filepath))

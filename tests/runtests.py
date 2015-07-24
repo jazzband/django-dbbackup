@@ -4,6 +4,7 @@ import os
 import sys
 import django
 from django.conf import settings
+from django.core.management import call_command
 
 here = os.path.dirname(os.path.abspath(__file__))
 parent = os.path.dirname(here)
@@ -37,10 +38,14 @@ settings.configure(
 def main():
     if django.VERSION >= (1, 7):
         django.setup()
-    from django.test.runner import DiscoverRunner
-    runner = DiscoverRunner(failfast=True, verbosity=int(os.environ.get('DJANGO_DEBUG', 1)))
-    failures = runner.run_tests(['dbbackup'], interactive=True)
-    sys.exit(failures)
+    if sys.argv[-1] == 'shell':
+        call_command('shell')
+        sys.exit(0)
+    else:
+        from django.test.runner import DiscoverRunner
+        runner = DiscoverRunner(failfast=True, verbosity=int(os.environ.get('DJANGO_DEBUG', 1)))
+        failures = runner.run_tests(['dbbackup'], interactive=True)
+        sys.exit(failures)
 
 if __name__ == '__main__':
     main()

@@ -10,7 +10,7 @@ from django.conf import settings
 from mock import patch
 from dbbackup import utils
 
-GPG_PRIVATE_PATH = os.path.join(settings.BASE_DIR, 'tests/gpg/pubring.gpg')
+GPG_PUBLIC_PATH = os.path.join(settings.BASE_DIR, 'tests/gpg/pubring.gpg')
 DEV_NULL = open(os.devnull, 'w')
 
 
@@ -64,7 +64,7 @@ class Encrypt_FileTest(TestCase):
         self.path = '/tmp/foo'
         with open(self.path, 'a') as fd:
             fd.write('foo')
-        cmd = ('gpg --import %s' % GPG_PRIVATE_PATH).split()
+        cmd = ('gpg --import %s' % GPG_PUBLIC_PATH).split()
         subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
 
     def tearDown(self):

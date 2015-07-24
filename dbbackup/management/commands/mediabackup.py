@@ -53,19 +53,18 @@ class Command(BaseDbBackupCommand):
             self.stderr.write("No media source dir configured.")
             sys.exit(0)
         self.log("Backing up media files in %s" % source_dir, 1)
+        filename = self.get_backup_basename(compress=compress)
         output_file = self.create_backup_file(
             source_dir,
-            self.get_backup_basename(
-                compress=compress
-            ),
+            filename,
             compress=compress
         )
 
         if encrypt:
-            encrypted_file = utils.encrypt_file(output_file)
-            output_file = encrypted_file
+            encrypted_file = utils.encrypt_file(output_file, filename)
+            output_file, filename = encrypted_file
 
-        self.log("  Backup tempfile created: %s (%s)" % (output_file.name, utils.handle_size(output_file)), 1)
+        self.log("  Backup tempfile created: %s (%s)" % (filename, utils.handle_size(output_file)), 1)
         self.log("  Writing file to %s: %s" % (self.storage.name, self.storage.backup_dir), 1)
         self.storage.write_file(
             output_file,
@@ -90,14 +89,18 @@ class Command(BaseDbBackupCommand):
         # TODO: WTF is this??
         return settings.DATABASES['default']['NAME']
 
+    def get_source_dir(self):
+        # TODO: WTF again ??
+        return dbbackup_settings.MEDIA_PATH
+
     def create_backup_file(self, source_dir, backup_basename, **kwargs):
-        temp_dir = tempfile.mkdtemp(dir = dbbackup_settings.TMP_DIR)
+        temp_dir = tempfile.mkdtemp(dir=dbbackup_settings.TMP_DIR)
         try:
             backup_filename = os.path.join(temp_dir, backup_basename)
             try:
                 tar_file = tarfile.open(backup_filename, 'w|gz') \
-                if kwargs.get('compress') \
-                else tarfile.open(backup_filename, 'w')
+                    if kwargs.get('compress') \
+                    else tarfile.open(backup_filename, 'w')
 
                 try:
                     tar_file.add(source_dir)
@@ -110,9 +113,6 @@ class Command(BaseDbBackupCommand):
                     os.remove(backup_filename)
         finally:
             os.rmdir(temp_dir)
-
-    def get_source_dir(self):
-        return dbbackup_settings.MEDIA_PATH
 
     def cleanup_old_backups(self):
         """ Cleanup old backups, keeping the number of backups specified by

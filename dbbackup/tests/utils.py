@@ -34,8 +34,12 @@ HANDLED_FILES = handled_files()
 class FakeStorage(BaseStorage):
     name = 'FakeStorage'
     list_files = ['foo', 'bar']
-    deleted_files = []
     file_read = ENCRYPTED_FILE
+
+    def __init__(self, *args, **kwargs):
+        super(FakeStorage, self).__init__(*args, **kwargs)
+        self.deleted_files = []
+        self.written_files = []
 
     def delete_file(self, filepath):
         HANDLED_FILES['deleted_files'].append(filepath)

@@ -2,3 +2,4 @@ pep8
 flake8
 mock
 coverage
+python-gnupg

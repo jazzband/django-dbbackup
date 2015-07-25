@@ -17,6 +17,7 @@ from dbbackup.storage.base import BaseStorage
 from dbbackup.storage.base import StorageError
 from dbbackup import settings as dbbackup_settings
 
+
 class Command(BaseCommand):
     help = "backup_media [--encrypt] [--clean] [--no-compress] " \
     "--servername SERVER_NAME"

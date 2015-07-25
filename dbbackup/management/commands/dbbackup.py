@@ -37,7 +37,7 @@ class Command(LabelCommand):
         """ Django command handler. """
         try:
             self.clean = options.get('clean')
-            self.clean_keep = getattr(settings, 'DBBACKUP_CLEANUP_KEEP', 10)
+            self.clean_keep = settings.CLEANUP_KEEP
             self.database = options.get('database')
             self.servername = options.get('servername')
             self.compress = options.get('compress')

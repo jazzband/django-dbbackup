@@ -82,10 +82,9 @@ class Command(LabelCommand):
         input_filename = self.filepath
         inputfile = self.storage.read_file(input_filename)
         if self.decrypt:
-            unencrypted_file = self.unencrypt_file(inputfile)
+            unencrypted_file, input_filename = self.unencrypt_file(inputfile, input_filename)
             inputfile.close()
             inputfile = unencrypted_file
-            input_filename = inputfile.name
         if self.uncompress:
             uncompressed_file = self.uncompress_file(inputfile)
             inputfile.close()
@@ -115,7 +114,7 @@ class Command(LabelCommand):
             zipfile.close()
         return outputfile
 
-    def unencrypt_file(self, inputfile):
+    def unencrypt_file(self, inputfile, inputfilename):
         """ Unencrypt this file using gpg. The input and the output are filelike objects. """
         import gnupg
 
@@ -124,8 +123,7 @@ class Command(LabelCommand):
 
         temp_dir = tempfile.mkdtemp(dir=dbbackup_settings.TMP_DIR)
         try:
-            inputfile.fileno()   # Convert inputfile from SpooledTemporaryFile to regular file (Fixes Issue #21)
-            new_basename = os.path.basename(inputfile.name).replace('.gpg', '')
+            new_basename = os.path.basename(inputfilename).replace('.gpg', '')
             temp_filename = os.path.join(temp_dir, new_basename)
             try:
                 inputfile.seek(0)
@@ -147,7 +145,7 @@ class Command(LabelCommand):
                     os.remove(temp_filename)
         finally:
             os.rmdir(temp_dir)
-        return outputfile
+        return outputfile, new_basename
 
     def list_backups(self):
         """ List backups in the backup directory. """

@@ -74,7 +74,8 @@ class Encrypt_FileTest(TestCase):
 
     def test_func(self, *args):
         with open(self.path) as fd:
-            encrypted_file = utils.encrypt_file(inputfile=fd)
+            encrypted_file, filename = utils.encrypt_file(inputfile=fd,
+                                                          filename='foo.txt')
         encrypted_file.seek(0)
         self.assertTrue(encrypted_file.read())
 

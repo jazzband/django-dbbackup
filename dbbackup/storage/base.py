@@ -1,8 +1,8 @@
 """
 Abstract Storage class.
 """
-from django.conf import settings
 from importlib import import_module
+from dbbackup import settings
 
 
 class StorageError(Exception):
@@ -15,7 +15,7 @@ class StorageError(Exception):
 
 class BaseStorage(object):
     """ Abstract storage class. """
-    BACKUP_STORAGE = getattr(settings, 'DBBACKUP_STORAGE', 'dbbackup.storage.filesystem_storage')
+    BACKUP_STORAGE = settings.STORAGE
 
     def __init__(self, server_name=None):
         if not self.name:

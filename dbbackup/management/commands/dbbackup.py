@@ -64,11 +64,11 @@ class Command(LabelCommand):
             dir=dbbackup_settings.TMP_DIR)
         self.dbcommands.run_backup_commands(outputfile)
         if self.compress:
-            compressed_file = self.compress_file(outputfile)
+            compressed_file, filename = self.compress_file(outputfile, filename)
             outputfile.close()
             outputfile = compressed_file
         if self.encrypt:
-            encrypted_file = utils.encrypt_file(outputfile)
+            encrypted_file, filename = utils.encrypt_file(outputfile, filename)
             outputfile = encrypted_file
         print("  Backup tempfile created: %s" % (utils.handle_size(outputfile)))
         print("  Writing file to %s: %s, filename: %s" % (self.storage.name, self.storage.backup_dir, filename))
@@ -90,15 +90,15 @@ class Command(LabelCommand):
                     print("  Deleting: %s" % filepath)
                     self.storage.delete_file(filepath)
 
-    def compress_file(self, inputfile):
+    def compress_file(self, inputfile, filename):
         """ Compress this file using gzip.
             The input and the output are filelike objects.
         """
         outputfile = tempfile.SpooledTemporaryFile(
             max_size=10 * 1024 * 1024,
             dir=dbbackup_settings.TMP_DIR)
-        outputfile.name = inputfile.name + '.gz'
-        zipfile = gzip.GzipFile(fileobj=outputfile, mode="wb")
+        new_filename = filename + '.gz'
+        zipfile = gzip.GzipFile(filename=filename, fileobj=outputfile, mode="wb")
         # TODO: Why do we have an exception block without handling exceptions?
         try:
             inputfile.seek(0)
@@ -106,4 +106,4 @@ class Command(LabelCommand):
         finally:
             zipfile.close()
 
-        return outputfile
+        return outputfile, new_filename

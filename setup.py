@@ -19,6 +19,7 @@ setup(
     author='Michael Shepanski',
     author_email='mjs7231@gmail.com',
     install_requires=get_requirements(),
+    tests_require=('mock', 'python-gnupg'),
     license='BSD',
     url='https://github.com/mjs7231/django-dbbackup',
     keywords=['django', 'dropbox', 'database', 'backup', 'amazon', 's3'],

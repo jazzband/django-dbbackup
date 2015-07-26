@@ -1,0 +1,23 @@
+# Config file for automatic testing at travis-ci.org
+
+language: python
+
+python:
+  - "3.2"  # Only 3.2 works with Gir, 3.4 is not avail. for system sitepackages
+  - "2.7"
+
+#before_install:
+#  - sudo apt-get update
+#  - sudo apt-get install -qq gnupg
+
+#virtualenv:
+#  system_site_packages: true
+
+# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+install:
+  - pip install -r requirements.txt
+
+# command to run tests, e.g. python setup.py test
+script:
+  - python setup.py test
+

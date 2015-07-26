@@ -31,7 +31,18 @@ BYTES = (
 
 
 def bytes_to_str(byteVal, decimals=1):
-    """ Convert bytes to a human readable string. """
+    """
+    Convert bytes to a human readable string.
+
+    :param byteVal: Value to convert in bytes
+    :type byteVal: int or float
+
+    :param decimal: Number of decimal to display
+    :type decimal: int
+
+    :returns: Number of byte with the best unit of measure
+    :rtype: str
+    """
     for unit, byte in BYTES:
         if (byteVal >= byte):
             if decimals == 0:
@@ -41,14 +52,28 @@ def bytes_to_str(byteVal, decimals=1):
 
 
 def handle_size(filehandle):
-    """ Given a filehandle return the filesize. """
+    """
+    Get file's size to a human readable string.
+
+    :param filehandle: File to handle
+    :type filehandle: file
+
+    :returns: File's size with the best unit of measure
+    :rtype: str
+    """
     filehandle.seek(0, 2)
     return bytes_to_str(filehandle.tell())
 
 
 def email_uncaught_exception(func):
-    """ Decorator: Email uncaught exceptions to the SERVER_EMAIL. """
+    """
+    Function decorator for send email with uncaught exceptions to admins.
+    Email is sent to ``settings.DBBACKUP_FAILURE_RECIPIENTS``
+    (``settings.ADMINS`` if not defined). The message contains a traceback
+    of error.
+    """
     module = func.__module__
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
@@ -56,15 +81,15 @@ def email_uncaught_exception(func):
         except:
             if settings.SEND_EMAIL:
                 excType, excValue, traceback = sys.exc_info()
-                reporter = ExceptionReporter(FAKE_HTTP_REQUEST, excType, 
-                    excValue, traceback.tb_next)
+                reporter = ExceptionReporter(FAKE_HTTP_REQUEST, excType,
+                                             excValue, traceback.tb_next)
                 subject = 'Cron: Uncaught exception running %s' % module
                 body = reporter.get_traceback_html()
                 msgFrom = settings.SERVER_EMAIL
                 msgTo = [admin[1] for admin in settings.FAILURE_RECIPIENTS]
                 message = EmailMessage(subject, body, msgFrom, msgTo)
                 message.content_subtype = 'html'
-                message.send(fail_silently=True)
+                message.send(fail_silently=False)
             raise
         finally:
             connection.close()
@@ -72,7 +97,15 @@ def email_uncaught_exception(func):
 
 
 def encrypt_file(inputfile):
-    """ Encrypt the file using gpg. The input and the output are filelike objects. """
+    """
+    Encrypt the file using GPG.
+
+    :param inputfile: File to encrypt
+    :type inputfile: file like
+
+    :returns: Encrypted file
+    :rtype: file like
+    """
     import gnupg
     tempdir = tempfile.mkdtemp(dir=settings.TMP_DIR)
     try:
@@ -83,10 +116,12 @@ def encrypt_file(inputfile):
             always_trust = settings.GPG_ALWAYS_TRUST
             g = gnupg.GPG()
             result = g.encrypt_file(inputfile, output=filepath,
-                recipients=settings.GPG_RECIPIENT, always_trust=always_trust)
+                                    recipients=settings.GPG_RECIPIENT,
+                                    always_trust=always_trust)
             inputfile.close()
             if not result:
-                raise Exception('Encryption failed; status: %s' % result.status)
+                msg = 'Encryption failed; status: %s' % result.status
+                raise Exception(msg)
             return create_spooled_temporary_file(filepath)
         finally:
             if os.path.exists(filepath):
@@ -96,9 +131,14 @@ def encrypt_file(inputfile):
 
 
 def create_spooled_temporary_file(filepath):
-    """ Create a spooled temporary file.
-        - filepath: path of input file
-        - filename: file of the spooled temporary file
+    """
+    Create a spooled temporary file.
+
+    :param filepath: Path of input file
+    :type filepath: str
+
+    :returns: file of the spooled temporary file
+    :rtype: :class:`tempfile.SpooledTemporaryFile`
     """
     spooled_file = tempfile.SpooledTemporaryFile(
         max_size=10 * 1024 * 1024,

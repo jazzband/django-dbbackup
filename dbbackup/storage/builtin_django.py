@@ -1,5 +1,5 @@
 """
-Lazy storage adapted to Django buit-in one.
+Wrapper around Django storage API.
 """
 from django.core.files.storage import get_storage_class
 from .base import BaseStorage
@@ -8,6 +8,14 @@ from .. import settings
 
 class Storage(BaseStorage):
     def __init__(self, storage_path=None, **options):
+        """
+        Initialize a Django Storage instance with given options.
+
+        :param storage_path: Path to a Django Storage class with dot style
+                             If ``None``, ``settings.DBBACKUP_BUILTIN_STORAGE``
+                             will be used.
+        :type storage_path: str
+        """
         storage_path = storage_path or settings.BUILTIN_STORAGE
         options = options.copy()
         options.update(settings.STORAGE_OPTIONS)

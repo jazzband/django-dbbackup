@@ -27,8 +27,11 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         open(TEST_DATABASE['NAME']).close()
 
     def tearDown(self):
-        cmd = ("gpg --batch --yes --delete-secret-key '%s'" % GPG_FINGERPRINT)
-        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        try:
+            cmd = ("gpg --batch --yes --delete-secret-key '%s'" % GPG_FINGERPRINT)
+            subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        except OSError:
+            pass
         os.remove(TEST_DATABASE['NAME'])
 
     def test_func(self):
@@ -77,4 +80,4 @@ class DbbackupCommandCompressFileTest(TestCase):
 
     def test_compress_file(self):
         inputfile = open(TEST_DATABASE['NAME'])
-        self.command.compress_file(inputfile)
+        self.command.compress_file(inputfile, 'foofile.txt')

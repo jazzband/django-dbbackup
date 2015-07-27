@@ -43,6 +43,7 @@ def main():
         call_command('shell')
         sys.exit(0)
     else:
+        # call_command('test', *sys.argv[2:])
         from django.test.runner import DiscoverRunner
         runner = DiscoverRunner(failfast=True, verbosity=int(os.environ.get('DJANGO_DEBUG', 1)))
         failures = runner.run_tests(['dbbackup'], interactive=True)

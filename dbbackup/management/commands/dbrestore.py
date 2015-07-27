@@ -1,6 +1,5 @@
 """
-Restore pgdump files from Dropbox.
-See __init__.py for a list of options.
+Restore database.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
@@ -8,44 +7,49 @@ import os
 import tempfile
 import gzip
 import sys
+from getpass import getpass
 
-from ... import utils
-from ...dbcommands import DBCommands
-from ...storage.base import BaseStorage
-from ...storage.base import StorageError
-from dbbackup import settings as dbbackup_settings
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
-from django.core.management.base import LabelCommand
 from django.utils import six
 from django.db import connection
+
 from optparse import make_option
+
+from dbbackup.management.commands._base import BaseDbBackupCommand
+from dbbackup import utils
+from dbbackup.dbcommands import DBCommands
+from dbbackup.storage.base import BaseStorage, StorageError
+from dbbackup import settings as dbbackup_settings
 
 input = raw_input if six.PY2 else input  # @ReservedAssignment
 
 
-class Command(LabelCommand):
+class Command(BaseDbBackupCommand):
     help = "dbrestore [-d <dbname>] [-f <filename>] [-s <servername>]"
-    option_list = BaseCommand.option_list + (
+    option_list = BaseDbBackupCommand.option_list + (
         make_option("-d", "--database", help="Database to restore"),
         make_option("-f", "--filepath", help="Specific file to backup from"),
         make_option("-x", "--backup-extension", help="The extension to use when scanning for files to restore from."),
         make_option("-s", "--servername", help="Use a different servername backup"),
         make_option("-l", "--list", action='store_true', default=False, help="List backups in the backup directory"),
         make_option("-c", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),
+        make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
         make_option("-z", "--uncompress", help="Uncompress gzip data before restoring", action='store_true'),
     )
 
     def handle(self, **options):
         """ Django command handler. """
+        self.verbosity = int(options.get('verbosity'))
+        self.quiet = options.get('quiet')
         try:
             connection.close()
             self.filepath = options.get('filepath')
-            self.backup_extension = options.get('backup-extension') or 'backup'
+            self.backup_extension = options.get('backup_extension') or 'backup'
             self.servername = options.get('servername')
             self.decrypt = options.get('decrypt')
             self.uncompress = options.get('uncompress')
+            self.passphrase = options.get('passphrase')
             self.database = self._get_database(options)
             self.storage = BaseStorage.storage_factory()
             self.dbcommands = DBCommands(self.database)
@@ -68,17 +72,17 @@ class Command(LabelCommand):
 
     def restore_backup(self):
         """ Restore the specified database. """
-        self.stdout.write("Restoring backup for database: %s" % self.database['NAME'])
+        self.log("Restoring backup for database: %s" % self.database['NAME'], 1)
         # Fetch the latest backup if filepath not specified
         if not self.filepath:
-            self.stdout.write("  Finding latest backup")
+            self.log("  Finding latest backup", 1)
             filepaths = self.storage.list_directory()
             filepaths = [f for f in filepaths if f.endswith('.' + self.backup_extension)]
             if not filepaths:
                 raise CommandError("No backup files found in: /%s" % self.storage.backup_dir)
             self.filepath = filepaths[-1]
         # Restore the specified filepath backup
-        self.stdout.write("  Restoring: %s" % self.filepath)
+        self.log("  Restoring: %s" % self.filepath, 1)
         input_filename = self.filepath
         inputfile = self.storage.read_file(input_filename)
         if self.decrypt:
@@ -89,10 +93,10 @@ class Command(LabelCommand):
             uncompressed_file = self.uncompress_file(inputfile)
             inputfile.close()
             inputfile = uncompressed_file
-        self.stdout.write("  Restore tempfile created: %s" % utils.handle_size(inputfile))
+        self.log("  Restore tempfile created: %s" % utils.handle_size(inputfile), 1)
         answer = input("Are you sure you want to continue? [Y/n]")
         if answer.lower() not in ('y', 'yes', ''):
-            self.stdout.write("Quitting")
+            self.log("Quitting", 1)
             sys.exit(0)
         inputfile.seek(0)
         self.dbcommands.run_restore_commands(inputfile)
@@ -119,7 +123,7 @@ class Command(LabelCommand):
         import gnupg
 
         def get_passphrase():
-            return input('Input Passphrase: ')
+            return self.passphrase or getpass('Input Passphrase: ') or None
 
         temp_dir = tempfile.mkdtemp(dir=dbbackup_settings.TMP_DIR)
         try:
@@ -149,8 +153,8 @@ class Command(LabelCommand):
 
     def list_backups(self):
         """ List backups in the backup directory. """
-        self.stdout.write("Listing backups on %s in /%s:" % (self.storage.name, self.storage.backup_dir))
+        self.log("Listing backups on %s in /%s:" % (self.storage.name, self.storage.backup_dir), 1)
         for filepath in self.storage.list_directory():
-            self.stdout.write("  %s" % os.path.basename(filepath))
+            self.log("  %s" % os.path.basename(filepath), 1)
             # TODO: Implement filename_details method
             # print(utils.filename_details(filepath))

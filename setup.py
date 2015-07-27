@@ -1,27 +1,25 @@
-import os
 from setuptools import setup, find_packages
-
-from dbbackup import VERSION
-
-
-def get_path(fname):
-    return os.path.join(os.path.dirname(__file__), fname)
+import dbbackup
 
 
 def get_requirements():
     return open('requirements.txt').read().splitlines()
 
 
+def get_test_requirements():
+    return open('requirements-tests.txt').read().splitlines()
+
+
 setup(
     name='django-dbbackup',
-    version=VERSION,
-    description='Management commands to help backup and restore a project database to AmazonS3, Dropbox or local disk.',
-    author='Michael Shepanski',
-    author_email='mjs7231@gmail.com',
+    version=dbbackup.__version__,
+    description=dbbackup.__doc__,
+    author=dbbackup.__author__,
+    author_email=dbbackup.__email__,
     install_requires=get_requirements(),
-    tests_require=('mock', 'python-gnupg'),
+    tests_require=get_test_requirements(),
     license='BSD',
-    url='https://github.com/mjs7231/django-dbbackup',
+    url='https://github.com/django-dbbackup/django-dbbackup',
     keywords=['django', 'dropbox', 'database', 'backup', 'amazon', 's3'],
     packages=find_packages(exclude=['tests.runtests.main']),
     test_suite='tests.runtests.main',

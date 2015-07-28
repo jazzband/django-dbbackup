@@ -20,7 +20,11 @@ DEV_NULL = open(os.devnull, 'w')
 
 
 class handled_files(dict):
-    """Dict for gather information about fake storage and clean between tests."""
+    """
+    Dict for gather information about fake storage and clean between tests.
+    You should use the constant instance ``HANDLED_FILES`` and clean it
+    before tests.
+    """
     def __init__(self):
         super(handled_files, self).__init__()
         self.clean()
@@ -33,7 +37,6 @@ HANDLED_FILES = handled_files()
 
 class FakeStorage(BaseStorage):
     name = 'FakeStorage'
-    list_files = ['foo', 'bar']
     file_read = ENCRYPTED_FILE
 
     def __init__(self, *args, **kwargs):
@@ -46,13 +49,13 @@ class FakeStorage(BaseStorage):
         self.deleted_files.append(filepath)
 
     def list_directory(self, raw=False):
-        return self.list_files
+        return [f[0] for f in HANDLED_FILES['written_files']]
 
     def write_file(self, filehandle, filename):
         HANDLED_FILES['written_files'].append((filename, filehandle))
 
     def read_file(self, filepath):
-        return open(self.file_read, 'rb')
+        return [f[1] for f in HANDLED_FILES['written_files'] if f[0] == filepath][0]
 
 Storage = FakeStorage
 

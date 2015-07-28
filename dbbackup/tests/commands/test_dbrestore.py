@@ -1,5 +1,6 @@
 import subprocess
 from mock import patch
+from io import BytesIO
 from django.test import TestCase
 from django.core.management.base import CommandError
 from django.conf import settings
@@ -8,10 +9,11 @@ from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
 from dbbackup.dbcommands import DBCommands
 from dbbackup.tests.utils import FakeStorage, ENCRYPTED_FILE, TEST_DATABASE
 from dbbackup.tests.utils import GPG_PRIVATE_PATH, DEV_NULL, COMPRESSED_FILE
-from dbbackup.tests.utils import GPG_PUBLIC_PATH, clean_gpg_keys
+from dbbackup.tests.utils import clean_gpg_keys, HANDLED_FILES
 
 
 @patch('dbbackup.management.commands.dbrestore.input', return_value='y')
+@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils.FakeStorage')
 class DbrestoreCommandRestoreBackupTest(TestCase):
     def setUp(self):
         self.command = DbrestoreCommand()
@@ -24,6 +26,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.dbcommands = DBCommands(TEST_DATABASE)
         self.command.passphrase = None
         self.command.storage = FakeStorage()
+        HANDLED_FILES.clean()
         cmd = ('gpg --import %s' % GPG_PRIVATE_PATH).split()
         subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
 
@@ -31,7 +34,9 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         clean_gpg_keys()
 
     def test_no_filepath(self, *args):
-        self.command.storage.list_files = ['foo.bak']
+        # Create backup
+        HANDLED_FILES['written_files'].append((':memory:.bak', BytesIO(b'bar')))
+        # Check
         self.command.filepath = None
         self.command.restore_backup()
 
@@ -43,6 +48,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
     def test_uncompress(self, *args):
         self.command.storage.file_read = COMPRESSED_FILE
         self.command.filepath = COMPRESSED_FILE
+        HANDLED_FILES['written_files'].append((COMPRESSED_FILE, open(COMPRESSED_FILE, 'rb')))
         self.command.uncompress = True
         self.command.restore_backup()
 
@@ -52,6 +58,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
             self.skipTest("Decryption isn't implemented in Python3")
         self.command.decrypt = True
         self.command.filepath = ENCRYPTED_FILE
+        HANDLED_FILES['written_files'].append((ENCRYPTED_FILE, open(ENCRYPTED_FILE)))
         self.command.restore_backup()
 
 

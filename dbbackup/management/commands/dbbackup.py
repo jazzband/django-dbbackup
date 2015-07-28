@@ -34,7 +34,7 @@ class Command(LabelCommand):
 
     @utils.email_uncaught_exception
     def handle(self, **options):
-        """Django command handler."""
+        """ Django command handler. """
         try:
             self.clean = options.get('clean')
             self.clean_keep = getattr(settings, 'DBBACKUP_CLEANUP_KEEP', 10)
@@ -50,18 +50,18 @@ class Command(LabelCommand):
             for database_key in database_keys:
                 database = settings.DATABASES[database_key]
                 self.dbcommands = DBCommands(database)
-                self.save_new_backup(database)
+                self.save_new_backup(database, database_key)
                 self.cleanup_old_backups(database)
         except StorageError as err:
             raise CommandError(err)
 
-    def save_new_backup(self, database):
-        """Save a new backup file."""
-        self.stdout.write("Backing Up Database: %s" % database['NAME'])
+    def save_new_backup(self, database, database_name):
+        """ Save a new backup file. """
+        print("Backing Up Database: %s" % database['NAME'])
+        filename = self.dbcommands.filename(self.servername)
         outputfile = tempfile.SpooledTemporaryFile(
             max_size=10 * 1024 * 1024,
             dir=dbbackup_settings.TMP_DIR)
-        filename = outputfile.name = self.dbcommands.filename(self.servername)
         self.dbcommands.run_backup_commands(outputfile)
         if self.compress:
             compressed_file = self.compress_file(outputfile)
@@ -70,21 +70,16 @@ class Command(LabelCommand):
         if self.encrypt:
             encrypted_file = utils.encrypt_file(outputfile)
             outputfile = encrypted_file
-        self.stdout.write("  Backup tempfile created: %s" %
-                          (utils.handle_size(outputfile)))
-        self.stdout.write("  Writing file to %s: %s, filename: %s" % (
-                          self.storage.name, self.storage.backup_dir,
-                          filename))
+        print("  Backup tempfile created: %s" % (utils.handle_size(outputfile)))
+        print("  Writing file to %s: %s, filename: %s" % (self.storage.name, self.storage.backup_dir, filename))
         self.storage.write_file(outputfile, filename)
 
     def cleanup_old_backups(self, database):
-        """
-        Cleanup old backups, keeping the number of backups specified by
-        DBBACKUP_CLEANUP_KEEP and any backups that occur on first of the month.
+        """ Cleanup old backups, keeping the number of backups specified by
+            DBBACKUP_CLEANUP_KEEP and any backups that occur on first of the month.
         """
         if self.clean:
-            self.stdout.write("Cleaning Old Backups for: %s" %
-                              database['NAME'])
+            print("Cleaning Old Backups for: %s" % database['NAME'])
             filepaths = self.storage.list_directory()
             filepaths = self.dbcommands.filter_filepaths(filepaths)
             for filepath in sorted(filepaths[0:-self.clean_keep]):
@@ -92,7 +87,7 @@ class Command(LabelCommand):
                 datestr = re.findall(regex, os.path.basename(filepath))[0]
                 dateTime = datetime.datetime.strptime(datestr, dbbackup_settings.DATE_FORMAT)
                 if int(dateTime.strftime("%d")) != 1:
-                    self.stdout.write("  Deleting: %s" % filepath)
+                    print("  Deleting: %s" % filepath)
                     self.storage.delete_file(filepath)
 
     def compress_file(self, inputfile):
@@ -110,4 +105,5 @@ class Command(LabelCommand):
             copyfileobj(inputfile, zipfile, 2 * 1024 * 1024)
         finally:
             zipfile.close()
+
         return outputfile

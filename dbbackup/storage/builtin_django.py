@@ -22,7 +22,6 @@ class Storage(BaseStorage):
         self.storageCls = get_storage_class(storage_path)
         self.storage = self.storageCls(**options)
         self.name = self.storageCls.__name__
-        self.backup_dir = self.name
 
     def delete_file(self, filepath):
         self.storage.delete(name=filepath)

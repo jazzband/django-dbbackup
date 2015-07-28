@@ -3,58 +3,36 @@ Filesystem Storage object.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-import os
-from .base import BaseStorage, StorageError
+import warnings
 
-from dbbackup import settings
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+
+from .base import StorageError
+from .builtin_django import Storage as DjangoStorage
+
+STORAGE_PATH = 'django.core.files.storage.FileSystemStorage'
 
 
-################################
-#  Filesystem Storage Object
-################################
+class Storage(DjangoStorage):
+    """Filesystem API Storage."""
 
-class Storage(BaseStorage):
-    """ Filesystem API Storage. """
-
-    def __init__(self, server_name=None):
-        self._check_filesystem_errors()
+    def __init__(self, server_name=None, **options):
         self.name = 'Filesystem'
-        BaseStorage.__init__(self)
+        options['location'] = options.get('location')
+        super(Storage, self).__init__(storage_path=STORAGE_PATH,
+                                      **options)
+        self._check_filesystem_errors(options)
 
-    def _check_filesystem_errors(self):
+    def _check_filesystem_errors(self, options):
         """ Check we have all the required settings defined. """
-        if not self.backup_dir:
+        if options.get('location') is None:
             raise StorageError('Filesystem storage requires DBBACKUP_BACKUP_DIRECTORY to be defined in settings.')
-
-    ###################################
-    #  DBBackup Storage Methods
-    ###################################
-    
-    @property
-    def backup_dir(self):
-        return settings.BACKUP_DIRECTORY
-
-    def delete_file(self, filepath):
-        """ Delete the specified filepath. """
-        os.unlink(filepath)
-
-    def list_directory(self):
-        """ List all stored backups for the specified. """
-        filepaths = os.listdir(self.backup_dir)
-        filepaths = [os.path.join(self.backup_dir, path) for path in filepaths]
-        return sorted(filter(os.path.isfile, filepaths))
-
-    def write_file(self, filehandle, filename):
-        """ Write the specified file. """
-        filehandle.seek(0)
-        backuppath = os.path.join(self.backup_dir, filename)
-        backupfile = open(backuppath, 'wb')
-        data = filehandle.read(1024)
-        while data:
-            backupfile.write(data)
-            data = filehandle.read(1024)
-        backupfile.close()
-
-    def read_file(self, filepath):
-        """ Read the specified file and return it's handle. """
-        return open(filepath, 'rb')
+        if settings.MEDIA_ROOT and options.get('location', '').startswith(settings.MEDIA_ROOT):
+            if not settings.DEBUG:
+                msg = "Backups can't be stored in MEDIA_ROOT if DEBUG is False, "\
+                      "Please use an another location for your storage."
+                raise ImproperlyConfigured(msg)
+            msg = "Backups are saved in MEDIA_ROOT, this is a critical issue in "\
+                  "production."
+            warnings.warn(msg)

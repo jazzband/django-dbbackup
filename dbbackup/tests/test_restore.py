@@ -39,6 +39,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.uncompress = True
         self.command.restore_backup()
 
+    @patch('dbbackup.management.commands.dbrestore.getpass', return_value=None)
     def test_decrypt(self, *args):
         if six.PY3:
             self.skipTest("Decryption isn't implemented in Python3")
@@ -101,6 +102,7 @@ class DbrestoreCommandDecryptTest(TestCase):
         subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
 
     @patch('dbbackup.management.commands.dbrestore.input', return_value=None)
+    @patch('dbbackup.management.commands.dbrestore.getpass', return_value=None)
     def test_decrypt(self, *args):
         if six.PY3:
             self.skipTest("Decryption isn't implemented in Python3")

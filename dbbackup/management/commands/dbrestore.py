@@ -8,11 +8,11 @@ import os
 import tempfile
 import gzip
 import sys
+from getpass import getpass
 
-from ... import utils
-from ...dbcommands import DBCommands
-from ...storage.base import BaseStorage
-from ...storage.base import StorageError
+from dbbackup import utils
+from dbbackup.dbcommands import DBCommands
+from dbbackup.storage.base import BaseStorage, StorageError
 from dbbackup import settings as dbbackup_settings
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -42,7 +42,7 @@ class Command(LabelCommand):
         try:
             connection.close()
             self.filepath = options.get('filepath')
-            self.backup_extension = options.get('backup-extension') or 'backup'
+            self.backup_extension = options.get('backup_extension') or 'backup'
             self.servername = options.get('servername')
             self.decrypt = options.get('decrypt')
             self.uncompress = options.get('uncompress')
@@ -120,7 +120,7 @@ class Command(LabelCommand):
         import gnupg
 
         def get_passphrase():
-            return input('Input Passphrase: ')
+            return getpass('Input Passphrase: ') or None
 
         temp_dir = tempfile.mkdtemp(dir=dbbackup_settings.TMP_DIR)
         try:

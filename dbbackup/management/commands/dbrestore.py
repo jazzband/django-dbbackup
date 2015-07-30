@@ -20,6 +20,8 @@ from django.core.management.base import LabelCommand
 from django.db import connection
 from optparse import make_option
 
+from dbbackup import settings as dbbackup_settings
+
 
 # Fix Python 2.x.
 try:

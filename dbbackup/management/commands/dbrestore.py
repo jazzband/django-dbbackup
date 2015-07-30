@@ -8,6 +8,8 @@ import os
 import tempfile
 import gzip
 import sys
+import getpass
+import gnupg
 
 from ... import utils
 from ...dbcommands import DBCommands
@@ -20,6 +22,7 @@ from django.core.management.base import LabelCommand
 from django.db import connection
 from optparse import make_option
 
+from dbbackup import settings as dbbackup_settings
 
 # Fix Python 2.x.
 try:
@@ -45,7 +48,7 @@ class Command(LabelCommand):
         try:
             connection.close()
             self.filepath = options.get('filepath')
-            self.backup_extension = options.get('backup-extension') or 'backup'
+            self.backup_extension = options.get('backup_extension') or 'backup'
             self.servername = options.get('servername')
             self.decrypt = options.get('decrypt')
             self.uncompress = options.get('uncompress')
@@ -74,7 +77,6 @@ class Command(LabelCommand):
         print("Restoring backup for database: %s" % self.database['NAME'])
         # Fetch the latest backup if filepath not specified
         if not self.filepath:
-            print("  Finding latest backup")
             filepaths = self.storage.list_directory()
             filepaths = list(filter(lambda f: f.endswith('.' + self.backup_extension), filepaths))
             if not filepaths:
@@ -120,11 +122,10 @@ class Command(LabelCommand):
 
     def unencrypt_file(self, inputfile):
         """ Unencrypt this file using gpg. The input and the output are filelike objects. """
-        import gnupg
+
         def get_passphrase():
-            print('Input Passphrase: ')
-            return input()
-        
+            return getpass.getpass('Input Passphrase: ')
+
         temp_dir = tempfile.mkdtemp(dir=dbbackup_settings.TMP_DIR)
         try:
             inputfile.fileno()   # Convert inputfile from SpooledTemporaryFile to regular file (Fixes Issue #21)

@@ -8,6 +8,11 @@ Django Database Backup
         :target: https://readthedocs.org/projects/django-dbbackup/?badge=latest
         :alt: Documentation Status
 
+
+.. image:: https://coveralls.io/repos/django-dbbackup/django-dbbackup/badge.svg?branch=master&service=github
+        :target: https://coveralls.io/github/django-dbbackup/django-dbbackup?branch=master
+
+
 This Django application provides management commands to help backup and
 restore your project database to AmazonS3, Dropbox or Local Disk.
 

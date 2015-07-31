@@ -3,8 +3,16 @@
 language: python
 
 python:
-  - "3.2"  # Only 3.2 works with Gir, 3.4 is not avail. for system sitepackages
   - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "pypy"
+
+env:
+  - DJANGO_PACKAGE="Django>=1.6,<1.7"
+  - DJANGO_PACKAGE="Django>=1.7,<1.8"
+  - DJANGO_PACKAGE="Django>=1.8,<1.9"
 
 #before_install:
 #  - sudo apt-get update

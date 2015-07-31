@@ -3,23 +3,21 @@ Save database.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
+
 import os
 import re
 import datetime
 import tempfile
-import gzip
-from shutil import copyfileobj
 
 from django.conf import settings
 from django.core.management.base import CommandError
 from optparse import make_option
 
-from dbbackup.management.commands._base import BaseDbBackupCommand
-from dbbackup import utils
-from dbbackup.dbcommands import DBCommands
-from dbbackup.storage.base import BaseStorage
-from dbbackup.storage.base import StorageError
-from dbbackup import settings as dbbackup_settings
+from ._base import BaseDbBackupCommand
+from ... import utils
+from ...dbcommands import DBCommands
+from ...storage.base import BaseStorage, StorageError
+from ... import settings as dbbackup_settings
 
 
 class Command(BaseDbBackupCommand):
@@ -65,9 +63,8 @@ class Command(BaseDbBackupCommand):
             max_size=10 * 1024 * 1024,
             dir=dbbackup_settings.TMP_DIR)
         self.dbcommands.run_backup_commands(outputfile)
-        outputfile.name = filename
         if self.compress:
-            compressed_file, filename = self.compress_file(outputfile, filename)
+            compressed_file, filename = utils.compress_file(outputfile, filename)
             outputfile.close()
             outputfile = compressed_file
         if self.encrypt:
@@ -92,21 +89,3 @@ class Command(BaseDbBackupCommand):
                 if int(dateTime.strftime("%d")) != 1:
                     self.log("  Deleting: %s" % filepath, 1)
                     self.storage.delete_file(filepath)
-
-    def compress_file(self, inputfile, filename):
-        """ Compress this file using gzip.
-            The input and the output are filelike objects.
-        """
-        outputfile = tempfile.SpooledTemporaryFile(
-            max_size=10 * 1024 * 1024,
-            dir=dbbackup_settings.TMP_DIR)
-        new_filename = filename + '.gz'
-        zipfile = gzip.GzipFile(filename=filename, fileobj=outputfile, mode="wb")
-        # TODO: Why do we have an exception block without handling exceptions?
-        try:
-            inputfile.seek(0)
-            copyfileobj(inputfile, zipfile, 2 * 1024 * 1024)
-        finally:
-            zipfile.close()
-
-        return outputfile, new_filename

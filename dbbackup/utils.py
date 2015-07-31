@@ -1,18 +1,26 @@
 """
-Util functions for dropbox application.
+Utility functions for dbbackup.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
+
 import sys
 import os
 import tempfile
+import gzip
+from getpass import getpass
+from shutil import copyfileobj
+from functools import wraps
+
 from django.core.mail import EmailMessage
 from django.db import connection
 from django.http import HttpRequest
 from django.views.debug import ExceptionReporter
-from functools import wraps
+from django.utils import six
 
-from dbbackup import settings
+from . import settings
+
+input = raw_input if six.PY2 else input  # @ReservedAssignment
 
 FAKE_HTTP_REQUEST = HttpRequest()
 FAKE_HTTP_REQUEST.META['SERVER_NAME'] = ''
@@ -98,13 +106,16 @@ def email_uncaught_exception(func):
 
 def encrypt_file(inputfile, filename):
     """
-    Encrypt the file using GPG.
+    Encrypt input file using GPG and remove .gpg extension to its name.
 
     :param inputfile: File to encrypt
-    :type inputfile: file like
+    :type inputfile: ``file`` like object
 
-    :returns: Encrypted file
-    :rtype: file like
+    :param filename: File's name
+    :type filename: ``str``
+
+    :returns: Tuple with file and new file's name
+    :rtype: :class:`tempfile.SpooledTemporaryFile`, ``str``
     """
     import gnupg
     tempdir = tempfile.mkdtemp(dir=settings.TMP_DIR)
@@ -128,6 +139,105 @@ def encrypt_file(inputfile, filename):
                 os.remove(filepath)
     finally:
         os.rmdir(tempdir)
+
+
+def unencrypt_file(inputfile, filename, passphrase=None):
+    """
+    Unencrypt input file using GPG and remove .gpg extension to its name.
+
+    :param inputfile: File to encrypt
+    :type inputfile: ``file`` like object
+
+    :param filename: File's name
+    :type filename: ``str``
+
+    :param passphrase: Passphrase of GPG key, if equivalent to False, it will
+                       be asked to user. If user answer an empty pass, no
+                       passphrase will be used.
+    :type passphrase: ``str`` or ``None``
+
+    :returns: Tuple with file and new file's name
+    :rtype: :class:`tempfile.SpooledTemporaryFile`, ``str``
+    """
+    import gnupg
+
+    def get_passphrase(passphrase=passphrase):
+        return passphrase or getpass('Input Passphrase: ') or None
+
+    temp_dir = tempfile.mkdtemp(dir=settings.TMP_DIR)
+    try:
+        new_basename = os.path.basename(filename).replace('.gpg', '')
+        temp_filename = os.path.join(temp_dir, new_basename)
+        try:
+            inputfile.seek(0)
+            g = gnupg.GPG()
+            result = g.decrypt_file(file=inputfile, passphrase=get_passphrase(), output=temp_filename)
+            if not result:
+                raise Exception('Decryption failed; status: %s' % result.status)
+            outputfile = tempfile.SpooledTemporaryFile(
+                max_size=10 * 1024 * 1024, dir=settings.TMP_DIR)
+            f = open(temp_filename, 'r+b')
+            try:
+                outputfile.write(f.read())
+            finally:
+                f.close()
+        finally:
+            if os.path.exists(temp_filename):
+                os.remove(temp_filename)
+    finally:
+        os.rmdir(temp_dir)
+    return outputfile, new_basename
+
+
+def compress_file(inputfile, filename):
+    """
+    Compress input file using gzip and change its name.
+
+    :param inputfile: File to compress
+    :type inputfile: ``file`` like object
+
+    :param filename: File's name
+    :type filename: ``str``
+
+    :returns: Tuple with compressed file and new file's name
+    :rtype: :class:`tempfile.SpooledTemporaryFile`, ``str``
+    """
+    outputfile = tempfile.SpooledTemporaryFile(
+        max_size=10 * 1024 * 1024, dir=settings.TMP_DIR)
+    new_filename = filename + '.gz'
+    zipfile = gzip.GzipFile(filename=filename, fileobj=outputfile, mode="wb")
+    # TODO: Why do we have an exception block without handling exceptions?
+    try:
+        inputfile.seek(0)
+        copyfileobj(inputfile, zipfile, 2 * 1024 * 1024)
+    finally:
+        zipfile.close()
+    return outputfile, new_filename
+
+
+def uncompress_file(inputfile, filename):
+    """
+    Uncompress this file using gzip and change its name.
+
+    :param inputfile: File to compress
+    :type inputfile: ``file`` like object
+
+    :param filename: File's name
+    :type filename: ``str``
+
+    :returns: Tuple with file and new file's name
+    :rtype: :class:`tempfile.SpooledTemporaryFile`, ``str``
+    """
+    new_basename = os.path.basename(filename).replace('.gz', '')
+    outputfile = tempfile.SpooledTemporaryFile(
+        max_size=500 * 1024 * 1024, dir=settings.TMP_DIR)
+    zipfile = gzip.GzipFile(fileobj=inputfile, mode="rb")
+    try:
+        inputfile.seek(0)
+        outputfile.write(zipfile.read())
+    finally:
+        zipfile.close()
+    return outputfile, new_basename
 
 
 def create_spooled_temporary_file(filepath):

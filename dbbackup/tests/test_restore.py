@@ -21,6 +21,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.filepath = 'foofile'
         self.command.database = TEST_DATABASE
         self.command.dbcommands = DBCommands(TEST_DATABASE)
+        self.command.passphrase = None
         self.command.storage = FakeStorage()
 
     def test_no_filepath(self, *args):
@@ -39,6 +40,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.uncompress = True
         self.command.restore_backup()
 
+    @patch('dbbackup.management.commands.dbrestore.getpass', return_value=None)
     def test_decrypt(self, *args):
         if six.PY3:
             self.skipTest("Decryption isn't implemented in Python3")
@@ -97,10 +99,12 @@ class DbrestoreCommandUncompressTest(TestCase):
 class DbrestoreCommandDecryptTest(TestCase):
     def setUp(self):
         self.command = DbrestoreCommand()
+        self.command.passphrase = None
         cmd = ('gpg --import %s' % GPG_PRIVATE_PATH).split()
         subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
 
     @patch('dbbackup.management.commands.dbrestore.input', return_value=None)
+    @patch('dbbackup.management.commands.dbrestore.getpass', return_value=None)
     def test_decrypt(self, *args):
         if six.PY3:
             self.skipTest("Decryption isn't implemented in Python3")

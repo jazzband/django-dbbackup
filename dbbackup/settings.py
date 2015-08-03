@@ -7,6 +7,10 @@ DATABASES = getattr(settings, 'DBBACKUP_DATABASES', list(settings.DATABASES.keys
 
 BACKUP_DIRECTORY = getattr(settings, 'DBBACKUP_BACKUP_DIRECTORY', os.getcwd())
 
+DBBACKUP_MYSQL_EXTENSION = getattr(settings, 'DBBACKUP_MYSQL_EXTENSION', 'mysql')
+DBBACKUP_POSTGRESQL_EXTENSION = getattr(settings, 'DBBACKUP_POSTGRESQL_EXTENSION', 'psql')
+DBBACKUP_SQLITE_EXTENSION = getattr(settings, 'DBBACKUP_SQLITE_EXTENSION', 'sqlite')
+
 # Fake host
 DBBACKUP_FAKE_HOST = getattr(settings, 'DBBACKUP_FAKE_HOST', 'django-dbbackup')
 

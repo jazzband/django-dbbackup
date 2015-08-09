@@ -1,3 +1,6 @@
+"""
+Save media files.
+"""
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 import os
@@ -9,28 +12,23 @@ from optparse import make_option
 import re
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 
+from dbbackup.management.commands._base import BaseDbBackupCommand
 from dbbackup import utils
 from dbbackup.storage.base import BaseStorage
 from dbbackup.storage.base import StorageError
 from dbbackup import settings as dbbackup_settings
 
-class Command(BaseCommand):
+
+class Command(BaseDbBackupCommand):
     help = "backup_media [--encrypt] [--clean] [--no-compress] " \
     "--servername SERVER_NAME"
-    option_list = BaseCommand.option_list + (
+    option_list = BaseDbBackupCommand.option_list + (
         make_option("-c", "--clean", help="Clean up old backup files", action="store_true", default=False),
         make_option("-s", "--servername", help="Specify server name to include in backup filename"),
         make_option("-e", "--encrypt", help="Encrypt the backup files", action="store_true", default=False),
-        make_option(
-            "-x",
-            "--no-compress",
-            help="Do not compress the archive",
-            action="store_true",
-            default=False
-        ),
+        make_option("-x", "--no-compress", help="Do not compress the archive", action="store_true", default=False),
     )
 
     @utils.email_uncaught_exception
@@ -52,9 +50,9 @@ class Command(BaseCommand):
     def backup_mediafiles(self, encrypt, compress):
         source_dir = self.get_source_dir()
         if not source_dir:
-            print("No media source dir configured.")
+            self.stderr.write("No media source dir configured.")
             sys.exit(0)
-        print("Backing up media files in %s" % source_dir)
+        self.log("Backing up media files in %s" % source_dir, 1)
         output_file = self.create_backup_file(
             source_dir,
             self.get_backup_basename(
@@ -67,8 +65,8 @@ class Command(BaseCommand):
             encrypted_file = utils.encrypt_file(output_file)
             output_file = encrypted_file
 
-        print("  Backup tempfile created: %s (%s)" % (output_file.name, utils.handle_size(output_file)))
-        print("  Writing file to %s: %s" % (self.storage.name, self.storage.backup_dir))
+        self.log("  Backup tempfile created: %s (%s)" % (output_file.name, utils.handle_size(output_file)), 1)
+        self.log("  Writing file to %s: %s" % (self.storage.name, self.storage.backup_dir), 1)
         self.storage.write_file(
             output_file,
             self.get_backup_basename(
@@ -120,13 +118,13 @@ class Command(BaseCommand):
         """ Cleanup old backups, keeping the number of backups specified by
         DBBACKUP_CLEANUP_KEEP and any backups that occur on first of the month.
         """
-        print("Cleaning Old Backups for media files")
+        self.log("Cleaning Old Backups for media files", 1)
 
         file_list = self.get_backup_file_list()
 
         for backup_date, filename in file_list[0:-dbbackup_settings.CLEANUP_KEEP_MEDIA]:
             if int(backup_date.strftime("%d")) != 1:
-                print("  Deleting: %s" % filename)
+                self.log("  Deleting: %s" % filename, 1)
                 self.storage.delete_file(filename)
 
     def get_backup_file_list(self):

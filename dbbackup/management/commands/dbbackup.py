@@ -35,11 +35,11 @@ class Command(BaseDbBackupCommand):
     @utils.email_uncaught_exception
     def handle(self, **options):
         """ Django command handler. """
-        self.verbosity = options.get('verbosity')
+        self.verbosity = int(options.get('verbosity'))
         self.quiet = options.get('quiet')
         try:
             self.clean = options.get('clean')
-            self.clean_keep = settings.CLEANUP_KEEP
+            self.clean_keep = dbbackup_settings.CLEANUP_KEEP
             self.database = options.get('database')
             self.servername = options.get('servername')
             self.compress = options.get('compress')
@@ -52,7 +52,7 @@ class Command(BaseDbBackupCommand):
             for database_key in database_keys:
                 database = settings.DATABASES[database_key]
                 self.dbcommands = DBCommands(database)
-                self.save_new_backup(database, database_key)
+                self.save_new_backup(database)
                 self.cleanup_old_backups(database)
         except StorageError as err:
             raise CommandError(err)
@@ -67,11 +67,11 @@ class Command(BaseDbBackupCommand):
         self.dbcommands.run_backup_commands(outputfile)
         outputfile.name = filename
         if self.compress:
-            compressed_file = self.compress_file(outputfile)
+            compressed_file, filename = self.compress_file(outputfile, filename)
             outputfile.close()
             outputfile = compressed_file
         if self.encrypt:
-            encrypted_file = utils.encrypt_file(outputfile)
+            encrypted_file, filename = utils.encrypt_file(outputfile, filename)
             outputfile = encrypted_file
         self.log("  Backup tempfile created: %s" % (utils.handle_size(outputfile)), 1)
         self.log("  Writing file to %s: %s, filename: %s" % (self.storage.name, self.storage.backup_dir, filename), 1)
@@ -93,15 +93,15 @@ class Command(BaseDbBackupCommand):
                     self.log("  Deleting: %s" % filepath, 1)
                     self.storage.delete_file(filepath)
 
-    def compress_file(self, inputfile):
+    def compress_file(self, inputfile, filename):
         """ Compress this file using gzip.
             The input and the output are filelike objects.
         """
         outputfile = tempfile.SpooledTemporaryFile(
             max_size=10 * 1024 * 1024,
             dir=dbbackup_settings.TMP_DIR)
-        outputfile.name = inputfile.name + '.gz'
-        zipfile = gzip.GzipFile(fileobj=outputfile, mode="wb")
+        new_filename = filename + '.gz'
+        zipfile = gzip.GzipFile(filename=filename, fileobj=outputfile, mode="wb")
         # TODO: Why do we have an exception block without handling exceptions?
         try:
             inputfile.seek(0)
@@ -109,4 +109,4 @@ class Command(BaseDbBackupCommand):
         finally:
             zipfile.close()
 
-        return outputfile
+        return outputfile, new_filename

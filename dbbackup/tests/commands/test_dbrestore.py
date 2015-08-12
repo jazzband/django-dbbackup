@@ -8,6 +8,7 @@ from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
 from dbbackup.dbcommands import DBCommands
 from dbbackup.tests.utils import FakeStorage, ENCRYPTED_FILE, TEST_DATABASE
 from dbbackup.tests.utils import GPG_PRIVATE_PATH, DEV_NULL, COMPRESSED_FILE
+from dbbackup.tests.utils import GPG_PUBLIC_PATH, clean_gpg_keys
 
 
 @patch('dbbackup.management.commands.dbrestore.input', return_value='y')
@@ -23,6 +24,11 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.dbcommands = DBCommands(TEST_DATABASE)
         self.command.passphrase = None
         self.command.storage = FakeStorage()
+        cmd = ('gpg --import %s' % GPG_PRIVATE_PATH).split()
+        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+
+    def tearDown(self):
+        clean_gpg_keys()
 
     def test_no_filepath(self, *args):
         self.command.storage.list_files = ['foo.bak']
@@ -44,9 +50,8 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
     def test_decrypt(self, *args):
         if six.PY3:
             self.skipTest("Decryption isn't implemented in Python3")
-        cmd = ('gpg --import %s' % GPG_PRIVATE_PATH).split()
-        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
         self.command.decrypt = True
+        self.command.filepath = ENCRYPTED_FILE
         self.command.restore_backup()
 
 
@@ -103,12 +108,15 @@ class DbrestoreCommandDecryptTest(TestCase):
         cmd = ('gpg --import %s' % GPG_PRIVATE_PATH).split()
         subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
 
+    def tearDown(self):
+        clean_gpg_keys()
+
     @patch('dbbackup.management.commands.dbrestore.input', return_value=None)
     @patch('dbbackup.management.commands.dbrestore.getpass', return_value=None)
     def test_decrypt(self, *args):
         if six.PY3:
             self.skipTest("Decryption isn't implemented in Python3")
         inputfile = open(ENCRYPTED_FILE, 'r+b')
-        uncryptfile = self.command.unencrypt_file(inputfile)
+        uncryptfile, filename = self.command.unencrypt_file(inputfile, 'foofile.gpg')
         uncryptfile.seek(0)
         self.assertEqual('foo\n', uncryptfile.read())

@@ -1,3 +1,4 @@
+import os
 import subprocess
 from django.test import TestCase
 from django.utils import six
@@ -5,7 +6,7 @@ from mock import patch
 from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
 from dbbackup.dbcommands import DBCommands
 from dbbackup.tests.utils import FakeStorage, TEST_DATABASE
-from dbbackup.tests.utils import GPG_PUBLIC_PATH, DEV_NULL
+from dbbackup.tests.utils import GPG_PUBLIC_PATH, DEV_NULL, GPG_FINGERPRINT
 
 
 @patch('dbbackup.settings.GPG_RECIPIENT', 'test@test')
@@ -23,6 +24,15 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         self.command.dbcommands = DBCommands(TEST_DATABASE)
         self.command.storage = FakeStorage()
         self.command.stdout = DEV_NULL
+        open(TEST_DATABASE['NAME']).close()
+
+    def tearDown(self):
+        try:
+            cmd = ("gpg --batch --yes --delete-secret-key '%s'" % GPG_FINGERPRINT)
+            subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        except OSError:
+            pass
+        os.remove(TEST_DATABASE['NAME'])
 
     def test_func(self):
         self.command.save_new_backup(TEST_DATABASE)
@@ -70,4 +80,4 @@ class DbbackupCommandCompressFileTest(TestCase):
 
     def test_compress_file(self):
         inputfile = open(TEST_DATABASE['NAME'])
-        self.command.compress_file(inputfile)
+        self.command.compress_file(inputfile, 'foofile.txt')

@@ -96,7 +96,7 @@ def email_uncaught_exception(func):
     return wrapper
 
 
-def encrypt_file(inputfile):
+def encrypt_file(inputfile, filename):
     """
     Encrypt the file using GPG.
 
@@ -109,7 +109,7 @@ def encrypt_file(inputfile):
     import gnupg
     tempdir = tempfile.mkdtemp(dir=settings.TMP_DIR)
     try:
-        filename = '%s.gpg' % inputfile.name
+        filename = '%s.gpg' % filename
         filepath = os.path.join(tempdir, filename)
         try:
             inputfile.seek(0)
@@ -122,7 +122,7 @@ def encrypt_file(inputfile):
             if not result:
                 msg = 'Encryption failed; status: %s' % result.status
                 raise Exception(msg)
-            return create_spooled_temporary_file(filepath)
+            return create_spooled_temporary_file(filepath), filename
         finally:
             if os.path.exists(filepath):
                 os.remove(filepath)

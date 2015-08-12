@@ -129,7 +129,7 @@ class Storage(BaseStorage):
         total_files = 0
         filehandle = tempfile.SpooledTemporaryFile(
             max_size=MAX_SPOOLED_SIZE,
-            dir=dbbackup_settings.TMP_DIR)
+            dir=settings.TMP_DIR)
         try:
             while True:
                 response = self.run_dropbox_action(self.dropbox.get_file,

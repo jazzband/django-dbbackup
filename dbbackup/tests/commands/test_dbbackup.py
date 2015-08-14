@@ -1,8 +1,8 @@
 import os
 import subprocess
+from mock import patch
 from django.test import TestCase
 from django.utils import six
-from mock import patch
 from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
 from dbbackup.dbcommands import DBCommands
 from dbbackup.tests.utils import FakeStorage, TEST_DATABASE

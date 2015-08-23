@@ -1,11 +1,10 @@
 # DO NOT IMPORT THIS BEFORE django.configure() has been run!
 
 import os
+import warnings
 from django.conf import settings
 
 DATABASES = getattr(settings, 'DBBACKUP_DATABASES', list(settings.DATABASES.keys()))
-
-BACKUP_DIRECTORY = getattr(settings, 'DBBACKUP_BACKUP_DIRECTORY', os.getcwd())
 
 # Fake host
 DBBACKUP_FAKE_HOST = getattr(settings, 'DBBACKUP_FAKE_HOST', 'django-dbbackup')
@@ -64,3 +63,8 @@ GPG_RECIPIENT = GPG_ALWAYS_TRUST = getattr(settings, 'DBBACKUP_GPG_RECIPIENT', N
 STORAGE = getattr(settings, 'DBBACKUP_STORAGE', 'dbbackup.storage.filesystem_storage')
 BUILTIN_STORAGE = getattr(settings, 'DBBACKUP_BUILTIN_STORAGE', None)
 STORAGE_OPTIONS = getattr(settings, 'DBBACKUP_STORAGE_OPTIONS', {})
+
+if hasattr(settings, 'DBBACKUP_BACKUP_DIRECTORY'):
+    BACKUP_DIRECTORY = STORAGE_OPTIONS['location'] = \
+        getattr(settings, 'DBBACKUP_BACKUP_DIRECTORY', os.getcwd())
+    warnings.warn("DBBACKUP_BACKUP_DIRECTORY is deprecated, use DBBACKUP_STORAGE_OPTIONS['location']", DeprecationWarning)

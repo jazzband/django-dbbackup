@@ -13,8 +13,6 @@ from dbbackup.tests.utils import GPG_PUBLIC_PATH, DEV_NULL, GPG_FINGERPRINT
 @patch('sys.stdout', DEV_NULL)
 class DbbackupCommandSaveNewBackupTest(TestCase):
     def setUp(self):
-        if six.PY3:
-            self.skipTest("Compression isn't implemented in Python3")
         open(TEST_DATABASE['NAME'], 'a+b').close()
         self.command = DbbackupCommand()
         self.command.servername = 'foo-server'
@@ -65,19 +63,3 @@ class DbbackupCommandCleanupOldBackupsTest(TestCase):
     def test_cleanup_empty(self):
         self.command.storage.list_files = []
         self.command.cleanup_old_backups(TEST_DATABASE)
-
-
-class DbbackupCommandCompressFileTest(TestCase):
-    def setUp(self):
-        if six.PY3:
-            self.skipTest("Compression isn't implemented in Python3")
-        open(TEST_DATABASE['NAME'], 'a+b').close()
-        self.command = DbbackupCommand()
-        self.command.database = TEST_DATABASE['NAME']
-        self.command.dbcommands = DBCommands(TEST_DATABASE)
-        self.command.storage = FakeStorage()
-        self.command.stdout = DEV_NULL
-
-    def test_compress_file(self):
-        inputfile = open(TEST_DATABASE['NAME'])
-        self.command.compress_file(inputfile, 'foofile.txt')

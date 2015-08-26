@@ -10,6 +10,7 @@ from django.core import mail
 from django.conf import settings
 
 from .. import utils
+from .. import settings as dbackup_settings
 from .utils import (ENCRYPTED_FILE, clean_gpg_keys, GPG_PRIVATE_PATH,
                     COMPRESSED_FILE)
 
@@ -134,3 +135,12 @@ class Create_Spooled_Temporary_FileTest(TestCase):
 
     def test_func(self, *args):
         utils.create_spooled_temporary_file(filepath=self.path)
+
+
+class Filename_GenerateTest(TestCase):
+    def test_func(self, *args):
+        extension = 'foo'
+        dbackup_settings.SERVER_NAME = 'test'
+        generated_name = utils.filename_generate(extension)
+        self.assertTrue(generated_name.startswith(dbackup_settings.SERVER_NAME))
+        self.assertTrue(generated_name.endswith(extension))

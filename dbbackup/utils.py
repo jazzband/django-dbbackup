@@ -18,7 +18,11 @@ from django.core.mail import EmailMessage
 from django.db import connection
 from django.http import HttpRequest
 from django.views.debug import ExceptionReporter
+<<<<<<< HEAD
 from django.utils import (six, timezone)
+=======
+from django.utils import six, timezone
+>>>>>>> ab2b8a2... add FILENAME_TEMPLATE support in mediabackup
 
 from . import settings
 
@@ -370,3 +374,27 @@ def filename_to_date(filename, datefmt=None):
     datefmt = datefmt or settings.DATE_FORMAT 
     datestring = filename_to_datestring(filename, datefmt)
     return datetime.strptime(datestring, datefmt)
+
+
+def filename_generate(extension, database_name="", servername=None,
+                      wildcard=None, filetype='db'):
+    """ Create a new backup filename. """
+    database_name = database_name.replace("/", "_")
+    params = {
+        'databasename': database_name,
+        'servername': servername or settings.SERVER_NAME,
+        'timestamp': timezone.now(),
+        'extension': extension,
+        'wildcard': wildcard,
+        'filetype': filetype
+    }
+    if callable(settings.FILENAME_TEMPLATE):
+        filename = settings.FILENAME_TEMPLATE(**params)
+    else:
+        params['datetime'] = \
+            wildcard or params['timestamp'].strftime(settings.DATE_FORMAT)
+        filename = settings.FILENAME_TEMPLATE.format(**params)
+        filename = filename.replace('--', '-')
+        if filename.startswith('-'):
+            filename = filename[1:]
+    return filename

@@ -11,7 +11,12 @@ from django.test import TestCase
 from django.core import mail
 from django.conf import settings
 
+<<<<<<< HEAD
 from dbbackup import utils, settings as dbbackup_settings
+=======
+from .. import utils
+from .. import settings as dbackup_settings
+>>>>>>> ab2b8a2... add FILENAME_TEMPLATE support in mediabackup
 from .utils import (ENCRYPTED_FILE, clean_gpg_keys, GPG_PRIVATE_PATH,
                     COMPRESSED_FILE)
 
@@ -189,3 +194,12 @@ class Filename_To_DateTest(TestCase):
         filename = '%s-foo.gz.gpg' % datetime.strftime(now, datefmt)
         date = utils.filename_to_date(filename, datefmt)
         self.assertEqual(date.timetuple()[:5], now.timetuple()[:5])
+
+
+class Filename_GenerateTest(TestCase):
+    def test_func(self, *args):
+        extension = 'foo'
+        dbackup_settings.SERVER_NAME = 'test'
+        generated_name = utils.filename_generate(extension)
+        self.assertTrue(generated_name.startswith(dbackup_settings.SERVER_NAME))
+        self.assertTrue(generated_name.endswith(extension))

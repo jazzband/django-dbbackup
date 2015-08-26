@@ -16,13 +16,14 @@ if mock_s3 is None:
         return obj
 
 
-@skip_py3
 @mock_s3
+@skip_py3
 class S3StorageTest(TestCase):
     def setUp(self):
         self.storage = S3Storage(bucket_name='foo_bucket',
                                  access_key='foo_id',
                                  secret_key='foo_secret')
+        # Create fixtures
         self.conn = boto.connect_s3()
         self.bucket = self.conn.create_bucket('foo_bucket')
         key = boto.s3.key.Key(self.bucket)
@@ -50,13 +51,12 @@ class S3StorageTest(TestCase):
     def test_check(self):
         with self.assertRaises(StorageError):
             self.storage._check_filesystem_errors({
-                'aws_storage_bucket_name': '', 'aws_s3_access_key_id': ''})
+                'bucket_name': '', 'access_key': ''})
         with self.assertRaises(StorageError):
             self.storage._check_filesystem_errors({
-                'aws_storage_bucket_name': '', 'aws_s3_secret_access_key': ''})
+                'bucket_name': '', 'secret_key': ''})
         with self.assertRaises(StorageError):
             self.storage._check_filesystem_errors({
-                'aws_s3_access_key_id': '', 'aws_s3_secret_access_key': ''})
+                'access_key': '', 'secret_key': ''})
         self.storage._check_filesystem_errors({
-            'aws_storage_bucket_name': '', 'aws_s3_access_key_id': '',
-            'aws_s3_secret_access_key': ''})
+            'bucket_name': '', 'access_key': '', 'secret_key': ''})

@@ -74,7 +74,9 @@ def clean_gpg_keys():
         pass
 
 
-def skip_py3(testcase):
+def skip_py3(testcase, reason="Not in Python 3"):
+    """Decorator for skip Python 3 tests."""
     if six.PY3:
-        setup = lambda s: s.skipTest('')
+        setup = lambda s: s.skipTest(reason)
         testcase.setUp = setup
+    return testcase

@@ -20,9 +20,9 @@ if mock_s3 is None:
 @mock_s3
 class S3StorageTest(TestCase):
     def setUp(self):
-        self.storage = S3Storage(aws_storage_bucket_name='foo_bucket',
-                                 aws_s3_access_key_id='foo_id',
-                                 aws_s3_secret_access_key='foo_secret')
+        self.storage = S3Storage(bucket_name='foo_bucket',
+                                 access_key='foo_id',
+                                 secret_key='foo_secret')
         self.conn = boto.connect_s3()
         self.bucket = self.conn.create_bucket('foo_bucket')
         key = boto.s3.key.Key(self.bucket)

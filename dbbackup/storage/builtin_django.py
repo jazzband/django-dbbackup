@@ -27,7 +27,7 @@ class Storage(BaseStorage):
         self.storage.delete(name=filepath)
 
     def list_directory(self):
-        return self.storage.listdir(path='')[1]
+        return self.storage.listdir('')[1]
 
     def write_file(self, filehandle, filename):
         self.storage.save(name=filename, content=filehandle)

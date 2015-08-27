@@ -45,14 +45,27 @@ class FileSystemStorageTest(TestCase):
         read_file = self.storage.read_file('foo')
         self.assertEqual(read_file.read(), b'bar')
 
-    def test_no_location(self):
+
+class FileSystemStorageCheckTest(TestCase):
+    def test_fail_location_is_none(self):
         with self.assertRaises(Exception):
             self.storage = FileSystemStorage(location=None)
 
-    def test_backup_in_media_file(self):
+    def test_fail_location_is_empty_str(self):
+        with self.assertRaises(Exception):
+            self.storage = FileSystemStorage(location='')
+
+    def test_fail_no_location(self):
+        with self.assertRaises(Exception):
+            self.storage = FileSystemStorage()
+
+    def test_fail_backup_in_media_file(self):
         with self.assertRaises(ImproperlyConfigured):
             self.storage = FileSystemStorage(location=settings.MEDIA_ROOT)
 
     @patch('django.conf.settings.DEBUG', True)
-    def test_backup_in_media_file_debug(self):
+    def test_success_backup_in_media_file_debug(self):
         self.storage = FileSystemStorage(location=settings.MEDIA_ROOT)
+
+    def test_success(self):
+        self.storage = FileSystemStorage(location='foo')

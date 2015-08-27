@@ -153,4 +153,4 @@ class Command(BaseDbBackupCommand):
         return sorted(file_list, key=lambda v: v[0])
 
     def get_servername(self):
-        return self.servername or dbbackup_settings.SERVER_NAME
+        return self.servername or dbbackup_settings.HOSTNAME

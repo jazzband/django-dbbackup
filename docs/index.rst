@@ -23,6 +23,12 @@ Contents:
 .. warning::
    django-dbbackup is currently under heavy refactoring, stay tuned for
    new versions and a final 2.0 release.
+
+Compatibility
+-------------
+
+Django Database Backup supports Pypy, Python 2.7, 3.2 to 3.4 and Django greater than
+1.6.
    
 Management Commands
 -------------------

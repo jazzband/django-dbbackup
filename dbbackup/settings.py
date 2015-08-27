@@ -1,18 +1,22 @@
 # DO NOT IMPORT THIS BEFORE django.configure() has been run!
 
 import os
+import tempfile
+import socket
 import warnings
 from django.conf import settings
 
 DATABASES = getattr(settings, 'DBBACKUP_DATABASES', list(settings.DATABASES.keys()))
 
 # Fake host
-DBBACKUP_FAKE_HOST = getattr(settings, 'DBBACKUP_FAKE_HOST', 'django-dbbackup')
+HOSTNAME = getattr(settings, 'DBBACKUP_HOSTNAME', socket.gethostname())
 
 # Directory to use for temporary files
-TMP_DIR = getattr(settings, 'DBBACKUP_TMP_DIR', '/tmp')
+TMP_DIR = getattr(settings, 'DBBACKUP_TMP_DIR', tempfile.gettempdir())
+TMP_FILE_MAX_SIZE = getattr(settings, 'DBBACKUP_TMP_FILE_MAX_SIZE', 10*1024*1024)
+TMP_FILE_READ_SIZE = getattr(settings, 'DBBACKUP_TMP_FILE_READ_SIZE', 1024*1000)
 
-# Days to keep backups
+# Days to keep
 CLEANUP_KEEP = getattr(settings, 'DBBACKUP_CLEANUP_KEEP', 10)
 
 # Days to keep backed up media (default: same as CLEANUP_KEEP)
@@ -21,7 +25,6 @@ CLEANUP_KEEP_MEDIA = getattr(settings, 'DBBACKUP_CLEANUP_KEEP_MEDIA', CLEANUP_KE
 MEDIA_PATH = getattr(settings, 'DBBACKUP_MEDIA_PATH', settings.MEDIA_ROOT)
 
 DATE_FORMAT = getattr(settings, 'DBBACKUP_DATE_FORMAT', '%Y-%m-%d-%H%M%S')
-SERVER_NAME = getattr(settings, 'DBBACKUP_SERVER_NAME', '')
 FORCE_ENGINE = getattr(settings, 'DBBACKUP_FORCE_ENGINE', '')
 FILENAME_TEMPLATE = getattr(settings, 'DBBACKUP_FILENAME_TEMPLATE', '{databasename}-{servername}-{datetime}.{extension}')
 
@@ -57,7 +60,6 @@ SEND_EMAIL = getattr(settings, 'DBBACKUP_SEND_EMAIL', True)
 SERVER_EMAIL = getattr(settings, 'DBBACKUP_SERVER_EMAIL', settings.SERVER_EMAIL)
 
 GPG_ALWAYS_TRUST = getattr(settings, 'DBBACKUP_GPG_ALWAYS_TRUST', False)
-
 GPG_RECIPIENT = GPG_ALWAYS_TRUST = getattr(settings, 'DBBACKUP_GPG_RECIPIENT', None)
 
 STORAGE = getattr(settings, 'DBBACKUP_STORAGE', 'dbbackup.storage.filesystem_storage')
@@ -68,3 +70,7 @@ if hasattr(settings, 'DBBACKUP_BACKUP_DIRECTORY'):
     BACKUP_DIRECTORY = STORAGE_OPTIONS['location'] = \
         getattr(settings, 'DBBACKUP_BACKUP_DIRECTORY', os.getcwd())
     warnings.warn("DBBACKUP_BACKUP_DIRECTORY is deprecated, use DBBACKUP_STORAGE_OPTIONS['location']", DeprecationWarning)
+
+if hasattr(settings, 'DBBACKUP_FAKE_HOST'):  # noqa
+    warnings.warn("DBBACKUP_FAKE_HOST is deprecated, use DBBACKUP_HOSTNAME", DeprecationWarning)
+    HOSTNAME = settings.DBBACKUP_FAKE_HOST

@@ -18,7 +18,6 @@ DBBACKUP_BACKUP_DIRECTORY
 Where to store backups. String pointing to django-dbbackup
 location module to use when performing a backup.
 
-
 Default: ``os.getcwd()`` (Current working directory)
 
 DBBACKUP_TMP_DIR
@@ -26,8 +25,16 @@ DBBACKUP_TMP_DIR
 
 Directory to be used for temporary files.
 
+Default: ``tempfile.gettempdir()``
 
-Default: ``/tmp``
+DBBACKUP_TMP_FILE_MAX_SIZE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Maximum size in bytes for file handling in memory before write a temporary
+file on ``DBBACKUP_TMP_DIR``.
+
+Default: ``10*1024*1024``
+
 
 DBBACKUP_CLEANUP_KEEP and DBBACKUP_CLEANUP_KEEP_MEDIA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -107,15 +114,19 @@ exception is received.
 
 Default: ``True``
 
-DBBACKUP_FAKE_HOST
-~~~~~~~~~~~~~~~~~~
+HOSTNAME
+~~~~~~~~
 
-Fake host is needed by django-dbbackup uncaught exception email sender for
+Hostname needed by django-dbbackup's uncaught exception email sender for
 well described error reporting. If you are using ``ALLOWED_HOSTS`` you should
-set ``DBBACKUP_FAKE_HOST`` to any host from ``ALLOWED_HOSTS`` setting. Otherwise
-djnago-dbbackup can not send email to the ``SERVER_EMAIL``.
+set ``HOSTNAME`` to any host from ``ALLOWED_HOSTS`` setting. Otherwise
+django-dbbackup can not send email to the ``SERVER_EMAIL``.
 
-Default: ``'django-dbbackup'``
+Default: ``socket.gethostname()``
+
+.. note::
+
+    Previously ``DBBACKUP_FAKE_HOST`` was used for this setting.
 
 **DBBACKUP\_CLEANUP\_KEEP (optional)** - The number of backups to keep
 when specifying the --clean flag. Defaults to keeping 10 + the first

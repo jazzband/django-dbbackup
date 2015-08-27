@@ -120,7 +120,7 @@ class DbrestoreCommandDecryptTest(TestCase):
         clean_gpg_keys()
 
     @patch('dbbackup.management.commands.dbrestore.input', return_value=None)
-    @patch('dbbackup.management.commands.dbrestore.getpass', return_value=None)
+    @patch('dbbackup.utils.getpass', return_value=None)
     def test_decrypt(self, *args):
         if six.PY3:
             self.skipTest("Decryption isn't implemented in Python3")

@@ -1,5 +1,6 @@
 import os
 import subprocess
+from io import BytesIO
 from mock import patch
 from django.test import TestCase
 from django.core.management import execute_from_command_line
@@ -40,3 +41,59 @@ class DbBackupCommandTest(TestCase):
         self.assertEqual(1, len(HANDLED_FILES['written_files']))
         filename, outputfile = HANDLED_FILES['written_files'][0]
         self.assertTrue(filename.endswith('.gz.gpg'))
+
+
+# TODO: Add fake database to restore
+@patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})
+@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils.FakeStorage')
+@patch('dbbackup.management.commands.dbrestore.input', return_value='y')
+class DbRestoreCommandTest(TestCase):
+    def setUp(self):
+        if six.PY3:
+            self.skipTest("Compression isn't implemented in Python3")
+        HANDLED_FILES.clean()
+        cmd = ('gpg --import %s' % GPG_PUBLIC_PATH).split()
+        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        open(TEST_DATABASE['NAME'], 'a').close()
+
+    def tearDown(self):
+        os.remove(TEST_DATABASE['NAME'])
+        clean_gpg_keys()
+
+    def test_restore(self, *args):
+        # Create backup
+        execute_from_command_line(['', 'dbbackup'])
+        # Restore
+        execute_from_command_line(['', 'dbrestore'])
+
+    @patch('dbbackup.management.commands.dbrestore.getpass', return_value=None)
+    def test_encrypted(self, *args):
+        # Create backup
+        execute_from_command_line(['', 'dbbackup', '--encrypt'])
+        # Restore
+        execute_from_command_line(['', 'dbrestore', '--decrypt'])
+
+    def test_compressed(self, *args):
+        # Create backup
+        execute_from_command_line(['', 'dbbackup', '--compress'])
+        # Restore
+        execute_from_command_line(['', 'dbrestore', '--uncompress'])
+
+    def test_no_backup_available(self, *args):
+        with self.assertRaises(SystemExit):
+            execute_from_command_line(['', 'dbrestore'])
+
+    # @patch('dbbackup.management.commands.dbrestore.getpass', return_value=None)
+    # def test_available_but_not_encrypted(self, *args):
+    #     # Create backup
+    #     execute_from_command_line(['', 'dbbackup'])
+    #     # Restore
+    #     with self.assertRaises(Exception):
+    #         execute_from_command_line(['', 'dbrestore', '--decrypt'])
+
+    # def test_available_but_not_compressed(self, *args):
+    #     # Create backup
+    #     execute_from_command_line(['', 'dbbackup'])
+    #     # Restore
+    #     with self.assertRaises(Exception):
+    #         execute_from_command_line(['', 'dbrestore', '--uncompress'])

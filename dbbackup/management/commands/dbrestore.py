@@ -74,7 +74,8 @@ class Command(BaseDbBackupCommand):
         if not self.filepath:
             self.log("  Finding latest backup", 1)
             filepaths = self.storage.list_directory()
-            filepaths = [f for f in filepaths if f.endswith('.' + self.backup_extension)]
+            # TODO: It is a bad filter
+            # filepaths = [f for f in filepaths if f.endswith('.' + self.backup_extension)]
             if not filepaths:
                 raise CommandError("No backup files found in: /%s" % self.storage.backup_dir)
             self.filepath = filepaths[-1]

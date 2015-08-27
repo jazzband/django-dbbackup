@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.utils import six
 
 from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
+from dbbackup.db import get_connector
 from dbbackup.dbcommands import DBCommands, MongoDBCommands
 from dbbackup.tests.utils import (FakeStorage, TEST_DATABASE,
                                   add_public_gpg, clean_gpg_keys, DEV_NULL, TEST_MONGODB)
@@ -17,7 +18,6 @@ from dbbackup.tests.utils import (FakeStorage, TEST_DATABASE,
 @patch('sys.stdout', DEV_NULL)
 class DbbackupCommandSaveNewBackupTest(TestCase):
     def setUp(self):
-        open(TEST_DATABASE['NAME'], 'a+b').close()
         self.command = DbbackupCommand()
         self.command.servername = 'foo-server'
         self.command.encrypt = False
@@ -25,14 +25,13 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         self.command.database = TEST_DATABASE['NAME']
         self.command.dbcommands = DBCommands(TEST_DATABASE)
         self.command.storage = FakeStorage()
+        self.command.connector = get_connector()
         self.command.stdout = DEV_NULL
         self.command.filename = None
         self.command.path = None
-        open(TEST_DATABASE['NAME']).close()
 
     def tearDown(self):
         clean_gpg_keys()
-        os.remove(TEST_DATABASE['NAME'])
 
     def test_func(self):
         self.command._save_new_backup(TEST_DATABASE)
@@ -56,7 +55,7 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
 
 @patch('dbbackup.settings.GPG_RECIPIENT', 'test@test')
 @patch('sys.stdout', DEV_NULL)
-@patch('dbbackup.dbcommands.DBCommands.run_commands')
+@patch('dbbackup.db.sqlite.SqliteConnector.create_dump')
 class DbbackupCommandSaveNewMongoBackupTest(TestCase):
     def setUp(self):
         self.command = DbbackupCommand()
@@ -68,6 +67,7 @@ class DbbackupCommandSaveNewMongoBackupTest(TestCase):
         self.command.stdout = DEV_NULL
         self.command.filename = None
         self.command.path = None
+        self.command.connector = get_connector('default')
 
     def tearDown(self):
         clean_gpg_keys()
@@ -107,6 +107,7 @@ class DbbackupWriteLocallyTest(TestCase):
         self.command.stdout = DEV_NULL
         self.command.filename = None
         self.command.path = None
+        self.command.connector = get_connector('default')
 
     def test_write(self):
         fd, path = six.BytesIO(b"foo"), '/tmp/foo.bak'

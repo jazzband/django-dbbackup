@@ -17,6 +17,7 @@ from django.db import connection
 from ._base import BaseDbBackupCommand
 from ... import utils
 from ...dbcommands import DBCommands, MongoDBCommands
+from ...db import get_connector
 from ...storage.base import BaseStorage, StorageError
 
 input = raw_input if six.PY2 else input  # @ReservedAssignment
@@ -43,6 +44,7 @@ class Command(BaseDbBackupCommand):
         """Django command handler."""
         self.verbosity = int(options.get('verbosity'))
         self.quiet = options.get('quiet')
+        self.connector = get_connector('default')
         try:
             connection.close()
             self.filename = options.get('input_filename')
@@ -116,7 +118,8 @@ class Command(BaseDbBackupCommand):
                 self.logger.info("Quitting")
                 sys.exit(0)
         input_file.seek(0)
-        self.dbcommands.run_restore_commands(input_file)
+        # self.dbcommands.run_restore_commands(input_file)
+        self.connector.restore_dump(input_file)
 
     # TODO: Remove this
     def _list_backups(self):

@@ -1,14 +1,13 @@
-import os
 from mock import patch
 
-from django.test import TestCase
+from django.test import TransactionTestCase as TestCase
 from django.core.management import execute_from_command_line
-from django.utils.six import BytesIO
-from django.utils import six
 
 from dbbackup.tests.utils import (TEST_DATABASE, HANDLED_FILES,
                                   clean_gpg_keys, add_public_gpg,
                                   add_private_gpg)
+
+from testapp import models
 
 
 @patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})
@@ -18,9 +17,9 @@ class DbBackupCommandTest(TestCase):
         HANDLED_FILES.clean()
         add_public_gpg()
         open(TEST_DATABASE['NAME'], 'a').close()
+        self.instance = models.CharModel.objects.create(field='foo')
 
     def tearDown(self):
-        os.remove(TEST_DATABASE['NAME'])
         clean_gpg_keys()
 
     def test_encrypt(self):
@@ -53,7 +52,6 @@ class DbBackupCommandTest(TestCase):
         self.assertTrue(outputfile.read().startswith(b'-----BEGIN PGP MESSAGE-----'))
 
 
-# TODO: Add fake database to restore
 @patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})
 @patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils')
 @patch('dbbackup.management.commands.dbrestore.input', return_value='y')
@@ -63,16 +61,19 @@ class DbRestoreCommandTest(TestCase):
         add_public_gpg()
         add_private_gpg()
         open(TEST_DATABASE['NAME'], 'a').close()
+        self.instance = models.CharModel.objects.create(field='foo')
 
     def tearDown(self):
-        os.remove(TEST_DATABASE['NAME'])
         clean_gpg_keys()
 
     def test_restore(self, *args):
         # Create backup
         execute_from_command_line(['', 'dbbackup'])
+        self.instance.delete()
         # Restore
         execute_from_command_line(['', 'dbrestore'])
+        restored = models.CharModel.objects.all().exists()
+        self.assertTrue(restored)
 
     @patch('dbbackup.utils.getpass', return_value=None)
     def test_encrypted(self, *args):
@@ -134,7 +135,9 @@ class MediaBackupCommandTest(TestCase):
         filename, outputfile = HANDLED_FILES['written_files'][0]
         self.assertFalse('.gz' in filename)
 
-    def test_no_compress_and_encrypt(self):
+    @patch('dbbackup.utils.getpass', return_value=None)
+    @patch('dbbackup.management.commands.dbrestore.input', return_value='y')
+    def test_no_compress_and_encrypted(self, getpass_mock, confirm_mock):
         argv = ['', 'mediabackup', '--no-compress', '--encrypt']
         execute_from_command_line(argv)
         self.assertEqual(1, len(HANDLED_FILES['written_files']))
@@ -145,3 +148,14 @@ class MediaBackupCommandTest(TestCase):
         outputfile = HANDLED_FILES['written_files'][0][1]
         outputfile.seek(0)
         self.assertTrue(outputfile.read().startswith(b'-----BEGIN PGP MESSAGE-----'))
+        with self.assertRaises(Exception):
+            execute_from_command_line(['', 'dbrestore', '--decrypt'])
+        self.assertTrue(getpass_mock.called)
+        self.assertTrue(confirm_mock.called)
+
+    # def test_available_but_not_compressed(self, *args):
+    #     # Create backup
+    #     execute_from_command_line(['', 'dbbackup'])
+    #     # Restore
+    #     with self.assertRaises(Exception):
+    #         execute_from_command_line(['', 'dbrestore', '--uncompress'])

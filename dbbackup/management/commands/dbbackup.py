@@ -16,6 +16,8 @@ from django.core.management.base import CommandError
 
 from ._base import BaseDbBackupCommand
 from ...dbcommands import DBCommands, MongoDBCommands
+from ... import utils
+from ...db import get_connector
 from ...storage.base import BaseStorage, StorageError
 from ... import utils, settings as dbbackup_settings
 
@@ -55,6 +57,8 @@ class Command(BaseDbBackupCommand):
                 self.dbcommands = MongoDBCommands(database)
             else:
                 self.dbcommands = DBCommands(database)
+            self.connector = get_connector(database_key)
+            database = settings.DATABASES[database_key]
             try:
                 self._save_new_backup(database)
                 if self.clean:
@@ -69,10 +73,8 @@ class Command(BaseDbBackupCommand):
         if not self.quiet:
             self.logger.info("Backing Up Database: %s", database['NAME'])
         filename = self.dbcommands.filename(self.servername)
-        outputfile = tempfile.SpooledTemporaryFile(
-            max_size=dbbackup_settings.TMP_FILE_MAX_SIZE,
-            dir=dbbackup_settings.TMP_DIR)
-        self.dbcommands.run_backup_commands(outputfile)
+        # self.dbcommands.run_backup_commands(outputfile)
+        outputfile = self.connector.create_dump()
         if self.compress:
             compressed_file, filename = utils.compress_file(outputfile, filename)
             outputfile = compressed_file

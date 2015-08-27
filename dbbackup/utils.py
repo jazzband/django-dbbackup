@@ -228,7 +228,6 @@ def uncompress_file(inputfile, filename):
     :returns: Tuple with file and new file's name
     :rtype: :class:`tempfile.SpooledTemporaryFile`, ``str``
     """
-    new_basename = os.path.basename(filename).replace('.gz', '')
     outputfile = tempfile.SpooledTemporaryFile(
         max_size=500 * 1024 * 1024, dir=settings.TMP_DIR)
     zipfile = gzip.GzipFile(fileobj=inputfile, mode="rb")
@@ -237,6 +236,7 @@ def uncompress_file(inputfile, filename):
         outputfile.write(zipfile.read())
     finally:
         zipfile.close()
+    new_basename = os.path.basename(filename).replace('.gz', '')
     return outputfile, new_basename
 
 

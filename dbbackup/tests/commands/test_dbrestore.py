@@ -6,6 +6,7 @@ from django.core.management.base import CommandError
 from django.conf import settings
 from django.utils import six
 
+from dbbackup.utils import unencrypt_file, uncompress_file
 from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
 from dbbackup.dbcommands import DBCommands
 from dbbackup.tests.utils import FakeStorage, ENCRYPTED_FILE, TEST_DATABASE
@@ -104,7 +105,7 @@ class DbrestoreCommandUncompressTest(TestCase):
 
     def test_uncompress(self):
         inputfile = open(COMPRESSED_FILE, 'rb')
-        fd = self.command.uncompress_file(inputfile)
+        fd, basename = uncompress_file(inputfile, "whatever")
         fd.seek(0)
         self.assertEqual(fd.read(), b'foo\n')
 
@@ -125,6 +126,6 @@ class DbrestoreCommandDecryptTest(TestCase):
         if six.PY3:
             self.skipTest("Decryption isn't implemented in Python3")
         inputfile = open(ENCRYPTED_FILE, 'r+b')
-        uncryptfile, filename = self.command.unencrypt_file(inputfile, 'foofile.gpg')
+        uncryptfile, filename = unencrypt_file(inputfile, 'foofile.gpg')
         uncryptfile.seek(0)
         self.assertEqual('foo\n', uncryptfile.read())

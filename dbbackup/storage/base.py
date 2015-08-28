@@ -3,7 +3,7 @@ Abstract Storage class.
 """
 from importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
-from .. import settings
+from .. import settings, utils
 
 
 def get_storage(path=None, options={}):
@@ -51,12 +51,17 @@ class BaseStorage(object):
     def latest_backup(self, regex):
         """Return the latest backup file matching regex."""
         pass
-
     def backup_dir(self):
         raise NotImplementedError("Programming Error: backup_dir() not defined.")
 
     def delete_file(self, filepath):
         raise NotImplementedError("Programming Error: delete_file() not defined.")
+
+    def write_file(self, filehandle, filename):
+        raise StorageError("Programming Error: write_file() not defined.")
+
+    def read_file(self, filepath):
+        raise StorageError("Programming Error: read_file() not defined.")
 
     def list_backups(self, encrypted=None, compressed=None, content_type=None,
                      database=None):
@@ -102,3 +107,55 @@ class BaseStorage(object):
 
     def read_file(self, filepath):
         raise NotImplementedError("Programming Error: read_file() not defined.")
+
+    def get_latest_backup(self, encrypted=None, compressed=None,
+                          content_type=None, database=None):
+        """
+        Return the latest backup file name.
+
+        :param encrypted: Filter by encrypted or not
+        :type encrypted: ``bool`` or ``None``
+
+        :param compressed: Filter by compressed or not
+        :type compressed: ``bool`` or ``None``
+
+        :param content_type: Filter by media or database backup, must be
+                             ``'db'`` or ``'media'``
+
+        :type content_type: ``str`` or ``None``
+
+        :param database: Filter by source database's name
+        :type: ``str`` or ``None``
+
+        :returns: Most recent file
+        :rtype: ``str``
+        """
+        files = self.list_backups(encrypted=encrypted, compressed=compressed,
+                                  content_type=content_type, database=database)
+        return max(files, key=utils.filename_to_date)
+
+    def get_older_backup(self, encrypted=None, compressed=None,
+                          content_type=None, database=None):
+        """
+        Return the older backup's file name.
+
+        :param encrypted: Filter by encrypted or not
+        :type encrypted: ``bool`` or ``None``
+
+        :param compressed: Filter by compressed or not
+        :type compressed: ``bool`` or ``None``
+
+        :param content_type: Filter by media or database backup, must be
+                             ``'db'`` or ``'media'``
+
+        :type content_type: ``str`` or ``None``
+
+        :param database: Filter by source database's name
+        :type: ``str`` or ``None``
+
+        :returns: Older file
+        :rtype: ``str``
+        """
+        files = self.list_backups(encrypted=encrypted, compressed=compressed,
+                                  content_type=content_type, database=database)
+        return min(files, key=utils.filename_to_date)

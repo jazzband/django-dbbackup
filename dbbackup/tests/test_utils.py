@@ -173,10 +173,19 @@ class Datefmt_To_Regex(TestCase):
         self.assertEqual(match.groups()[0], date_string)
 
 
-class Date_From_Filename(TestCase):
+class Filename_To_DatestringTest(TestCase):
     def test_func(self):
         now = datetime.now()
         datefmt = dbbackup_settings.DATE_FORMAT
         filename = '%s-foo.gz.gpg' % datetime.strftime(now, datefmt)
-        datestring = utils.date_from_filename(filename, datefmt)
+        datestring = utils.filename_to_datestring(filename, datefmt)
         self.assertIn(datestring, filename)
+
+
+class Filename_To_DateTest(TestCase):
+    def test_func(self):
+        now = datetime.now()
+        datefmt = dbbackup_settings.DATE_FORMAT
+        filename = '%s-foo.gz.gpg' % datetime.strftime(now, datefmt)
+        date = utils.filename_to_date(filename, datefmt)
+        self.assertEqual(date.timetuple()[:5], now.timetuple()[:5])

@@ -12,6 +12,7 @@ import re
 from getpass import getpass
 from shutil import copyfileobj
 from functools import wraps
+from datetime import datetime
 
 from django.core.mail import EmailMessage
 from django.db import connection
@@ -323,14 +324,49 @@ PATTERN_MATCHNG = (
 
 
 def datefmt_to_regex(datefmt):
+    """
+    Convert a strftime format string to a regex.
+
+    :param datefmt: strftime format string
+    :type datefmt: ``str``
+
+    :returns: Equivalent regex
+    :rtype: ``re.compite``
+    """
     new_string = datefmt
     for pat, reg in PATTERN_MATCHNG:
         new_string = new_string.replace(pat, reg)
     return re.compile(r'(%s)' % new_string)
 
 
-def date_from_filename(filename, datefmt=None):
+def filename_to_datestring(filename, datefmt=None):
+    """
+    Return the date part of a file name.
+
+    :param datefmt: strftime format string, ``settings.DATE_FORMAT`` is used
+                    if is ``None``
+    :type datefmt: ``str`` or ``None``
+
+    :returns: Date part
+    :rtype: ``str``
+    """
     datefmt = datefmt or settings.DATE_FORMAT 
     regex = datefmt_to_regex(datefmt)
     match = regex.match(filename)
     return match.groups()[0]
+
+
+def filename_to_date(filename, datefmt=None):
+    """
+    Return a datetime from a file name.
+
+    :param datefmt: strftime format string, ``settings.DATE_FORMAT`` is used
+                    if is ``None``
+    :type datefmt: ``str`` or ``None``
+
+    :returns: Date guessed
+    :rtype: ``datetime.datetime``
+    """
+    datefmt = datefmt or settings.DATE_FORMAT 
+    datestring = filename_to_datestring(filename, datefmt)
+    return datetime.strptime(datestring, datefmt)

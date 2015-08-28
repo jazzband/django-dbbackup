@@ -1,5 +1,6 @@
 pep8
 flake8
+pylint
 mock
 coverage
 python-gnupg

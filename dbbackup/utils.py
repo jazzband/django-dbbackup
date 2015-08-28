@@ -8,6 +8,7 @@ import sys
 import os
 import tempfile
 import gzip
+import re
 from getpass import getpass
 from shutil import copyfileobj
 from functools import wraps
@@ -291,3 +292,45 @@ def timestamp(value):
 def filename_details(filepath):
     # TODO: What was this function made for ?
     return ''
+
+
+PATTERN_MATCHNG = (
+    ('%a', r'[A-Z][a-z]+'),
+    ('%A', r'[A-Z][a-z]+'),
+    ('%w', r'\d'),
+    ('%d', r'\d{2}'),
+    ('%b', r'[A-Z][a-z]+'),
+    ('%B', r'[A-Z][a-z]+'),
+    ('%m', r'\d{2}'),
+    ('%y', r'\d{2}'),
+    ('%Y', r'\d{4}'),
+    ('%H', r'\d{2}'),
+    ('%I', r'\d{2}'),
+    # ('%p', r'(?AM|PM|am|pm)'),
+    ('%M', r'\d{2}'),
+    ('%S', r'\d{2}'),
+    ('%f', r'\d{6}'),
+    # ('%z', r'\+\d{4}'),
+    # ('%Z', r'(?|UTC|EST|CST)'),
+    ('%j', r'\d{3}'),
+    ('%U', r'\d{2}'),
+    ('%W', r'\d{2}'),
+    # ('%c', r'[A-Z][a-z]+ [A-Z][a-z]{2} \d{2} \d{2}:\d{2}:\d{2} \d{4}'),
+    # ('%x', r'd{2}/d{2}/d{4}'),
+    # ('%X', r'd{2}:d{2}:d{2}'),
+    # ('%%', r'%'),
+)
+
+
+def datefmt_to_regex(datefmt):
+    new_string = datefmt
+    for pat, reg in PATTERN_MATCHNG:
+        new_string = new_string.replace(pat, reg)
+    return re.compile(r'(%s)' % new_string)
+
+
+def date_from_filename(filename, datefmt=None):
+    datefmt = datefmt or settings.DATE_FORMAT 
+    regex = datefmt_to_regex(datefmt)
+    match = regex.match(filename)
+    return match.groups()[0]

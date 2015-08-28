@@ -30,6 +30,7 @@ class Command(BaseDbBackupCommand):
         make_option("-x", "--backup-extension", help="The extension to use when scanning for files to restore from."),
         make_option("-s", "--servername", help="Use a different servername backup"),
         make_option("-l", "--list", action='store_true', default=False, help="List backups in the backup directory"),
+
         make_option("-c", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),
         make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
         make_option("-z", "--uncompress", help="Uncompress gzip data before restoring", action='store_true'),
@@ -105,6 +106,8 @@ class Command(BaseDbBackupCommand):
 
     def list_backups(self):
         """List backups in the backup directory."""
+        msg = "'dbbrestore --list' is deprecated, use 'listbackup'."
+        warnings.warn(msg, DeprecationWarning)
         self.log("Listing backups on %s in /%s:" % (self.storage.name, self.storage.backup_dir), 1)
         for filepath in self.storage.list_directory():
             self.log("  %s" % os.path.basename(filepath), 1)

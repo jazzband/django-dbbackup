@@ -14,6 +14,8 @@ from django.core.management.base import CommandError
 from django.utils import timezone
 from dbbackup import settings
 
+from .utils import filename_generate
+
 
 class BaseEngineSettings:
     """Base settings for a database engine"""
@@ -215,21 +217,9 @@ class DBCommands:
         return command
 
     def filename(self, servername=None, wildcard=None):
-        """ Create a new backup filename. """
-        params = {
-            'databasename': self.database['NAME'].replace("/", "_"),
-            'servername': servername or settings.SERVER_NAME,
-            'timestamp': timezone.now(),
-            'extension': self.settings.extension,
-            'wildcard': wildcard,
-        }
-        if callable(settings.FILENAME_TEMPLATE):
-            filename = settings.FILENAME_TEMPLATE(**params)
-        else:
-            params['datetime'] = wildcard or params['timestamp'].strftime(settings.DATE_FORMAT)
-            filename = settings.FILENAME_TEMPLATE.format(**params)
-            filename = filename.replace('--', '-')
-        return filename
+        extension = self.settings.extension
+        return filename_generate(extension, self.settings.database['NAME'],
+                                 servername, wildcard)
 
     def filename_match(self, servername=None, wildcard='*'):
         """ Return the prefix for backup filenames. """

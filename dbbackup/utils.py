@@ -16,7 +16,7 @@ from django.core.mail import EmailMessage
 from django.db import connection
 from django.http import HttpRequest
 from django.views.debug import ExceptionReporter
-from django.utils import six
+from django.utils import six, timezone
 
 from . import settings
 
@@ -268,3 +268,27 @@ def create_spooled_temporary_file(filepath):
 def filename_details(filepath):
     # TODO: What was this function made for ?
     return ''
+
+
+def filename_generate(extension, database_name="", servername=None,
+                      wildcard=None, filetype='db'):
+    """ Create a new backup filename. """
+    database_name = database_name.replace("/", "_")
+    params = {
+        'databasename': database_name,
+        'servername': servername or settings.SERVER_NAME,
+        'timestamp': timezone.now(),
+        'extension': extension,
+        'wildcard': wildcard,
+        'filetype': filetype
+    }
+    if callable(settings.FILENAME_TEMPLATE):
+        filename = settings.FILENAME_TEMPLATE(**params)
+    else:
+        params['datetime'] = \
+            wildcard or params['timestamp'].strftime(settings.DATE_FORMAT)
+        filename = settings.FILENAME_TEMPLATE.format(**params)
+        filename = filename.replace('--', '-')
+        if filename.startswith('-'):
+            filename = filename[1:]
+    return filename

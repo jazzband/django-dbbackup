@@ -216,10 +216,11 @@ class DBCommands:
             command[i] = replace(command[i])
         return command
 
+    # TODO: Clean wildcard
     def filename(self, servername=None, wildcard=None):
         extension = self.settings.extension
         return filename_generate(extension, self.settings.database['NAME'],
-                                 servername, wildcard)
+                                 servername)
 
     def filename_match(self, servername=None, wildcard='*'):
         """ Return the prefix for backup filenames. """

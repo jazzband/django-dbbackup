@@ -18,11 +18,7 @@ from django.core.mail import EmailMessage
 from django.db import connection
 from django.http import HttpRequest
 from django.views.debug import ExceptionReporter
-<<<<<<< HEAD
-from django.utils import (six, timezone)
-=======
 from django.utils import six, timezone
->>>>>>> ab2b8a2... add FILENAME_TEMPLATE support in mediabackup
 
 from . import settings
 
@@ -42,6 +38,8 @@ BYTES = (
     ('KB', 1024.0),
     ('B', 1.0)
 )
+
+REG_FILENAME_CLEAN = re.compile(r'-+')
 
 
 class EncryptionError(Exception):
@@ -376,25 +374,42 @@ def filename_to_date(filename, datefmt=None):
     return datetime.strptime(datestring, datefmt)
 
 
-def filename_generate(extension, database_name="", servername=None,
-                      wildcard=None, filetype='db'):
-    """ Create a new backup filename. """
-    database_name = database_name.replace("/", "_")
+def filename_generate(extension, database_name='', servername=None,
+                      content_type='db'):
+    """
+    Create a new backup filename.
+
+    :param extension: Extension of backup file
+    :type extension: ``str``
+
+    :param database_name: If it is database backup specify its name
+    :type database_name: ``str``
+
+    :param servername: Specify server name or by default ``settings.HOSTNAME``
+    :type servername: ``str``
+
+    :param content_type: Content type to backup, ``'media'`` or ``'db'``
+    :type content_type: ``str``
+
+    :returns: Computed file name
+    :rtype: ``str`
+    """
+    if content_type == 'db':
+        name_format = settings.FILENAME_TEMPLATE
+        database_name = database_name.replace("/", "_")
+    else:
+         name_format = settings.MEDIA_FILENAME_TEMPLATE
     params = {
+        'servername': servername or settings.HOSTNAME,
+        'datetime': timezone.now().strftime(settings.DATE_FORMAT),
         'databasename': database_name,
-        'servername': servername or settings.SERVER_NAME,
-        'timestamp': timezone.now(),
         'extension': extension,
-        'wildcard': wildcard,
-        'filetype': filetype
+        'content_type': content_type
     }
     if callable(settings.FILENAME_TEMPLATE):
         filename = settings.FILENAME_TEMPLATE(**params)
     else:
-        params['datetime'] = \
-            wildcard or params['timestamp'].strftime(settings.DATE_FORMAT)
         filename = settings.FILENAME_TEMPLATE.format(**params)
-        filename = filename.replace('--', '-')
-        if filename.startswith('-'):
-            filename = filename[1:]
+        filename = REG_FILENAME_CLEAN.sub('-', filename)
+        filename = filename[1:] if filename.startswith('-') else filename
     return filename

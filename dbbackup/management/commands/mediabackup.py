@@ -85,9 +85,9 @@ class Command(BaseDbBackupCommand):
     def get_backup_basename(self, **kwargs):
 
         extension = "tar%s" % ('.gz' if kwargs.get('compress') else '')
-        return utils.filename_generate(extension, "",
-                                       self.get_servername(), wildcard=None,
-                                       filetype='media')
+        return utils.filename_generate(extension,
+                                       servername=self.get_servername(),
+                                       content_type='media')
 
     def get_databasename(self):
         # TODO: WTF is this??

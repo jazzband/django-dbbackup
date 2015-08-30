@@ -1,8 +1,5 @@
-try:
-    from StringIO import StringIO
-except ImportError:  # Py3
-    from io import StringIO
 from django.test import TestCase
+from django.utils.six import StringIO
 from dbbackup.management.commands._base import BaseDbBackupCommand
 
 

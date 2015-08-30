@@ -28,7 +28,7 @@ Directory to be used for temporary files.
 Default: ``tempfile.gettempdir()``
 
 DBBACKUP_TMP_FILE_MAX_SIZE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Maximum size in bytes for file handling in memory before write a temporary
 file on ``DBBACKUP_TMP_DIR``.
@@ -91,14 +91,14 @@ The file name extension used for MySQL backups.
 Default: ``'mysql'``
 
 DBBACKUP_POSTGRESQL_EXTENSION
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The file name extension used for Postgres and PostGIS backups.
 
 Default: ``'psql'``
 
 DBBACKUP_SQLITE_EXTENSION
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The file name extension used for SQLite backups.
 

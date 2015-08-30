@@ -18,6 +18,7 @@ Contents:
    installation
    configuration
    storage
+   contributing
    faq
 
 .. warning::
@@ -27,7 +28,7 @@ Contents:
 Compatibility
 -------------
 
-Django Database Backup supports Pypy, Python 2.7, 3.2 to 3.4 and Django greater than
+Django Database Backup supports PyPy, Python 2.7, 3.2 to 3.4 and Django greater than
 1.6.
    
 Management Commands
@@ -117,7 +118,7 @@ Other Resources
 
 Source code here:
 
-https://github.com/mjs7231/django-dbbackup
+https://github.com/django-dbbackup/django-dbbackup
 
 PyPi project:
 

@@ -1,15 +1,19 @@
 #!/usr/bin/env python
-
+"""
+Configuration and launcher for dbbackup tests.
+"""
 import os
 import sys
 import django
 from django.conf import settings
 from django.core.management import call_command
 
-here = os.path.dirname(os.path.abspath(__file__))
-parent = os.path.dirname(here)
-sys.path[0:0] = [here, parent]
+# Add testproject dbbackup in path
+HERE = os.path.dirname(os.path.abspath(__file__))
+PARENT_DIR = os.path.dirname(HERE)
+sys.path[0:0] = [HERE, PARENT_DIR]
 
+# Settings
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_ROOT = os.path.join(BASE_DIR, 'tests/media')
 INSTALLED_APPS = (
@@ -39,15 +43,9 @@ settings.configure(
 def main():
     if django.VERSION >= (1, 7):
         django.setup()
-    if sys.argv[-1] == 'shell':
-        call_command('shell')
-        sys.exit(0)
-    else:
-        # call_command('test', *sys.argv[2:])
-        from django.test.runner import DiscoverRunner
-        runner = DiscoverRunner(failfast=True, verbosity=int(os.environ.get('DJANGO_DEBUG', 1)))
-        failures = runner.run_tests(['dbbackup'], interactive=True)
-        sys.exit(failures)
+    command_args = sys.argv[1:] or ['test', 'dbbackup']
+    call_command(*command_args)
+    exit(0)
 
 if __name__ == '__main__':
     main()

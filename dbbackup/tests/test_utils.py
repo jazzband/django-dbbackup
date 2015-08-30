@@ -174,6 +174,11 @@ class Filename_To_DatestringTest(TestCase):
         datestring = utils.filename_to_datestring(filename, datefmt)
         self.assertIn(datestring, filename)
 
+    def test_generated_filename(self):
+        filename = utils.filename_generate('bak', 'default')
+        datestring = utils.filename_to_datestring(filename)
+        self.assertIn(datestring, filename)
+
 
 class Filename_To_DateTest(TestCase):
     def test_func(self):
@@ -182,6 +187,10 @@ class Filename_To_DateTest(TestCase):
         filename = '%s-foo.gz.gpg' % datetime.strftime(now, datefmt)
         date = utils.filename_to_date(filename, datefmt)
         self.assertEqual(date.timetuple()[:5], now.timetuple()[:5])
+
+    def test_generated_filename(self):
+        filename = utils.filename_generate('bak', 'default')
+        datestring = utils.filename_to_date(filename)
 
 
 @patch('dbbackup.settings.HOSTNAME', 'test')

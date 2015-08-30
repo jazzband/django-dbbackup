@@ -34,6 +34,10 @@ class StorageError(Exception):
     pass
 
 
+class FileNotFound(StorageError):
+    pass
+
+
 class BaseStorage(object):
     """Abstract storage class."""
     def __init__(self, server_name=None):
@@ -48,9 +52,6 @@ class BaseStorage(object):
     def storage_factory(cls):
         return get_storage()
 
-    def latest_backup(self, regex):
-        """Return the latest backup file matching regex."""
-        pass
     def backup_dir(self):
         raise NotImplementedError("Programming Error: backup_dir() not defined.")
 
@@ -58,10 +59,10 @@ class BaseStorage(object):
         raise NotImplementedError("Programming Error: delete_file() not defined.")
 
     def write_file(self, filehandle, filename):
-        raise StorageError("Programming Error: write_file() not defined.")
+        raise NotImplementedError("Programming Error: write_file() not defined.")
 
     def read_file(self, filepath):
-        raise StorageError("Programming Error: read_file() not defined.")
+        raise NotImplementedError("Programming Error: read_file() not defined.")
 
     def list_backups(self, encrypted=None, compressed=None, content_type=None,
                      database=None):
@@ -97,7 +98,7 @@ class BaseStorage(object):
         if compressed is not None:
             files = [f for f in files if ('.gz' in f) == compressed]
         if content_type is not None:
-            files = [f for f in files if '.%s' % content_type in f]
+            files = [f for f in files if '%s' % content_type in f]
         if database is not None:
             files = [f for f in files if '%s' % database in f]
         return files
@@ -129,9 +130,13 @@ class BaseStorage(object):
 
         :returns: Most recent file
         :rtype: ``str``
+
+        :raises: FileNotFound: If no backup file is found
         """
         files = self.list_backups(encrypted=encrypted, compressed=compressed,
                                   content_type=content_type, database=database)
+        if not files:
+            raise FileNotFound("There's no backup file available.")
         return max(files, key=utils.filename_to_date)
 
     def get_older_backup(self, encrypted=None, compressed=None,
@@ -155,7 +160,41 @@ class BaseStorage(object):
 
         :returns: Older file
         :rtype: ``str``
+
+        :raises: FileNotFound: If no backup file is found
         """
         files = self.list_backups(encrypted=encrypted, compressed=compressed,
                                   content_type=content_type, database=database)
+        if not files:
+            raise FileNotFound("There's no backup file available.")
         return min(files, key=utils.filename_to_date)
+
+    def clean_old_backups(self, encrypted=None, compressed=None,
+                          content_type=None, database=None,
+                          keep_number=None):
+        """
+        Delete olders backups and hold the number defined.
+
+        :param encrypted: Filter by encrypted or not
+        :type encrypted: ``bool`` or ``None``
+
+        :param compressed: Filter by compressed or not
+        :type compressed: ``bool`` or ``None``
+
+        :param content_type: Filter by media or database backup, must be
+                             ``'db'`` or ``'media'``
+
+        :type content_type: ``str`` or ``None``
+
+        :param database: Filter by source database's name
+        :type: ``str`` or ``None``
+
+        :param keep_number: Number of files to keep, other will be deleted
+        :type keep_number: ``int`` or ``None``
+        """
+        files = self.list_backups(encrypted=encrypted, compressed=compressed,
+                                  content_type=content_type, database=database)
+        files = sorted(files, key=utils.filename_to_date, reverse=True)
+        files_to_delete = [fi for i, fi in enumerate(files) if i >= keep_number]
+        for filename in files_to_delete:
+            self.delete_file(filename)

@@ -9,6 +9,7 @@ from django.utils.six import BytesIO
 from dbbackup.utils import unencrypt_file, uncompress_file
 from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
 from dbbackup.dbcommands import DBCommands
+from dbbackup import utils
 from dbbackup.tests.utils import (FakeStorage, ENCRYPTED_FILE, TEST_DATABASE,
                                   add_private_gpg, DEV_NULL, COMPRESSED_FILE,
                                   clean_gpg_keys, HANDLED_FILES)
@@ -37,7 +38,8 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
 
     def test_no_filepath(self, *args):
         # Create backup
-        HANDLED_FILES['written_files'].append((':memory:.bak', BytesIO(b'bar')))
+        HANDLED_FILES['written_files'].append(
+            (utils.filename_generate('foo'), BytesIO(b'bar')))
         # Check
         self.command.filepath = None
         self.command.restore_backup()
@@ -56,11 +58,9 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
 
     @patch('dbbackup.utils.getpass', return_value=None)
     def test_decrypt(self, *args):
-        if six.PY3:
-            self.skipTest("Decryption isn't implemented in Python3")
         self.command.decrypt = True
         self.command.filepath = ENCRYPTED_FILE
-        HANDLED_FILES['written_files'].append((ENCRYPTED_FILE, open(ENCRYPTED_FILE)))
+        HANDLED_FILES['written_files'].append((ENCRYPTED_FILE, open(ENCRYPTED_FILE, 'rb')))
         self.command.restore_backup()
 
 

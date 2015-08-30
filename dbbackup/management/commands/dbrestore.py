@@ -72,16 +72,16 @@ class Command(BaseDbBackupCommand):
 
     def restore_backup(self):
         """Restore the specified database."""
-        self.log("Restoring backup for database: %s" % self.database['NAME'], 1)
+        database_name = self.database['NAME']
+        self.log("Restoring backup for database: %s" % database_name, 1)
         # Fetch the latest backup if filepath not specified
         if not self.filepath:
             self.log("  Finding latest backup", 1)
-            filepaths = self.storage.list_directory()
-            # TODO: It is a bad filter
-            # filepaths = [f for f in filepaths if f.endswith('.' + self.backup_extension)]
-            if not filepaths:
-                raise CommandError("No backup files found in: /%s" % self.storage.backup_dir)
-            self.filepath = filepaths[-1]
+            try:
+                self.filepath = self.storage.get_latest_backup(encrypted=self.decrypt,
+                                                               compressed=self.uncompress)
+            except StorageError as err:
+                raise CommandError(err.args[0])
         # Restore the specified filepath backup
         self.log("  Restoring: %s" % self.filepath, 1)
         input_filename = self.filepath

@@ -11,14 +11,13 @@ import tempfile
 from optparse import make_option
 import re
 
-from django.conf import settings
 from django.core.management.base import CommandError
 
 from ._base import BaseDbBackupCommand
 from ... import utils
 from ...dbcommands import DBCommands
 from ...storage.base import BaseStorage, StorageError
-from ... import settings as dbbackup_settings
+from ... import settings as settings
 
 
 class Command(BaseDbBackupCommand):
@@ -34,14 +33,12 @@ class Command(BaseDbBackupCommand):
 
     @utils.email_uncaught_exception
     def handle(self, *args, **options):
+        self.encrypt = options.get('encrypt')
+        self.compress = not options.get('no_compress')
+        self.servername = options.get('servername') or settings.HOSTNAME
         try:
-            self.servername = options.get('servername')
             self.storage = BaseStorage.storage_factory()
-
-            self.backup_mediafiles(
-                options.get('encrypt'),
-                options.get('no_compress', True))
-
+            self.backup_mediafiles(self.encrypt, self.compress)
             if options.get('clean'):
                 self.cleanup_old_backups()
 
@@ -58,47 +55,30 @@ class Command(BaseDbBackupCommand):
         :param compress: Compress file or not
         :type compress: ``bool``
         """
-        source_dir = self.get_source_dir()
+        # TODO: Remove MEDIA_PATH and list Media Storage
+        source_dir = settings.MEDIA_PATH
         if not source_dir:
             self.stderr.write("No media source dir configured.")
-            sys.exit(0)
+            sys.exit(1)
         self.log("Backing up media files in %s" % source_dir, 1)
         filename = self.get_backup_basename(compress=compress)
-        output_file = self.create_backup_file(
-            source_dir,
-            filename,
-            compress=compress
-        )
-
+        output_file = self.create_backup_file(source_dir, filename,
+                                              compress=compress)
         if encrypt:
             encrypted_file = utils.encrypt_file(output_file, filename)
             output_file, filename = encrypted_file
-
         self.log("  Backup tempfile created: %s (%s)" % (filename, utils.handle_size(output_file)), 1)
         self.log("  Writing file to %s: %s" % (self.storage.name, self.storage.backup_dir), 1)
-        self.storage.write_file(
-            output_file,
-            self.get_backup_basename(
-                compress=compress)
-        )
+        self.storage.write_file(output_file, filename)
 
     def get_backup_basename(self, **kwargs):
-
         extension = "tar%s" % ('.gz' if kwargs.get('compress') else '')
         return utils.filename_generate(extension,
-                                       servername=self.get_servername(),
+                                       servername=self.servername,
                                        content_type='media')
 
-    def get_databasename(self):
-        # TODO: WTF is this??
-        return settings.DATABASES['default']['NAME']
-
-    def get_source_dir(self):
-        # TODO: WTF again ??
-        return dbbackup_settings.MEDIA_PATH
-
     def create_backup_file(self, source_dir, backup_basename, **kwargs):
-        temp_dir = tempfile.mkdtemp(dir=dbbackup_settings.TMP_DIR)
+        temp_dir = tempfile.mkdtemp(dir=settings.TMP_DIR)
         try:
             backup_filename = os.path.join(temp_dir, backup_basename)
             try:
@@ -125,38 +105,6 @@ class Command(BaseDbBackupCommand):
         """
         self.log("Cleaning Old Backups for media files", 1)
 
-        file_list = self.get_backup_file_list()
-
-        for backup_date, filename in file_list[0:-dbbackup_settings.CLEANUP_KEEP_MEDIA]:
-            if int(backup_date.strftime("%d")) != 1:
-                self.log("  Deleting: %s" % filename, 1)
-                self.storage.delete_file(filename)
-
-    def get_backup_file_list(self):
-        """
-        Return a list of backup files including the backup date. The result
-        is a list of tuples (datetime, filename).  The list is sorted by date.
-        """
-        server_name = self.get_servername()
-        if server_name:
-            server_name = '-%s' % server_name
-
-        media_re = re.compile(r'^%s%s-(.*)\.media\.tar(?:\.gz)?(?:\.\d+)?$' %
-            re.escape(self.get_databasename()), re.escape(server_name))
-
-        def is_media_backup(filename):
-            return media_re.search(filename)
-
-        def get_datetime_from_filename(filename):
-            datestr = media_re.findall(filename)[0]
-            return datetime.strptime(datestr, dbbackup_settings.DATE_FORMAT)
-
-        file_list = [
-            (get_datetime_from_filename(os.path.basename(f)), f)
-            for f in self.storage.list_directory()
-            if is_media_backup(os.path.basename(f))
-        ]
-        return sorted(file_list, key=lambda v: v[0])
-
-    def get_servername(self):
-        return self.servername or dbbackup_settings.HOSTNAME
+        file_list = self.storage.clean_old_backups(encrypted=self.encrypt,
+                                                   compressed=self.compress,
+                                                   keep_number=settings.CLEANUP_KEEP_MEDIA)

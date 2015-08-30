@@ -354,8 +354,8 @@ def filename_to_datestring(filename, datefmt=None):
     """
     datefmt = datefmt or settings.DATE_FORMAT 
     regex = datefmt_to_regex(datefmt)
-    match = regex.match(filename)
-    return match.groups()[0]
+    search = regex.search(filename)
+    return search.groups()[0]
 
 
 def filename_to_date(filename, datefmt=None):

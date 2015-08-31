@@ -25,7 +25,7 @@ input = raw_input if six.PY2 else input  # @ReservedAssignment
 FAKE_HTTP_REQUEST = HttpRequest()
 FAKE_HTTP_REQUEST.META['SERVER_NAME'] = ''
 FAKE_HTTP_REQUEST.META['SERVER_PORT'] = ''
-FAKE_HTTP_REQUEST.META['HTTP_HOST'] = settings.DBBACKUP_FAKE_HOST
+FAKE_HTTP_REQUEST.META['HTTP_HOST'] = settings.HOSTNAME
 FAKE_HTTP_REQUEST.path = '/DJANGO-DBBACKUP-EXCEPTION'
 
 BYTES = (
@@ -36,6 +36,14 @@ BYTES = (
     ('KB', 1024.0),
     ('B', 1.0)
 )
+
+
+class EncryptionError(Exception):
+    pass
+
+
+class DecryptionError(Exception):
+    pass
 
 
 def bytes_to_str(byteVal, decimals=1):
@@ -132,7 +140,7 @@ def encrypt_file(inputfile, filename):
             inputfile.close()
             if not result:
                 msg = 'Encryption failed; status: %s' % result.status
-                raise Exception(msg)
+                raise EncryptionError(msg)
             return create_spooled_temporary_file(filepath), filename
         finally:
             if os.path.exists(filepath):
@@ -171,11 +179,12 @@ def unencrypt_file(inputfile, filename, passphrase=None):
         try:
             inputfile.seek(0)
             g = gnupg.GPG()
-            result = g.decrypt_file(file=inputfile, passphrase=get_passphrase(), output=temp_filename)
+            result = g.decrypt_file(file=inputfile, passphrase=get_passphrase(),
+                                    output=temp_filename)
             if not result:
-                raise Exception('Decryption failed; status: %s' % result.status)
+                raise DecryptionError('Decryption failed; status: %s' % result.status)
             outputfile = tempfile.SpooledTemporaryFile(
-                max_size=10 * 1024 * 1024, dir=settings.TMP_DIR)
+                max_size=settings.TMP_FILE_MAX_SIZE, dir=settings.TMP_DIR)
             f = open(temp_filename, 'r+b')
             try:
                 outputfile.write(f.read())
@@ -203,13 +212,13 @@ def compress_file(inputfile, filename):
     :rtype: :class:`tempfile.SpooledTemporaryFile`, ``str``
     """
     outputfile = tempfile.SpooledTemporaryFile(
-        max_size=10 * 1024 * 1024, dir=settings.TMP_DIR)
+        max_size=settings.TMP_FILE_MAX_SIZE, dir=settings.TMP_DIR)
     new_filename = filename + '.gz'
     zipfile = gzip.GzipFile(filename=filename, fileobj=outputfile, mode="wb")
     # TODO: Why do we have an exception block without handling exceptions?
     try:
         inputfile.seek(0)
-        copyfileobj(inputfile, zipfile, 2 * 1024 * 1024)
+        copyfileobj(inputfile, zipfile, settings.TMP_FILE_READ_SIZE)
     finally:
         zipfile.close()
     return outputfile, new_filename
@@ -229,7 +238,7 @@ def uncompress_file(inputfile, filename):
     :rtype: :class:`tempfile.SpooledTemporaryFile`, ``str``
     """
     outputfile = tempfile.SpooledTemporaryFile(
-        max_size=500 * 1024 * 1024, dir=settings.TMP_DIR)
+        max_size=settings.TMP_FILE_MAX_SIZE, dir=settings.TMP_DIR)
     zipfile = gzip.GzipFile(fileobj=inputfile, mode="rb")
     try:
         inputfile.seek(0)
@@ -251,7 +260,7 @@ def create_spooled_temporary_file(filepath):
     :rtype: :class:`tempfile.SpooledTemporaryFile`
     """
     spooled_file = tempfile.SpooledTemporaryFile(
-        max_size=10 * 1024 * 1024,
+        max_size=settings.TMP_FILE_MAX_SIZE,
         dir=settings.TMP_DIR)
     tmpfile = open(filepath, 'r+b')
     try:

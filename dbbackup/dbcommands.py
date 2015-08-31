@@ -218,7 +218,7 @@ class DBCommands:
         """ Create a new backup filename. """
         params = {
             'databasename': self.database['NAME'].replace("/", "_"),
-            'servername': servername or settings.SERVER_NAME,
+            'servername': servername or settings.HOSTNAME,
             'timestamp': timezone.now(),
             'extension': self.settings.extension,
             'wildcard': wildcard,

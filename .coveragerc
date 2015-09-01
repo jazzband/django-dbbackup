@@ -15,6 +15,7 @@ omit =
 exclude_lines =
     # Have to re-enable the standard pragma
     pragma: no cover
+    noqa:
 
     # Don't complain about missing debug-only code:
     def __repr__

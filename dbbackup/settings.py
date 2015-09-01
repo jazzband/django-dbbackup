@@ -66,7 +66,8 @@ STORAGE = getattr(settings, 'DBBACKUP_STORAGE', 'dbbackup.storage.filesystem_sto
 BUILTIN_STORAGE = getattr(settings, 'DBBACKUP_BUILTIN_STORAGE', None)
 STORAGE_OPTIONS = getattr(settings, 'DBBACKUP_STORAGE_OPTIONS', {})
 
-if hasattr(settings, 'DBBACKUP_BACKUP_DIRECTORY'):
+# Deprecation
+if hasattr(settings, 'DBBACKUP_BACKUP_DIRECTORY'):  # pragma: no cover
     BACKUP_DIRECTORY = STORAGE_OPTIONS['location'] = \
         getattr(settings, 'DBBACKUP_BACKUP_DIRECTORY', os.getcwd())
     warnings.warn("DBBACKUP_BACKUP_DIRECTORY is deprecated, use DBBACKUP_STORAGE_OPTIONS['location']", DeprecationWarning)
@@ -74,3 +75,24 @@ if hasattr(settings, 'DBBACKUP_BACKUP_DIRECTORY'):
 if hasattr(settings, 'DBBACKUP_FAKE_HOST'):  # noqa
     warnings.warn("DBBACKUP_FAKE_HOST is deprecated, use DBBACKUP_HOSTNAME", DeprecationWarning)
     HOSTNAME = settings.DBBACKUP_FAKE_HOST
+
+UNSED_AWS_SETTINGS = ('DIRECTORY',)
+DEPRECATED_AWS_SETTINGS = (
+    ('BUCKET', 'bucket_name'),
+    ('ACCESS_KEY', 'access_key'),
+    ('SECRET_KEY', 'secret_key'),
+    ('DOMAIN', 'host'),
+    ('IS_SECURE', 'use_ssl'),
+    ('SERVER_SIDE_ENCRYPTION', 'encryption'),
+)
+if hasattr(settings, 'DBBACKUP_S3_BUCKET'):  # pragma: no cover
+    for old_suffix, new_key in DEPRECATED_AWS_SETTINGS:
+        if hasattr(settings, 'DBBACKUP_S3_%s' % old_suffix):
+            STORAGE_OPTIONS[new_key] = getattr(settings, old_suffix)
+            msg = "DBBACKUP_S3_%s is deprecated, use DBBACKUP_STORAGE_OPTIONS['%s']" % (old_suffix, new_key)
+            warnings.warn(msg, DeprecationWarning)
+    for old_suffix in UNSED_AWS_SETTINGS:
+        if hasattr(settings, 'DBBACKUP_S3_%s' % old_suffix):
+            msg = "DBBACKUP_S3_%s is now useless" % old_suffix
+            warnings.warn(msg, DeprecationWarning)
+    del old_suffix, new_key

@@ -11,7 +11,7 @@ from dbbackup.utils import six
 
 
 @patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})
-@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils.FakeStorage')
+@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils')
 class DbBackupCommandTest(TestCase):
     def setUp(self):
         HANDLED_FILES.clean()
@@ -47,7 +47,7 @@ class DbBackupCommandTest(TestCase):
 
 # TODO: Add fake database to restore
 @patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})
-@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils.FakeStorage')
+@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils')
 @patch('dbbackup.management.commands.dbrestore.input', return_value='y')
 class DbRestoreCommandTest(TestCase):
     def setUp(self):

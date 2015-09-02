@@ -1,5 +1,5 @@
 """
-Filesystem Storage object.
+Filesystem Storage API.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
@@ -26,13 +26,13 @@ class Storage(DjangoStorage):
     def _check_filesystem_errors(self, options):
         """ Check we have all the required settings defined. """
         location = options.get('location')
-        if location is None or location == '':
-            raise StorageError('Filesystem storage requires'
-                               'DBBACKUP_STORAGE_OPTIONS["location"] to be'
+        if location is None:
+            raise StorageError('Filesystem storage requires '
+                               'DBBACKUP_STORAGE_OPTIONS["location"] to be '
                                'defined in settings.')
         if location == '':
-            raise StorageError('Filesystem storage requires'
-                               'DBBACKUP_STORAGE_OPTIONS["location"] to be'
+            raise StorageError('Filesystem storage requires '
+                               'DBBACKUP_STORAGE_OPTIONS["location"] to be '
                                'defined with a non empty string.')
 
         if settings.MEDIA_ROOT and \
@@ -41,6 +41,6 @@ class Storage(DjangoStorage):
                 msg = "Backups can't be stored in MEDIA_ROOT if DEBUG is "\
                       "False, Please use an another location for your storage."
                 raise ImproperlyConfigured(msg)
-            msg = "Backups are saved in MEDIA_ROOT, this is a critical issue"\
+            msg = "Backups are saved in MEDIA_ROOT, this is a critical issue "\
                   "in production."
             warnings.warn(msg)

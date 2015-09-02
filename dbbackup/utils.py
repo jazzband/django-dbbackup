@@ -16,7 +16,7 @@ from django.core.mail import EmailMessage
 from django.db import connection
 from django.http import HttpRequest
 from django.views.debug import ExceptionReporter
-from django.utils import six
+from django.utils import (six, timezone)
 
 from . import settings
 
@@ -272,6 +272,20 @@ def create_spooled_temporary_file(filepath):
     finally:
         tmpfile.close()
     return spooled_file
+
+
+def timestamp(value):
+    """
+    Return the timestamp of a datetime.datetime object.
+
+    :param value: a datetime object
+    :type value: datetime.datetime
+
+    :return: the timestamp
+    :rtype: str
+    """
+    value = value if timezone.is_naive(value) else timezone.localtime(value)
+    return value.strftime(settings.DATE_FORMAT)
 
 
 def filename_details(filepath):

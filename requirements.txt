@@ -1,2 +1,3 @@
+pytz
 six
 Django>=1.5

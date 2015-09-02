@@ -12,7 +12,7 @@ from shutil import copyfileobj
 from subprocess import Popen
 from django.core.management.base import CommandError
 from django.utils import timezone
-from dbbackup import settings
+from dbbackup import (settings, utils)
 
 
 class BaseEngineSettings:
@@ -219,14 +219,14 @@ class DBCommands:
         params = {
             'databasename': self.database['NAME'].replace("/", "_"),
             'servername': servername or settings.HOSTNAME,
-            'timestamp': timezone.now(),
+            'timestamp': utils.timestamp(timezone.now()),
             'extension': self.settings.extension,
             'wildcard': wildcard,
         }
         if callable(settings.FILENAME_TEMPLATE):
             filename = settings.FILENAME_TEMPLATE(**params)
         else:
-            params['datetime'] = wildcard or params['timestamp'].strftime(settings.DATE_FORMAT)
+            params['datetime'] = wildcard or params['timestamp']
             filename = settings.FILENAME_TEMPLATE.format(**params)
             filename = filename.replace('--', '-')
         return filename

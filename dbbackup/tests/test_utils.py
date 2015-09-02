@@ -1,4 +1,6 @@
+import datetime
 import os
+import pytz
 import subprocess
 from mock import patch
 try:
@@ -134,3 +136,16 @@ class Create_Spooled_Temporary_FileTest(TestCase):
 
     def test_func(self, *args):
         utils.create_spooled_temporary_file(filepath=self.path)
+
+
+class TimestampTest(TestCase):
+
+    def test_naive_value(self):
+        with self.settings(USE_TZ=False):
+            timestamp = utils.timestamp(datetime.datetime(2015, 8, 15, 8, 15, 12, 0))
+            self.assertEqual(timestamp, '2015-08-15-081512')
+
+    def test_aware_value(self):
+        with self.settings(USE_TZ=True) and self.settings(TIME_ZONE='Europe/Rome'):
+            timestamp = utils.timestamp(datetime.datetime(2015, 8, 15, 8, 15, 12, 0, tzinfo=pytz.utc))
+            self.assertEqual(timestamp, '2015-08-15-101512')

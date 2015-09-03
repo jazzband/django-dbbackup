@@ -6,6 +6,8 @@ from pysftp import Connection
 from django.conf import settings
 import os, tempfile
 
+from .. import settings as dbbackup_settings
+
 ################################
 #  SFTP Storage Object
 ################################

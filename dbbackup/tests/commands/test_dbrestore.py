@@ -27,6 +27,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.database = TEST_DATABASE
         self.command.dbcommands = DBCommands(TEST_DATABASE)
         self.command.passphrase = None
+        self.command.interactive = True
         self.command.storage = FakeStorage()
         HANDLED_FILES.clean()
         cmd = ('gpg --import %s' % GPG_PRIVATE_PATH).split()

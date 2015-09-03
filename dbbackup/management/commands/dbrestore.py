@@ -47,6 +47,7 @@ class Command(BaseDbBackupCommand):
             self.decrypt = options.get('decrypt')
             self.uncompress = options.get('uncompress')
             self.passphrase = options.get('passphrase')
+            self.interactive = options.get('interactive')
             self.database = self._get_database(options)
             self.storage = BaseStorage.storage_factory()
             self.dbcommands = DBCommands(self.database)
@@ -92,10 +93,11 @@ class Command(BaseDbBackupCommand):
             inputfile.close()
             inputfile = uncompressed_file
         self.log("  Restore tempfile created: %s" % utils.handle_size(inputfile), 1)
-        answer = input("Are you sure you want to continue? [Y/n]")
-        if answer.lower() not in ('y', 'yes', ''):
-            self.log("Quitting", 1)
-            sys.exit(0)
+        if self.interactive:
+            answer = input("Are you sure you want to continue? [Y/n]")
+            if answer.lower() not in ('y', 'yes', ''):
+                self.log("Quitting", 1)
+                sys.exit(0)
         inputfile.seek(0)
         self.dbcommands.run_restore_commands(inputfile)
 

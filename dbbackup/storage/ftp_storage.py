@@ -11,6 +11,8 @@ from .base import BaseStorage, StorageError
 from django.conf import settings
 from ftplib import FTP
 
+from .. import settings as dbbackup_settings
+
 MAX_SPOOLED_SIZE = 10 * 1024 * 1024
 FILE_SIZE_LIMIT = 145 * 1024 * 1024
 

@@ -21,17 +21,6 @@ install:
   - pip install -r requirements-docs.txt
   - pip install coveralls
 
-#before_install:
-#  - sudo apt-get update
-#  - sudo apt-get install -qq gnupg
-
-install:
-  - pip install "${DJANGO_PACKAGE:-Django}"
-  - pip install -r requirements.txt
-  - pip install -r requirements-tests.txt
-  - pip install -r requirements-docs.txt
-  - pip install coveralls
-
 script:
   - coverage run setup.py test
 after_success: coveralls $COVERALLS_OPTION

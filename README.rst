@@ -2,7 +2,7 @@ Django Database Backup
 ======================
 
 .. image:: https://api.travis-ci.org/django-dbbackup/django-dbbackup.svg
-        :target: https://travis-ci.org/django-dbbackup/ka-lite-gtk
+        :target: https://travis-ci.org/django-dbbackup/django-dbbackup
 
 .. image:: https://readthedocs.org/projects/django-dbbackup/badge/?version=latest
         :target: https://readthedocs.org/projects/django-dbbackup/?badge=latest

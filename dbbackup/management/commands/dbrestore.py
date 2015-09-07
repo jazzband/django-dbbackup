@@ -6,13 +6,12 @@ from __future__ import (absolute_import, division,
 
 import os
 import sys
+from optparse import make_option
 
 from django.conf import settings
 from django.core.management.base import CommandError
 from django.utils import six
 from django.db import connection
-
-from optparse import make_option
 
 from ._base import BaseDbBackupCommand
 from ... import utils
@@ -23,7 +22,9 @@ input = raw_input if six.PY2 else input  # @ReservedAssignment
 
 
 class Command(BaseDbBackupCommand):
-    help = "dbrestore [-d <dbname>] [-f <filename>] [-s <servername>]"
+    help = """
+    Restore a backup from storage, encrypted and/or compressed.
+    """
     option_list = BaseDbBackupCommand.option_list + (
         make_option("-d", "--database", help="Database to restore"),
         make_option("-f", "--filepath", help="Specific file to backup from"),
@@ -36,7 +37,7 @@ class Command(BaseDbBackupCommand):
     )
 
     def handle(self, **options):
-        """ Django command handler. """
+        """Django command handler."""
         self.verbosity = int(options.get('verbosity'))
         self.quiet = options.get('quiet')
         try:
@@ -58,18 +59,18 @@ class Command(BaseDbBackupCommand):
             raise CommandError(err)
 
     def _get_database(self, options):
-        """ Get the database to restore. """
+        """Get the database to restore."""
         database_key = options.get('database')
         if not database_key:
             if len(settings.DATABASES) >= 2:
-                errmsg = "Because this project contains more than one database, you"
-                errmsg += " must specify the --database option."
+                errmsg = "Because this project contains more than one database, you"\
+                    " must specify the --database option."
                 raise CommandError(errmsg)
             database_key = list(settings.DATABASES.keys())[0]
         return settings.DATABASES[database_key]
 
     def restore_backup(self):
-        """ Restore the specified database. """
+        """Restore the specified database."""
         self.log("Restoring backup for database: %s" % self.database['NAME'], 1)
         # Fetch the latest backup if filepath not specified
         if not self.filepath:

@@ -14,16 +14,15 @@ import re
 from django.conf import settings
 from django.core.management.base import CommandError
 
-from dbbackup.management.commands._base import BaseDbBackupCommand
-from dbbackup import utils
-from dbbackup.storage.base import BaseStorage
-from dbbackup.storage.base import StorageError
-from dbbackup import settings as dbbackup_settings
+from ._base import BaseDbBackupCommand
+from ... import utils, settings as dbbackup_settings
+from ...storage.base import BaseStorage, StorageError
 
 
 class Command(BaseDbBackupCommand):
-    help = "backup_media [--encrypt] [--clean] [--no-compress] " \
-    "--servername SERVER_NAME"
+    help = """
+    Backup media files, gather all in a tarball and encrypt or compress.
+    """
     option_list = BaseDbBackupCommand.option_list + (
         make_option("-c", "--clean", help="Clean up old backup files", action="store_true", default=False),
         make_option("-s", "--servername", help="Specify server name to include in backup filename"),
@@ -39,7 +38,7 @@ class Command(BaseDbBackupCommand):
 
             self.backup_mediafiles(
                 options.get('encrypt'),
-                options.get('no_compress')^True)
+                options.get('no_compress', True))
 
             if options.get('clean'):
                 self.cleanup_old_backups()
@@ -48,6 +47,15 @@ class Command(BaseDbBackupCommand):
             raise CommandError(err)
 
     def backup_mediafiles(self, encrypt, compress):
+        """
+        Create backup file and write it to storage.
+
+        :param encrypt: Encrypt file or not
+        :type encrypt: ``bool``
+
+        :param compress: Compress file or not
+        :type compress: ``bool``
+        """
         source_dir = self.get_source_dir()
         if not source_dir:
             self.stderr.write("No media source dir configured.")
@@ -115,7 +123,8 @@ class Command(BaseDbBackupCommand):
             os.rmdir(temp_dir)
 
     def cleanup_old_backups(self):
-        """ Cleanup old backups, keeping the number of backups specified by
+        """
+        Cleanup old backups, keeping the number of backups specified by
         DBBACKUP_CLEANUP_KEEP and any backups that occur on first of the month.
         """
         self.log("Cleaning Old Backups for media files", 1)
@@ -128,8 +137,9 @@ class Command(BaseDbBackupCommand):
                 self.storage.delete_file(filename)
 
     def get_backup_file_list(self):
-        """ Return a list of backup files including the backup date. The result is a list of tuples (datetime, filename).
-            The list is sorted by date.
+        """
+        Return a list of backup files including the backup date. The result
+        is a list of tuples (datetime, filename).  The list is sorted by date.
         """
         server_name = self.get_servername()
         if server_name:

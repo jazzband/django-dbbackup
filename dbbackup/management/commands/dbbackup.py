@@ -8,10 +8,10 @@ import os
 import re
 import datetime
 import tempfile
+from optparse import make_option
 
 from django.conf import settings
 from django.core.management.base import CommandError
-from optparse import make_option
 
 from ._base import BaseDbBackupCommand
 from ... import utils

@@ -1,8 +1,8 @@
-import datetime
 import os
 import pytz
 import subprocess
 from mock import patch
+from datetime import datetime
 try:
     from StringIO import StringIO
 except ImportError:  # Py3
@@ -11,7 +11,7 @@ from django.test import TestCase
 from django.core import mail
 from django.conf import settings
 
-from .. import utils
+from dbbackup import utils, settings as dbbackup_settings
 from .utils import (ENCRYPTED_FILE, clean_gpg_keys, GPG_PRIVATE_PATH,
                     COMPRESSED_FILE)
 
@@ -142,10 +142,50 @@ class TimestampTest(TestCase):
 
     def test_naive_value(self):
         with self.settings(USE_TZ=False):
-            timestamp = utils.timestamp(datetime.datetime(2015, 8, 15, 8, 15, 12, 0))
+            timestamp = utils.timestamp(datetime(2015, 8, 15, 8, 15, 12, 0))
             self.assertEqual(timestamp, '2015-08-15-081512')
 
     def test_aware_value(self):
         with self.settings(USE_TZ=True) and self.settings(TIME_ZONE='Europe/Rome'):
-            timestamp = utils.timestamp(datetime.datetime(2015, 8, 15, 8, 15, 12, 0, tzinfo=pytz.utc))
+            timestamp = utils.timestamp(datetime(2015, 8, 15, 8, 15, 12, 0, tzinfo=pytz.utc))
             self.assertEqual(timestamp, '2015-08-15-101512')
+
+
+class Datefmt_To_Regex(TestCase):
+    def test_patterns(self):
+        now = datetime.now()
+        for datefmt, regex in utils.PATTERN_MATCHNG:
+            date_string = datetime.strftime(now, datefmt)
+            regex = utils.datefmt_to_regex(datefmt)
+            match = regex.match(date_string)
+            self.assertTrue(match)
+            self.assertEqual(match.groups()[0], date_string)
+
+    def test_complex_pattern(self):
+        now = datetime.now()
+        datefmt = 'Foo%a_%A-%w-%d-%b-%B_%m_%y_%Y-%H-%I-%M_%S_%f_%j-%U-%W-Bar'
+        date_string = datetime.strftime(now, datefmt)
+        regex = utils.datefmt_to_regex(datefmt)
+        self.assertTrue(regex.pattern.startswith('(Foo'))
+        self.assertTrue(regex.pattern.endswith('Bar)'))
+        match = regex.match(date_string)
+        self.assertTrue(match)
+        self.assertEqual(match.groups()[0], date_string)
+
+
+class Filename_To_DatestringTest(TestCase):
+    def test_func(self):
+        now = datetime.now()
+        datefmt = dbbackup_settings.DATE_FORMAT
+        filename = '%s-foo.gz.gpg' % datetime.strftime(now, datefmt)
+        datestring = utils.filename_to_datestring(filename, datefmt)
+        self.assertIn(datestring, filename)
+
+
+class Filename_To_DateTest(TestCase):
+    def test_func(self):
+        now = datetime.now()
+        datefmt = dbbackup_settings.DATE_FORMAT
+        filename = '%s-foo.gz.gpg' % datetime.strftime(now, datefmt)
+        date = utils.filename_to_date(filename, datefmt)
+        self.assertEqual(date.timetuple()[:5], now.timetuple()[:5])

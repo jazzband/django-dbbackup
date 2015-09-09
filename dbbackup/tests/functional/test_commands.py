@@ -99,3 +99,36 @@ class DbRestoreCommandTest(TestCase):
     #     # Restore
     #     with self.assertRaises(Exception):
     #         execute_from_command_line(['', 'dbrestore', '--uncompress'])
+
+
+@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils')
+class MediaBackupCommandTest(TestCase):
+    def setUp(self):
+        HANDLED_FILES.clean()
+        cmd = ('gpg --import %s' % GPG_PUBLIC_PATH).split()
+        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+
+    def tearDown(self):
+        clean_gpg_keys()
+
+    def test_encrypt(self):
+        argv = ['', 'mediabackup', '--encrypt']
+        execute_from_command_line(argv)
+        self.assertEqual(1, len(HANDLED_FILES['written_files']))
+        filename, outputfile = HANDLED_FILES['written_files'][0]
+        # self.assertTrue('.gpg' in filename)
+
+    def test_no_compress(self):
+        argv = ['', 'mediabackup', '--no-compress']
+        execute_from_command_line(argv)
+        self.assertEqual(1, len(HANDLED_FILES['written_files']))
+        filename, outputfile = HANDLED_FILES['written_files'][0]
+        # self.assertFalse('.gz' in filename)
+
+    def test_no_compress_and_encrypt(self):
+        argv = ['', 'mediabackup', '--no-compress', '--encrypt']
+        execute_from_command_line(argv)
+        self.assertEqual(1, len(HANDLED_FILES['written_files']))
+        filename, outputfile = HANDLED_FILES['written_files'][0]
+        # self.assertTrue('.gpg' in filename)
+        # self.assertFalse('.gz' in filename)

@@ -52,25 +52,16 @@ Default: settings.MEDIA_ROOT
 DBBACKUP_DATE_FORMAT
 ~~~~~~~~~~~~~~~~~~~~
 
-Date format to use for naming files (only currently used in mediabackup).
+Date format to use for naming files. It must contain only alphanumerical
+characters, ``'_'``, ``'-'`` or ``'%'``.
 
 Default: ``'%Y-%m-%d-%H%M%S'``
-
-DBBACKUP_SERVER_NAME
-~~~~~~~~~~~~~~~~~~~~
-
-An optional server name to use when generating the backup filename. This is
-useful to help distinguish between development and production servers.
-By default this value is not used and the servername is not included in the
-generated filename.
-
-Default: ``''``
 
 DBBACKUP_FILENAME_TEMPLATE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The template to use when generating the backup filename. By default this is
-'{databasename}-{servername}-{datetime}.{extension}'. This setting can
+``'{databasename}-{servername}-{datetime}.{extension}'``. This setting can
 also be made a function which takes the following keyword arguments:
 
 ::

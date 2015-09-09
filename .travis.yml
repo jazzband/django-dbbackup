@@ -14,18 +14,24 @@ env:
   - DJANGO_PACKAGE="Django>=1.7,<1.8"
   - DJANGO_PACKAGE="Django>=1.8,<1.9"
 
-#before_install:
-#  - sudo apt-get update
-#  - sudo apt-get install -qq gnupg
-
-#virtualenv:
-#  system_site_packages: true
-
 install:
+  - pip install "${DJANGO_PACKAGE:-Django}"
   - pip install -r requirements.txt
   - pip install -r requirements-tests.txt
+  - pip install -r requirements-docs.txt
   - pip install coveralls
 
 script:
   - coverage run setup.py test
-after_success: coveralls
+after_success: coveralls $COVERALLS_OPTION
+
+matrix:
+  include:
+    - python: "3.4"
+      env: COVERALLS_OPTION=debug DJANGO_PACKAGE="Django>=1.8,<1.9"
+      script: 
+        - pylint --rcfile=.pylintrc -E dbbackup/ || true
+        - flake8 dbbackup || true
+    - python: "3.4"
+      env: COVERALLS_OPTION=debug DJANGO_PACKAGE="Django>=1.8,<1.9"
+      script: make docs

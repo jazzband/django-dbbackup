@@ -1,10 +1,12 @@
 # DO NOT IMPORT THIS BEFORE django.configure() has been run!
 
 import os
+import re
 import tempfile
 import socket
 import warnings
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 DATABASES = getattr(settings, 'DBBACKUP_DATABASES', list(settings.DATABASES.keys()))
 
@@ -65,6 +67,11 @@ GPG_RECIPIENT = GPG_ALWAYS_TRUST = getattr(settings, 'DBBACKUP_GPG_RECIPIENT', N
 STORAGE = getattr(settings, 'DBBACKUP_STORAGE', 'dbbackup.storage.filesystem_storage')
 BUILTIN_STORAGE = getattr(settings, 'DBBACKUP_BUILTIN_STORAGE', None)
 STORAGE_OPTIONS = getattr(settings, 'DBBACKUP_STORAGE_OPTIONS', {})
+
+# Checks
+if re.search(r'[^A-Za-z0-9%_-]', DATE_FORMAT):  # pragma: no cover
+    msg = "Bad DBBACKUP_DATE_FORMAT: %s, it must match with [A-Za-z0-9%_-]" % DATE_FORMAT
+    raise ImproperlyConfigured(msg)
 
 # Deprecation
 if hasattr(settings, 'DBBACKUP_BACKUP_DIRECTORY'):  # pragma: no cover

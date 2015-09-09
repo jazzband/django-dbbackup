@@ -3,26 +3,18 @@ FTP Storage object.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-import pickle
 import os
 import tempfile
-from shutil import copyfileobj
-from .base import BaseStorage, StorageError
-from django.conf import settings
 from ftplib import FTP
 
+from django.conf import settings
+
 from .. import settings as dbbackup_settings
-
-MAX_SPOOLED_SIZE = 10 * 1024 * 1024
-FILE_SIZE_LIMIT = 145 * 1024 * 1024
-
-################################
-#  FTP Storage Object
-################################
+from .base import BaseStorage, StorageError
 
 
 class Storage(BaseStorage):
-    """ FTP Storage. """
+    """FTP Storage."""
     name = 'FTP'
     FTP_HOST = getattr(settings, 'DBBACKUP_FTP_HOST', None)
     FTP_USER = getattr(settings, 'DBBACKUP_FTP_USER', None)
@@ -41,10 +33,6 @@ class Storage(BaseStorage):
         """ Check we have all the required settings defined. """
         if not self.FTP_HOST:
             raise StorageError('%s storage requires DBBACKUP_FTP_HOST to be defined in settings.' % self.name)
-
-    ###################################
-    #  DBBackup Storage Methods
-    ###################################
 
     @property
     def backup_dir(self):
@@ -67,7 +55,7 @@ class Storage(BaseStorage):
     def read_file(self, filepath):
         """ Read the specified file and return it's handle. """
         outputfile = tempfile.SpooledTemporaryFile(
-            max_size=10 * 1024 * 1024,
+            max_size=dbbackup_settings.TMP_FILE_MAX_SIZE,
             dir=dbbackup_settings.TMP_DIR)
         self.ftp.retrbinary('RETR ' + filepath, outputfile.write)
         return outputfile

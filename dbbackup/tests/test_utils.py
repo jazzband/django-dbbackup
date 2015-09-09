@@ -12,8 +12,9 @@ from django.core import mail
 from django.conf import settings
 
 from dbbackup import utils, settings as dbbackup_settings
+from dbbackup import utils
 from .utils import (ENCRYPTED_FILE, clean_gpg_keys, GPG_PRIVATE_PATH,
-                    COMPRESSED_FILE)
+                    COMPRESSED_FILE, callable_for_filename_template)
 
 GPG_PUBLIC_PATH = os.path.join(settings.BASE_DIR, 'tests/gpg/pubring.gpg')
 DEV_NULL = open(os.devnull, 'w')
@@ -189,3 +190,31 @@ class Filename_To_DateTest(TestCase):
         filename = '%s-foo.gz.gpg' % datetime.strftime(now, datefmt)
         date = utils.filename_to_date(filename, datefmt)
         self.assertEqual(date.timetuple()[:5], now.timetuple()[:5])
+
+
+@patch('dbbackup.settings.HOSTNAME', 'test')
+class Filename_GenerateTest(TestCase):
+    @patch('dbbackup.settings.FILENAME_TEMPLATE', '---{databasename}--{servername}-{datetime}.{extension}')
+    def test_func(self, *args):
+        extension = 'foo'
+        generated_name = utils.filename_generate(extension)
+        self.assertTrue('--' not in generated_name)
+        self.assertFalse(generated_name.startswith('-'))
+
+    def test_db(self, *args):
+        extension = 'foo'
+        generated_name = utils.filename_generate(extension)
+        self.assertTrue(generated_name.startswith(dbbackup_settings.HOSTNAME))
+        self.assertTrue(generated_name.endswith(extension))
+
+    def test_media(self, *args):
+        extension = 'foo'
+        generated_name = utils.filename_generate(extension, content_type='media')
+        self.assertTrue(generated_name.startswith(dbbackup_settings.HOSTNAME))
+        self.assertTrue(generated_name.endswith(extension))
+
+    @patch('dbbackup.settings.FILENAME_TEMPLATE', callable_for_filename_template)
+    def test_template_is_callable(self, *args):
+        extension = 'foo'
+        generated_name = utils.filename_generate(extension)
+        self.assertTrue(generated_name.endswith('foo'))

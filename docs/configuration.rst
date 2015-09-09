@@ -66,15 +66,22 @@ also be made a function which takes the following keyword arguments:
 
 ::
 
-    def backup_filename(databasename, servername, timestamp, extension, wildcard):
+    def backup_filename(databasename, servername, datetime, extension):
         pass
 
     DBBACKUP_FILENAME_TEMPLATE = backup_filename
 
-This allows you to modify the entire format of the filename based on the
-time of day, week, or month. For example, if you want to take advantage
-of Amazon S3's automatic expiry feature, you need to prefix your backups
-differently based on when you want them to expire.
+This allows you to modify the entire format of the filename, for example, if
+you want to take advantage of Amazon S3's automatic expiry feature, you need
+to prefix your backups differently based on when you want them to expire.
+
+``{datetime}`` is rendered with ``DBBACKUP_DATE_FORMAT``.
+
+DBBACKUP_MEDIA_FILENAME_TEMPLATE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Same as ``DBBACKUP_FILENAME_TEMPLATE`` but for media files backups.
+
 
 DBBACKUP_MYSQL_EXTENSION
 ~~~~~~~~~~~~~~~~~~~~~~~~

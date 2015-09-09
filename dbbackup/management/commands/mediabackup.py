@@ -15,8 +15,10 @@ from django.conf import settings
 from django.core.management.base import CommandError
 
 from ._base import BaseDbBackupCommand
-from ... import utils, settings as dbbackup_settings
+from ... import utils
+from ...dbcommands import DBCommands
 from ...storage.base import BaseStorage, StorageError
+from ... import settings as dbbackup_settings
 
 
 class Command(BaseDbBackupCommand):
@@ -81,17 +83,11 @@ class Command(BaseDbBackupCommand):
         )
 
     def get_backup_basename(self, **kwargs):
-        # TODO: use DBBACKUP_FILENAME_TEMPLATE
-        server_name = self.get_servername()
-        if server_name:
-            server_name = '-%s' % server_name
 
-        return '%s%s-%s.media.tar%s' % (
-            self.get_databasename(),
-            server_name,
-            datetime.now().strftime(dbbackup_settings.DATE_FORMAT),
-            ('.gz' if kwargs.get('compress') else '')
-        )
+        extension = "tar%s" % ('.gz' if kwargs.get('compress') else '')
+        return utils.filename_generate(extension,
+                                       servername=self.get_servername(),
+                                       content_type='media')
 
     def get_databasename(self):
         # TODO: WTF is this??

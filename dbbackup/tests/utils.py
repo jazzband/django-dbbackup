@@ -80,3 +80,7 @@ def skip_py3(testcase, reason="Not in Python 3"):
         setup = lambda s: s.skipTest(reason)
         testcase.setUp = setup
     return testcase
+
+
+def callable_for_filename_template(datetime, **kwargs):
+    return '%s_foo' % datetime

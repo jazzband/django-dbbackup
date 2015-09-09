@@ -29,6 +29,7 @@ MEDIA_PATH = getattr(settings, 'DBBACKUP_MEDIA_PATH', settings.MEDIA_ROOT)
 DATE_FORMAT = getattr(settings, 'DBBACKUP_DATE_FORMAT', '%Y-%m-%d-%H%M%S')
 FORCE_ENGINE = getattr(settings, 'DBBACKUP_FORCE_ENGINE', '')
 FILENAME_TEMPLATE = getattr(settings, 'DBBACKUP_FILENAME_TEMPLATE', '{databasename}-{servername}-{datetime}.{extension}')
+MEDIA_FILENAME_TEMPLATE = getattr(settings, 'DBBACKUP_MEDIA_FILENAME_TEMPLATE', '{servername}-{datetime}.{extension}')
 
 READ_FILE = '<READ_FILE>'
 WRITE_FILE = '<WRITE_FILE>'
@@ -79,7 +80,7 @@ if hasattr(settings, 'DBBACKUP_BACKUP_DIRECTORY'):  # pragma: no cover
         getattr(settings, 'DBBACKUP_BACKUP_DIRECTORY', os.getcwd())
     warnings.warn("DBBACKUP_BACKUP_DIRECTORY is deprecated, use DBBACKUP_STORAGE_OPTIONS['location']", DeprecationWarning)
 
-if hasattr(settings, 'DBBACKUP_FAKE_HOST'):  # noqa
+if hasattr(settings, 'DBBACKUP_FAKE_HOST'):  # pragma: no cover
     warnings.warn("DBBACKUP_FAKE_HOST is deprecated, use DBBACKUP_HOSTNAME", DeprecationWarning)
     HOSTNAME = settings.DBBACKUP_FAKE_HOST
 
@@ -103,3 +104,14 @@ if hasattr(settings, 'DBBACKUP_S3_BUCKET'):  # pragma: no cover
             msg = "DBBACKUP_S3_%s is now useless" % old_suffix
             warnings.warn(msg, DeprecationWarning)
     del old_suffix, new_key
+
+# TODO: Make a module ?
+# Checks
+for sett in [sett for sett in locals().copy() if sett.endswith('FILENAME_TEMPLATE')]:
+    if callable(sett):
+        continue
+    for param in ('datetime',):
+        if '{%s}' % param not in locals()[sett]:
+            msg = "You must provide '{%s}' in DBBACKUP_%s" % (param, 'FILENAME_TEMPLATE')
+            raise ImproperlyConfigured(msg)
+del sett

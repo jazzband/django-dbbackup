@@ -32,6 +32,8 @@ Adding in your project
 
 In your ``settings.INSTALLED_APPS``, make sure you have the following:
 
+::
+
     INSTALLED_APPS = (
         ...
         'dbbackup',  # django-dbbackup

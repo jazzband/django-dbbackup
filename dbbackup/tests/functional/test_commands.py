@@ -1,12 +1,11 @@
 import os
-import subprocess
 from io import BytesIO
 from mock import patch
 from django.test import TestCase
 from django.core.management import execute_from_command_line
-from dbbackup.tests.utils import TEST_DATABASE, HANDLED_FILES, clean_gpg_keys
-from dbbackup.tests.utils import GPG_PUBLIC_PATH, DEV_NULL
-
+from dbbackup.tests.utils import (TEST_DATABASE, HANDLED_FILES,
+                                  clean_gpg_keys, add_public_gpg,
+                                  add_private_gpg)
 from dbbackup.utils import six
 
 
@@ -15,8 +14,7 @@ from dbbackup.utils import six
 class DbBackupCommandTest(TestCase):
     def setUp(self):
         HANDLED_FILES.clean()
-        cmd = ('gpg --import %s' % GPG_PUBLIC_PATH).split()
-        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        add_public_gpg()
         open(TEST_DATABASE['NAME'], 'a').close()
 
     def tearDown(self):
@@ -51,11 +49,9 @@ class DbBackupCommandTest(TestCase):
 @patch('dbbackup.management.commands.dbrestore.input', return_value='y')
 class DbRestoreCommandTest(TestCase):
     def setUp(self):
-        if six.PY3:
-            self.skipTest("Compression isn't implemented in Python3")
         HANDLED_FILES.clean()
-        cmd = ('gpg --import %s' % GPG_PUBLIC_PATH).split()
-        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        add_public_gpg()
+        add_private_gpg()
         open(TEST_DATABASE['NAME'], 'a').close()
 
     def tearDown(self):
@@ -68,12 +64,12 @@ class DbRestoreCommandTest(TestCase):
         # Restore
         execute_from_command_line(['', 'dbrestore'])
 
-    # @patch('dbbackup.utils.getpass', return_value=None)
-    # def test_encrypted(self, *args):
-    #     # Create backup
-    #     execute_from_command_line(['', 'dbbackup', '--encrypt'])
-    #     # Restore
-    #     execute_from_command_line(['', 'dbrestore', '--decrypt'])
+    @patch('dbbackup.utils.getpass', return_value=None)
+    def test_encrypted(self, *args):
+        # Create backup
+        execute_from_command_line(['', 'dbbackup', '--encrypt'])
+        # Restore
+        execute_from_command_line(['', 'dbrestore', '--decrypt'])
 
     def test_compressed(self, *args):
         # Create backup
@@ -105,8 +101,7 @@ class DbRestoreCommandTest(TestCase):
 class MediaBackupCommandTest(TestCase):
     def setUp(self):
         HANDLED_FILES.clean()
-        cmd = ('gpg --import %s' % GPG_PUBLIC_PATH).split()
-        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        add_public_gpg()
 
     def tearDown(self):
         clean_gpg_keys()

@@ -1,8 +1,7 @@
-import subprocess
 from django.test import TestCase
 from dbbackup.management.commands.mediabackup import Command as DbbackupCommand
-from dbbackup.tests.utils import FakeStorage, DEV_NULL, HANDLED_FILES
-from dbbackup.tests.utils import GPG_PUBLIC_PATH
+from dbbackup.tests.utils import (FakeStorage, DEV_NULL, HANDLED_FILES,
+                                  add_public_gpg)
 
 
 class MediabackupBackupMediafilesTest(TestCase):
@@ -23,8 +22,7 @@ class MediabackupBackupMediafilesTest(TestCase):
         self.assertTrue(HANDLED_FILES['written_files'][0][0].endswith('.gz'))
 
     def test_encrypt(self):
-        cmd = ('gpg --import %s' % GPG_PUBLIC_PATH).split()
-        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        add_public_gpg()
         self.command.backup_mediafiles(encrypt=True, compress=False)
         self.assertEqual(1, len(HANDLED_FILES['written_files']))
         outputfile = HANDLED_FILES['written_files'][0][1]
@@ -32,8 +30,7 @@ class MediabackupBackupMediafilesTest(TestCase):
         self.assertTrue(outputfile.read().startswith(b'-----BEGIN PGP MESSAGE-----'))
 
     def test_compress_and_encrypt(self):
-        cmd = ('gpg --import %s' % GPG_PUBLIC_PATH).split()
-        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        add_public_gpg()
         self.command.backup_mediafiles(encrypt=True, compress=True)
         self.assertEqual(1, len(HANDLED_FILES['written_files']))
         outputfile = HANDLED_FILES['written_files'][0][1]

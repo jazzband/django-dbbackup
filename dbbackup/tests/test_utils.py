@@ -1,23 +1,18 @@
 import os
 import pytz
-import subprocess
 from mock import patch
 from datetime import datetime
-try:
-    from StringIO import StringIO
-except ImportError:  # Py3
-    from io import StringIO
+
 from django.test import TestCase
 from django.core import mail
 from django.conf import settings
+from django.utils.six import StringIO
 
 from dbbackup import utils, settings as dbbackup_settings
-from dbbackup import utils
-from .utils import (ENCRYPTED_FILE, clean_gpg_keys, GPG_PRIVATE_PATH,
-                    COMPRESSED_FILE, callable_for_filename_template)
-
-GPG_PUBLIC_PATH = os.path.join(settings.BASE_DIR, 'tests/gpg/pubring.gpg')
-DEV_NULL = open(os.devnull, 'w')
+from dbbackup.tests.utils import (ENCRYPTED_FILE, clean_gpg_keys,
+                                  add_private_gpg, COMPRESSED_FILE,
+                                  callable_for_filename_template,
+                                  DEV_NULL, add_public_gpg)
 
 
 class Bytes_To_StrTest(TestCase):
@@ -70,13 +65,11 @@ class Encrypt_FileTest(TestCase):
         self.path = '/tmp/foo'
         with open(self.path, 'a') as fd:
             fd.write('foo')
-        cmd = ('gpg --import %s' % GPG_PUBLIC_PATH).split()
-        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        add_public_gpg()
 
     def tearDown(self):
         os.remove(self.path)
-        subprocess.call('gpg --batch --yes --delete-key "test@test"'.split(),
-                        stdout=DEV_NULL, stderr=DEV_NULL)
+        clean_gpg_keys()
 
     def test_func(self, *args):
         with open(self.path) as fd:
@@ -88,8 +81,7 @@ class Encrypt_FileTest(TestCase):
 
 class Unencrypt_FileTest(TestCase):
     def setUp(self):
-        cmd = ('gpg --import %s' % GPG_PRIVATE_PATH).split()
-        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        add_private_gpg()
 
     def tearDown(self):
         clean_gpg_keys()

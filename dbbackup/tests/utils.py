@@ -1,11 +1,8 @@
 import os
 import subprocess
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
 from django.conf import settings
 from django.utils import six
+from django.utils.six import StringIO
 from dbbackup.storage.base import BaseStorage
 
 BASE_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt')
@@ -72,6 +69,16 @@ def clean_gpg_keys():
         subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
     except:
         pass
+
+
+def add_private_gpg():
+    cmd = ('gpg --import %s' % GPG_PRIVATE_PATH).split()
+    subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+
+
+def add_public_gpg():
+    cmd = ('gpg --import %s' % GPG_PUBLIC_PATH).split()
+    subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
 
 
 def skip_py3(testcase, reason="Not in Python 3"):

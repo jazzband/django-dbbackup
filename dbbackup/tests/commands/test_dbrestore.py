@@ -1,17 +1,17 @@
-import subprocess
 from mock import patch
-from io import BytesIO
+
 from django.test import TestCase
 from django.core.management.base import CommandError
 from django.conf import settings
 from django.utils import six
+from django.utils.six import BytesIO
 
 from dbbackup.utils import unencrypt_file, uncompress_file
 from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
 from dbbackup.dbcommands import DBCommands
-from dbbackup.tests.utils import FakeStorage, ENCRYPTED_FILE, TEST_DATABASE
-from dbbackup.tests.utils import GPG_PRIVATE_PATH, DEV_NULL, COMPRESSED_FILE
-from dbbackup.tests.utils import clean_gpg_keys, HANDLED_FILES
+from dbbackup.tests.utils import (FakeStorage, ENCRYPTED_FILE, TEST_DATABASE,
+                                  add_private_gpg, DEV_NULL, COMPRESSED_FILE,
+                                  clean_gpg_keys, HANDLED_FILES)
 
 
 @patch('dbbackup.management.commands.dbrestore.input', return_value='y')
@@ -30,8 +30,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.interactive = True
         self.command.storage = FakeStorage()
         HANDLED_FILES.clean()
-        cmd = ('gpg --import %s' % GPG_PRIVATE_PATH).split()
-        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        add_private_gpg()
 
     def tearDown(self):
         clean_gpg_keys()
@@ -115,8 +114,7 @@ class DbrestoreCommandDecryptTest(TestCase):
     def setUp(self):
         self.command = DbrestoreCommand()
         self.command.passphrase = None
-        cmd = ('gpg --import %s' % GPG_PRIVATE_PATH).split()
-        subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
+        add_private_gpg()
 
     def tearDown(self):
         clean_gpg_keys()
@@ -124,9 +122,7 @@ class DbrestoreCommandDecryptTest(TestCase):
     @patch('dbbackup.management.commands.dbrestore.input', return_value=None)
     @patch('dbbackup.utils.getpass', return_value=None)
     def test_decrypt(self, *args):
-        if six.PY3:
-            self.skipTest("Decryption isn't implemented in Python3")
         inputfile = open(ENCRYPTED_FILE, 'r+b')
         uncryptfile, filename = unencrypt_file(inputfile, 'foofile.gpg')
         uncryptfile.seek(0)
-        self.assertEqual('foo\n', uncryptfile.read())
+        self.assertEqual(b'foo\n', uncryptfile.read())

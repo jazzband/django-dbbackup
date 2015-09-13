@@ -1,3 +1,4 @@
+from mock import patch
 from django.test import TestCase
 from dbbackup.management.commands.mediabackup import Command as DbbackupCommand
 from dbbackup.tests.utils import (FakeStorage, DEV_NULL, HANDLED_FILES,
@@ -77,23 +78,20 @@ class MediabackupGetBackupFileListTest(TestCase):
 
 class MediabackupCleanUpOldBackupsTest(TestCase):
     def setUp(self):
-        self.skipTest("Doesn't work!")
+        HANDLED_FILES.clean()
         self.command = DbbackupCommand()
+        self.command.stdout = DEV_NULL
+        self.command.encrypt = False
+        self.command.compress = False
         self.command.servername = 'foo-server'
         self.command.storage = FakeStorage()
+        HANDLED_FILES['written_files'] = [(f, None) for f in [
+            '2015-02-06-042810.bak',
+            '2015-02-07-042810.bak',
+            '2015-02-08-042810.bak',
+        ]]
 
+    @patch('dbbackup.settings.CLEANUP_KEEP_MEDIA', 1)
     def test_func(self):
         self.command.cleanup_old_backups()
-
-
-class MediabackupGetServerNameTest(TestCase):
-    def setUp(self):
-        self.command = DbbackupCommand()
-
-    def test_func(self):
-        self.command.servername = 'foo-server'
-        self.command.get_servername()
-
-    def test_no_servername(self):
-        self.command.servername = ''
-        self.command.get_servername()
+        self.assertEqual(2, len(HANDLED_FILES['deleted_files']))

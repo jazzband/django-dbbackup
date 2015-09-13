@@ -20,8 +20,6 @@ TMP_FILE_READ_SIZE = getattr(settings, 'DBBACKUP_TMP_FILE_READ_SIZE', 1024*1000)
 
 # Days to keep
 CLEANUP_KEEP = getattr(settings, 'DBBACKUP_CLEANUP_KEEP', 10)
-
-# Days to keep backed up media (default: same as CLEANUP_KEEP)
 CLEANUP_KEEP_MEDIA = getattr(settings, 'DBBACKUP_CLEANUP_KEEP_MEDIA', CLEANUP_KEEP)
 
 MEDIA_PATH = getattr(settings, 'DBBACKUP_MEDIA_PATH', settings.MEDIA_ROOT)
@@ -69,11 +67,6 @@ STORAGE = getattr(settings, 'DBBACKUP_STORAGE', 'dbbackup.storage.filesystem_sto
 BUILTIN_STORAGE = getattr(settings, 'DBBACKUP_BUILTIN_STORAGE', None)
 STORAGE_OPTIONS = getattr(settings, 'DBBACKUP_STORAGE_OPTIONS', {})
 
-# Checks
-if re.search(r'[^A-Za-z0-9%_-]', DATE_FORMAT):  # pragma: no cover
-    msg = "Bad DBBACKUP_DATE_FORMAT: %s, it must match with [A-Za-z0-9%_-]" % DATE_FORMAT
-    raise ImproperlyConfigured(msg)
-
 # Deprecation
 if hasattr(settings, 'DBBACKUP_BACKUP_DIRECTORY'):  # pragma: no cover
     BACKUP_DIRECTORY = STORAGE_OPTIONS['location'] = \
@@ -115,3 +108,8 @@ for sett in [sett for sett in locals().copy() if sett.endswith('FILENAME_TEMPLAT
             msg = "You must provide '{%s}' in DBBACKUP_%s" % (param, 'FILENAME_TEMPLATE')
             raise ImproperlyConfigured(msg)
 del sett
+
+if re.search(r'[^A-Za-z0-9%_-]', DATE_FORMAT):  # pragma: no cover
+    msg = "Bad DBBACKUP_DATE_FORMAT: %s, it must match with [A-Za-z0-9%_-]" % DATE_FORMAT
+    raise ImproperlyConfigured(msg)
+

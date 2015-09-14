@@ -1,5 +1,6 @@
 import os
 import subprocess
+import logging
 from django.conf import settings
 from django.utils import six
 from django.utils.six import StringIO
@@ -35,7 +36,7 @@ HANDLED_FILES = handled_files()
 
 class FakeStorage(BaseStorage):
     name = 'FakeStorage'
-    file_read = ENCRYPTED_FILE
+    logger = logging.getLogger('dbbackup.storage')
 
     def __init__(self, *args, **kwargs):
         super(FakeStorage, self).__init__(*args, **kwargs)
@@ -43,6 +44,7 @@ class FakeStorage(BaseStorage):
         self.written_files = []
 
     def delete_file(self, filepath):
+        self.logger.debug("Delete %s", filepath)
         HANDLED_FILES['deleted_files'].append(filepath)
         self.deleted_files.append(filepath)
 
@@ -50,6 +52,7 @@ class FakeStorage(BaseStorage):
         return [f[0] for f in HANDLED_FILES['written_files']]
 
     def write_file(self, filehandle, filename):
+        self.logger.debug("Write %s", filename)
         HANDLED_FILES['written_files'].append((filename, filehandle))
 
     def read_file(self, filepath):

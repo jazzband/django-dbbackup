@@ -73,17 +73,17 @@ class Command(BaseDbBackupCommand):
     def restore_backup(self):
         """Restore the specified database."""
         database_name = self.database['NAME']
-        self.log("Restoring backup for database: %s" % database_name, 1)
+        self.logger.info("Restoring backup for database: %s", self.database['NAME'])
         # Fetch the latest backup if filepath not specified
         if not self.filepath:
-            self.log("  Finding latest backup", 1)
+            self.logger.info("Finding latest backup")
             try:
                 self.filepath = self.storage.get_latest_backup(encrypted=self.decrypt,
                                                                compressed=self.uncompress)
             except StorageError as err:
                 raise CommandError(err.args[0])
         # Restore the specified filepath backup
-        self.log("  Restoring: %s" % self.filepath, 1)
+        self.logger.info("Restoring: %s" % self.filepath)
         input_filename = self.filepath
         inputfile = self.storage.read_file(input_filename)
         if self.decrypt:
@@ -94,11 +94,11 @@ class Command(BaseDbBackupCommand):
             uncompressed_file, input_filename = utils.uncompress_file(inputfile, input_filename)
             inputfile.close()
             inputfile = uncompressed_file
-        self.log("  Restore tempfile created: %s" % utils.handle_size(inputfile), 1)
+        self.logger.info("Restore tempfile created: %s", utils.handle_size(inputfile))
         if self.interactive:
             answer = input("Are you sure you want to continue? [Y/n]")
             if answer.lower() not in ('y', 'yes', ''):
-                self.log("Quitting", 1)
+                self.logger.info("Quitting")
                 sys.exit(0)
         inputfile.seek(0)
         self.dbcommands.run_restore_commands(inputfile)
@@ -111,8 +111,8 @@ class Command(BaseDbBackupCommand):
         """List backups in the backup directory."""
         msg = "'dbbrestore --list' is deprecated, use 'listbackup'."
         warnings.warn(msg, DeprecationWarning)
-        self.log("Listing backups on %s in /%s:" % (self.storage.name, self.storage.backup_dir), 1)
+        self.logger.info("Listing backups on %s in /%s:", self.storage.name, self.storage.backup_dir)
         for filepath in self.storage.list_directory():
-            self.log("  %s" % os.path.basename(filepath), 1)
+            self.logger.info("  %s", os.path.basename(filepath))
             # TODO: Implement filename_details method
             # print(utils.filename_details(filepath))

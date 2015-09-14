@@ -1,28 +1,22 @@
 from django.test import TestCase
-from django.utils.six import StringIO
 from dbbackup.management.commands._base import BaseDbBackupCommand
 
 
-class BaseDbBackupCommandLogTest(TestCase):
+class BaseDbBackupCommandSetLoggerLevelTest(TestCase):
     def setUp(self):
         self.command = BaseDbBackupCommand()
-        self.command.stdout = StringIO()
 
-    def test_less_level(self):
-        self.command.verbosity = 1
-        self.command.log("foo", 2)
-        self.command.stdout.seek(0)
-        self.assertFalse(self.command.stdout.read())
+    def test_debug_level(self):
+        self.command.verbosity = 0
+        self.command._set_logger_level()
+        self.assertEqual(self.command.logger.level, 10)
 
-    def test_more_level(self):
+    def test_info_level(self):
         self.command.verbosity = 1
-        self.command.log("foo", 0)
-        self.command.stdout.seek(0)
-        self.assertEqual('foo', self.command.stdout.read())
+        self.command._set_logger_level()
+        self.assertEqual(self.command.logger.level, 20)
 
     def test_quiet(self):
         self.command.quiet = True
-        self.command.verbosity = 1
-        self.command.log("foo", 0)
-        self.command.stdout.seek(0)
-        self.assertFalse(self.command.stdout.read())
+        self.command._set_logger_level()
+        self.assertGreater(self.command.logger.level, 50)

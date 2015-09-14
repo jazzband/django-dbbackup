@@ -67,6 +67,13 @@ STORAGE = getattr(settings, 'DBBACKUP_STORAGE', 'dbbackup.storage.filesystem_sto
 BUILTIN_STORAGE = getattr(settings, 'DBBACKUP_BUILTIN_STORAGE', None)
 STORAGE_OPTIONS = getattr(settings, 'DBBACKUP_STORAGE_OPTIONS', {})
 
+# Logging
+import logging, dbbackup.log
+LOGGING = getattr(settings, 'DBBACKUP_LOGGING', dbbackup.log.DEFAULT_LOGGING)
+LOG_CONFIGURATOR = logging.config.DictConfigurator(LOGGING)
+LOG_CONFIGURATOR.configure()
+
+
 # Deprecation
 if hasattr(settings, 'DBBACKUP_BACKUP_DIRECTORY'):  # pragma: no cover
     BACKUP_DIRECTORY = STORAGE_OPTIONS['location'] = \
@@ -112,4 +119,3 @@ del sett
 if re.search(r'[^A-Za-z0-9%_-]', DATE_FORMAT):  # pragma: no cover
     msg = "Bad DBBACKUP_DATE_FORMAT: %s, it must match with [A-Za-z0-9%_-]" % DATE_FORMAT
     raise ImproperlyConfigured(msg)
-

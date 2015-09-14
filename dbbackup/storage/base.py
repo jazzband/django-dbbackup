@@ -1,6 +1,7 @@
 """
 Abstract Storage class.
 """
+import logging
 from importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
 from .. import settings, utils
@@ -40,6 +41,13 @@ class FileNotFound(StorageError):
 
 class BaseStorage(object):
     """Abstract storage class."""
+
+    @property
+    def logger(self):
+        if not hasattr(self, '_logger'):
+            self._logger = logging.getLogger('dbbackup.storage')
+        return self._logger
+
     def __init__(self, server_name=None):
         if not self.name:
             raise Exception("Programming Error: storage.name not defined.")

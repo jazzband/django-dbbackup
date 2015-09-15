@@ -7,6 +7,7 @@ from .. import settings
 
 
 class Storage(BaseStorage):
+    default_path = ''
     def __init__(self, storage_path=None, **options):
         """
         Initialize a Django Storage instance with given options.
@@ -27,7 +28,7 @@ class Storage(BaseStorage):
         self.storage.delete(name=filepath)
 
     def list_directory(self):
-        return self.storage.listdir('')[1]
+        return self.storage.listdir(self.default_path)[1]
 
     def write_file(self, filehandle, filename):
         self.storage.save(name=filename, content=filehandle)

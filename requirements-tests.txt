@@ -5,6 +5,7 @@ mock
 coverage
 python-gnupg
 django-storages-redux
+dropbox>=3.24
 boto
 moto
 pytz

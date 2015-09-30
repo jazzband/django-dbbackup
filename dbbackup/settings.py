@@ -109,7 +109,7 @@ if hasattr(settings, 'DBBACKUP_S3_BUCKET'):
 # TODO: Make a module ?
 # Checks
 for sett in [sett for sett in locals().copy() if sett.endswith('FILENAME_TEMPLATE')]:
-    if callable(sett):
+    if callable(locals()[sett]):
         continue
     for param in ('datetime',):
         if '{%s}' % param not in locals()[sett]:

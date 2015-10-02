@@ -60,15 +60,16 @@ class Command(BaseDbBackupCommand):
         if not source_dir:
             self.stderr.write("No media source dir configured.")
             sys.exit(1)
-        self.log("Backing up media files in %s" % source_dir, 1)
+        self.logger.info("Backing up media files in %s", source_dir)
         filename = self.get_backup_basename(compress=compress)
         output_file = self.create_backup_file(source_dir, filename,
                                               compress=compress)
         if encrypt:
             encrypted_file = utils.encrypt_file(output_file, filename)
             output_file, filename = encrypted_file
-        self.log("  Backup tempfile created: %s (%s)" % (filename, utils.handle_size(output_file)), 1)
-        self.log("  Writing file to %s: %s" % (self.storage.name, self.storage.backup_dir), 1)
+        self.logger.debug("Backup tempfile created: %s (%s)", filename,
+                          utils.handle_size(output_file))
+        self.logger.info("Writing file to %s: %s", self.storage.name, self.storage.backup_dir)
         self.storage.write_file(output_file, filename)
 
     def get_backup_basename(self, **kwargs):
@@ -103,8 +104,7 @@ class Command(BaseDbBackupCommand):
         Cleanup old backups, keeping the number of backups specified by
         DBBACKUP_CLEANUP_KEEP and any backups that occur on first of the month.
         """
-        self.log("Cleaning Old Backups for media files", 1)
-
+        self.logger.info("Cleaning Old Backups for media files")
         file_list = self.storage.clean_old_backups(encrypted=self.encrypt,
                                                    compressed=self.compress,
                                                    keep_number=settings.CLEANUP_KEEP_MEDIA)

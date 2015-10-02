@@ -25,6 +25,7 @@ GPG_RECIPIENT = "test@test"
 
 settings.configure(
     ADMIN=('foo@bar'),
+    ALLOWED_HOSTS=['*'],
     MEDIA_ROOT=MEDIA_ROOT,
     MIDDLEWARE_CLASSES=(),
     # CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}},

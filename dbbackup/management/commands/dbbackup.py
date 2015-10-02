@@ -59,7 +59,7 @@ class Command(BaseDbBackupCommand):
         Save a new backup file.
         """
         if not self.quiet:
-            self.log("Backing Up Database: %s" % database['NAME'], 1)
+            self.logger.info("Backing Up Database: %s", database['NAME'])
         filename = self.dbcommands.filename(self.servername)
         outputfile = tempfile.SpooledTemporaryFile(
             max_size=dbbackup_settings.TMP_FILE_MAX_SIZE,
@@ -72,8 +72,8 @@ class Command(BaseDbBackupCommand):
             encrypted_file, filename = utils.encrypt_file(outputfile, filename)
             outputfile = encrypted_file
         if not self.quiet:
-            self.log("  Backup tempfile created: %s" % (utils.handle_size(outputfile)), 1)
-            self.log("  Writing file to %s: %s, filename: %s" % (self.storage.name, self.storage.backup_dir, filename), 1)
+            self.logger.info("Backup tempfile created: %s", utils.handle_size(outputfile))
+            self.logger.info("Writing file to %s: %s, filename: %s", self.storage.name, self.storage.backup_dir, filename)
         self.storage.write_file(outputfile, filename)
 
     def cleanup_old_backups(self, database):
@@ -81,8 +81,7 @@ class Command(BaseDbBackupCommand):
         Cleanup old backups, keeping the number of backups specified by
         DBBACKUP_CLEANUP_KEEP and any backups that occur on first of the month.
         """
-        if not self.quiet:
-            self.log("Cleaning Old Backups for: %s" % database['NAME'], 1)
+        self.logger.info("Cleaning Old Backups for: %s", database['NAME'])
         filepaths = self.storage.list_directory()
         filepaths = self.dbcommands.filter_filepaths(filepaths)
         for filepath in sorted(filepaths[0:-self.clean_keep]):
@@ -91,5 +90,5 @@ class Command(BaseDbBackupCommand):
             dateTime = datetime.strptime(datestr, dbbackup_settings.DATE_FORMAT)
             if int(dateTime.strftime("%d")) != 1:
                 if not self.quiet:
-                    self.log("  Deleting: %s" % filepath, 1)
+                    self.logger.info("Deleting: %s", filepath)
                 self.storage.delete_file(filepath)

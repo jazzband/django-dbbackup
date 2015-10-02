@@ -2,12 +2,13 @@
 Process the Backup or Restore commands.
 """
 from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
+                        unicode_literals)
 import copy
 import os
 import re
 import six
 import shlex
+import logging
 from shutil import copyfileobj
 from subprocess import Popen
 from django.core.management.base import CommandError
@@ -182,6 +183,7 @@ class DBCommands:
         self.database = database
         self.engine = settings.FORCE_ENGINE or self.database['ENGINE'].split('.')[-1]
         self.settings = self._get_settings()
+        self.logger = logging.getLogger('dbbackup.dbbcommands')
 
     def _get_settings(self):
         """ Returns the proper settings dictionary. """
@@ -258,7 +260,7 @@ class DBCommands:
         pstdin = stdin if command[-1] == '<' else None
         pstdout = stdout if command[-1] == '>' else devnull
         command = [arg for arg in command if arg not in ['<', '>']]
-        print(self._clean_passwd("  Running: %s" % ' '.join(command)))
+        self.logger.info(self._clean_passwd("Running: %s" % ' '.join(command)))
         env = self.settings.get_env()
         env.update(settings.BACKUP_ENVIRONMENT)
         for k, v in env.items():
@@ -273,12 +275,12 @@ class DBCommands:
 
     def read_file(self, filepath, stdout):
         """ Read the specified file to stdout. """
-        print("  Reading: %s" % filepath)
-        with open(filepath, "rb") as f:
-            copyfileobj(f, stdout)
+        self.logger.info("Reading: %s", filepath)
+        with open(filepath, "rb") as fd:
+            copyfileobj(fd, stdout)
 
     def write_file(self, filepath, stdin):
         """ Write the specified file from stdin. """
-        print("  Writing: %s" % filepath)
-        with open(filepath, 'wb') as f:
-            copyfileobj(stdin, f)
+        self.logger.info("Writing: %s", filepath)
+        with open(filepath, 'wb') as fd:
+            copyfileobj(stdin, fd)

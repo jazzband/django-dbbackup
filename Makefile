@@ -1,7 +1,12 @@
 .PHONY: all test clean docs
 
 clean:
-	rm -rf django_dbbackup.egg-info/ build/ dist/ coverage_html_report .coverage
+	find . -name "*.pyc" -type f -delete
+	find . -name "__pycache__" -type d -exec rm -rf {} \;
+	find . -name "*.egg-info" -type d -exec rm -rf {} \; || true
+	rm -rf build/ dist/ \
+	       coverage_html_report .coverage \
+	       *.egg
 
 test:
 	python setup.py test
@@ -14,3 +19,8 @@ build:
 
 docs:
 	cd docs && make html
+
+upload:
+	make clean
+	python setup.py sdist bdist_wheel
+	twine upload dist/*

@@ -5,6 +5,7 @@ import os
 from mock import patch
 
 from django.test import TestCase
+from django.utils import six
 
 from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
 from dbbackup.dbcommands import DBCommands, MongoDBCommands
@@ -25,6 +26,8 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         self.command.dbcommands = DBCommands(TEST_DATABASE)
         self.command.storage = FakeStorage()
         self.command.stdout = DEV_NULL
+        self.command.filename = None
+        self.command.path = None
         open(TEST_DATABASE['NAME']).close()
 
     def tearDown(self):
@@ -56,6 +59,8 @@ class DbbackupCommandSaveNewMongoBackupTest(TestCase):
         self.command.dbcommands = MongoDBCommands(TEST_MONGODB)
         self.command.storage = FakeStorage()
         self.command.stdout = DEV_NULL
+        self.command.filename = None
+        self.command.path = None
 
     def tearDown(self):
         clean_gpg_keys()
@@ -75,6 +80,8 @@ class DbbackupCommandCleanupOldBackupsTest(TestCase):
         self.command.clean = True
         self.command.clean_keep = 1
         self.command.stdout = DEV_NULL
+        self.command.filename = None
+        self.command.path = None
 
     def test_cleanup_old_backups(self):
         self.command._cleanup_old_backups(TEST_DATABASE)
@@ -82,3 +89,21 @@ class DbbackupCommandCleanupOldBackupsTest(TestCase):
     def test_cleanup_empty(self):
         self.command.storage.list_files = []
         self.command._cleanup_old_backups(TEST_DATABASE)
+
+
+class DbbackupWriteLocallyTest(TestCase):
+    def setUp(self):
+        self.command = DbbackupCommand()
+        self.command.database = TEST_DATABASE['NAME']
+        self.command.dbcommands = DBCommands(TEST_DATABASE)
+        self.command.storage = FakeStorage()
+        self.command.stdout = DEV_NULL
+        self.command.filename = None
+        self.command.path = None
+
+    def test_write(self):
+        fd, path = six.BytesIO("foo"), '/tmp/foo.bak'
+        self.command.write_local_file(fd, path)
+        self.assertTrue(os.path.exists(path))
+        # tearDown
+        os.remove(path)

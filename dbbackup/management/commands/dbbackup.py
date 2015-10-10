@@ -9,6 +9,7 @@ import re
 from datetime import datetime
 import tempfile
 from optparse import make_option
+from shutil import copyfileobj
 
 from django.conf import settings
 from django.core.management.base import CommandError
@@ -88,7 +89,7 @@ class Command(BaseDbBackupCommand):
                              filename)
             self.storage.write_file(outputfile, filename)
         else:
-            self.logger.info("Writing file to %s", filename)
+            self.logger.info("Writing file to %s", self.path)
             self.write_local_file(outputfile, self.path)
 
     def _cleanup_old_backups(self, database):
@@ -111,6 +112,6 @@ class Command(BaseDbBackupCommand):
     # TODO: Define chunk size
     def write_local_file(self, outputfile, path):
         """Write file to the desired path."""
+        outputfile.seek(0)
         with open(path, 'wb') as fd:
-            for chunk in outputfile:
-                fd.write(chunk)
+            copyfileobj(outputfile, fd)

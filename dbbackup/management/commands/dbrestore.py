@@ -131,4 +131,4 @@ class Command(BaseDbBackupCommand):
 
     def read_local_file(self, path):
         """Open file on local filesystem."""
-        return open(path)
+        return open(path, 'rb')

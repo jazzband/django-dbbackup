@@ -70,6 +70,10 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         HANDLED_FILES['written_files'].append((ENCRYPTED_FILE, open(ENCRYPTED_FILE, 'rb')))
         self.command._restore_backup()
 
+    def test_path(self, *args):
+        self.command.path = COMPRESSED_FILE
+        self.command.restore_backup()
+
 
 class DbrestoreCommandGetDatabaseTest(TestCase):
     def setUp(self):

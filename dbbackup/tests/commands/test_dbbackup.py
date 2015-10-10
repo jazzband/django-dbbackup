@@ -102,7 +102,7 @@ class DbbackupWriteLocallyTest(TestCase):
         self.command.path = None
 
     def test_write(self):
-        fd, path = six.BytesIO("foo"), '/tmp/foo.bak'
+        fd, path = six.BytesIO(b"foo"), '/tmp/foo.bak'
         self.command.write_local_file(fd, path)
         self.assertTrue(os.path.exists(path))
         # tearDown

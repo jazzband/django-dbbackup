@@ -108,10 +108,9 @@ class Command(BaseDbBackupCommand):
                     self.logger.info("Deleting: %s", filepath)
                 self.storage.delete_file(filepath)
 
+    # TODO: Define chunk size
     def write_local_file(self, outputfile, path):
-        """
-        Write file to the desired path.
-        """
-        with open(path, 'w') as fd:
+        """Write file to the desired path."""
+        with open(path, 'wb') as fd:
             for chunk in outputfile:
                 fd.write(chunk)

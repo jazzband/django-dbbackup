@@ -28,7 +28,8 @@ class Command(BaseDbBackupCommand):
     """
     option_list = BaseDbBackupCommand.option_list + (
         make_option("-d", "--database", help="Database to restore"),
-        make_option("-f", "--filepath", help="Specific file to backup from"),
+        make_option("-i", "--input-filename", help="Specify filename to backup from"),
+        make_option("-I", "--input-path", help="Specify path on local filesystem to backup from"),
         make_option("-x", "--backup-extension", help="The extension to use when scanning for files to restore from."),
         make_option("-s", "--servername", help="Use a different servername backup"),
         make_option("-l", "--list", action='store_true', default=False, help="List backups in the backup directory"),
@@ -44,7 +45,8 @@ class Command(BaseDbBackupCommand):
         self.quiet = options.get('quiet')
         try:
             connection.close()
-            self.filepath = options.get('filepath')
+            self.filename = options.get('input_filename')
+            self.path = options.get('input_path')
             self.backup_extension = options.get('backup_extension') or 'backup'
             self.servername = options.get('servername')
             self.decrypt = options.get('decrypt')
@@ -81,38 +83,40 @@ class Command(BaseDbBackupCommand):
     def _restore_backup(self):
         """Restore the specified database."""
         self.logger.info("Restoring backup for database: %s", self.database['NAME'])
-        # Fetch the latest backup if filepath not specified
-        if not self.filepath:
-            self.logger.info("Finding latest backup")
-            try:
-                self.filepath = self.storage.get_latest_backup(encrypted=self.decrypt,
-                                                               compressed=self.uncompress)
-            except StorageError as err:
-                raise CommandError(err.args[0])
-        # Restore the specified filepath backup
-        self.logger.info("Restoring: %s" % self.filepath)
-        input_filename = self.filepath
-        inputfile = self.storage.read_file(input_filename)
+        if self.path:
+            input_filename = self.path
+            input_file = self.read_local_file(self.path)
+        else:
+            if self.filename:
+                input_filename = self.filename
+            # Fetch the latest backup if filepath not specified
+            else:
+                self.logger.info("Finding latest backup")
+                try:
+                    input_filename = self.storage.get_latest_backup(encrypted=self.decrypt,
+                                                                    compressed=self.uncompress)
+                except StorageError as err:
+                    raise CommandError(err.args[0])
+            input_file = self.storage.read_file(input_filename)
 
+        self.logger.info("Restoring: %s" % input_filename)
         if self.decrypt:
-            unencrypted_file, input_filename = utils.unencrypt_file(inputfile, input_filename,
+            unencrypted_file, input_filename = utils.unencrypt_file(input_file, input_filename,
                                                                     self.passphrase)
-            inputfile.close()
-            inputfile = unencrypted_file
-
+            input_file.close()
+            input_file = unencrypted_file
         if self.uncompress:
-            uncompressed_file, input_filename = utils.uncompress_file(inputfile, input_filename)
-            inputfile.close()
-            inputfile = uncompressed_file
-
-        self.logger.info("Restore tempfile created: %s", utils.handle_size(inputfile))
+            uncompressed_file, input_filename = utils.uncompress_file(input_file, input_filename)
+            input_file.close()
+            input_file = uncompressed_file
+        self.logger.info("Restore tempfile created: %s", utils.handle_size(input_file))
         if self.interactive:
             answer = input("Are you sure you want to continue? [Y/n]")
-            if answer.lower() not in ('y', 'yes', ''):
+            if answer.lower().startswith('n'):
                 self.logger.info("Quitting")
                 sys.exit(0)
-        inputfile.seek(0)
-        self.dbcommands.run_restore_commands(inputfile)
+        input_file.seek(0)
+        self.dbcommands.run_restore_commands(input_file)
 
     # TODO: Remove this
     def _list_backups(self):
@@ -124,3 +128,7 @@ class Command(BaseDbBackupCommand):
             self.logger.info("  %s", os.path.basename(filepath))
             # TODO: Implement filename_details method
             # print(utils.filename_details(filepath))
+
+    def read_local_file(self, path):
+        """Open file on local filesystem."""
+        return open(path)

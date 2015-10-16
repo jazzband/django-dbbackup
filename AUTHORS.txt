@@ -1,14 +1,14 @@
 Primary Authors:
-  * Michael Shepanski
+ * Michael Shepanski
+ * Anthony Monthe (ZuluPro)
+ * Benjamin Bach (benjaoming)
 
 Contributors:
-  * Hannes Hapke
-  * Joe Hu
-  * Marco Braak
-  * Nathan Duthoit
-  * Rich Leland
-  * Toumhi (Bitbucket)
-  * Tobias McNulty
-  * Grant McConnaughey
-  * Anthony Monthe (ZuluPro)
-  * Benjamin Bach (benjaoming)
+ * Hannes Hapke
+ * Joe Hu
+ * Marco Braak
+ * Nathan Duthoit
+ * Rich Leland
+ * Toumhi (Bitbucket)
+ * Tobias McNulty
+ * Grant McConnaughey

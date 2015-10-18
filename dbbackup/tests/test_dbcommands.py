@@ -82,7 +82,40 @@ class SQLiteSettingsTest(TestCase):
         commands = self.dbsettings.get_backup_commands()
         self.assertEqual(commands, wanted_commands)
 
-    def test_get_get_restore_commands(self):
+    def test_get_restore_commands(self):
         wanted_commands = [['<WRITE_FILE>', '{databasename}']]
         commands = self.dbsettings.get_restore_commands()
+        self.assertEqual(commands, wanted_commands)
+
+
+class MongoSettingsTest(TestCase):
+    def setUp(self):
+        self.database = settings.DATABASES['default']
+        self.dbsettings = dbcommands.MongoDBSettings(self.database)
+
+    def test_get_extension(self):
+        extension = self.dbsettings.get_extension()
+        self.assertEqual('tar', extension)
+
+    def test_get_backup_commands(self):
+        wanted_commands = [['tar', '-C', '{temp_dir}', '-cf', '-', '.', '>']]
+        commands = self.dbsettings.get_backup_commands()
+        self.assertEqual(commands, wanted_commands)
+
+    def test_get_restore_commands(self):
+        wanted_commands = [['tar', '-C', '{temp_dir}', '-x', '<']]
+        commands = self.dbsettings.get_restore_commands()
+        self.assertEqual(commands, wanted_commands)
+
+    def test_get_mongo_backup_commands(self):
+        wanted_commands = [['mongodump', '--username={adminuser}', '--password={password}', '-db',
+                            '{databasename}', '-o', '{temp_dir}']]
+        commands = self.dbsettings.get_mongo_backup_commands()
+        self.assertEqual(commands, wanted_commands)
+
+    def test_get_mongo_restore_commands(self):
+        wanted_commands = [['mongorestore', '--username={adminuser}', '--password={password}',
+                            '--authenticationDatabase', '{databasename}', '--objcheck',
+                            '--drop', '{temp_dir}']]
+        commands = self.dbsettings.get_mongo_restore_commands()
         self.assertEqual(commands, wanted_commands)

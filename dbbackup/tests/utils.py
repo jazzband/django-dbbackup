@@ -9,8 +9,10 @@ from dbbackup.storage.base import BaseStorage
 BASE_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt')
 ENCRYPTED_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt.gpg')
 COMPRESSED_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt.gz')
+TARED_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt.tar')
 ENCRYPTED_COMPRESSED_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt.gz.gpg')
 TEST_DATABASE = {'ENGINE': 'django.db.backends.sqlite3', 'NAME': '/tmp/foo.db', 'USER': 'foo', 'PASSWORD': 'bar', 'HOST': 'foo', 'PORT': 122}
+TEST_MONGODB = {'ENGINE': 'mongo', 'NAME': 'mongo_test', 'USER': 'foo', 'PASSWORD': 'bar', 'HOST': 'foo', 'PORT': 122}
 
 GPG_PRIVATE_PATH = os.path.join(settings.BASE_DIR, 'tests/gpg/secring.gpg')
 GPG_PUBLIC_PATH = os.path.join(settings.BASE_DIR, 'tests/gpg/pubring.gpg')

@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division,
 import copy
 import os
 import re
+import tempfile
 import six
 import shlex
 import logging
@@ -18,7 +19,7 @@ from dbbackup import (settings, utils)
 from .utils import filename_generate
 
 
-class BaseEngineSettings:
+class BaseEngineSettings(object):
     """Base settings for a database engine"""
 
     def __init__(self, database):
@@ -31,6 +32,8 @@ class BaseEngineSettings:
         self.database_port = str(self.database.get('PORT', ''))
         self.extension = self.get_extension()
         self.BACKUP_COMMANDS = self.get_backup_commands()
+        self.MONGO_BACKUP_COMMANDS = self.get_mongo_backup_commands()
+        self.MONGO_RESTORE_COMMANDS = self.get_mongo_restore_commands()
         self.RESTORE_COMMANDS = self.get_restore_commands()
 
     def get_extension(self):
@@ -45,6 +48,57 @@ class BaseEngineSettings:
     def get_env(self):
         """Extra environment variables to be passed to shell execution"""
         return {}
+
+    def get_mongo_backup_commands(self):
+        """Extra command to backup mongodb in a directory.
+           The same directory will be tared to be saved on the storage engine.
+        """
+        return ''
+
+    def get_mongo_restore_commands(self):
+        """Extra command to backup mongodb in a directory.
+           The same directory will be tared to be saved on the storage engine.
+        """
+        return ''
+
+
+class MongoDBSettings(BaseEngineSettings):
+    """Settings for the Mongo database engine"""
+
+    def get_extension(self):
+        return getattr(settings, 'DBBACKUP_MONGO_EXTENSION', 'tar')
+
+    def get_mongo_backup_commands(self):
+        command = "mongodump --username={adminuser} --password='{password}'"
+        if self.database_host:
+            command = '%s --host={host}' % command
+        self.port = self.database_port
+        if self.port:
+            command = '%s --port={port}' % command
+        command = '%s -db {databasename} -o {temp_dir}' % command
+        backup_commands = [shlex.split(command)]
+        return backup_commands
+
+    def get_backup_commands(self):
+        command = 'tar -C {temp_dir} -cf - . >'
+        backup_commands = [shlex.split(command)]
+        return backup_commands
+
+    def get_mongo_restore_commands(self):
+        command = "mongorestore --username={adminuser} --password='{password}' --authenticationDatabase {databasename}"
+        if self.database_host:
+            command = '%s --host={host}' % command
+        self.port = self.database_port
+        if self.port:
+            command = '%s --port={port}' % command
+        command = '%s --objcheck --drop {temp_dir}' % command
+        restore_commands = [shlex.split(command)]
+        return restore_commands
+
+    def get_restore_commands(self):
+        command = 'tar -C {temp_dir} -x <'
+        restore_commands = [shlex.split(command)]
+        return restore_commands
 
 
 class MySQLSettings(BaseEngineSettings):
@@ -176,9 +230,8 @@ class SQLiteSettings(BaseEngineSettings):
         return settings.SQLITE_RESTORE_COMMANDS
 
 
-class DBCommands:
+class DBCommands(object):
     """ Process the Backup or Restore commands. """
-
     def __init__(self, database):
         self.database = database
         self.engine = settings.FORCE_ENGINE or self.database['ENGINE'].split('.')[-1]
@@ -199,23 +252,25 @@ class DBCommands:
     def _clean_passwd(self, instr):
         return instr.replace(self.database['PASSWORD'], '******')
 
+    def _get_command_formater(self):
+        formater = {'username': self.database['USER'],
+                    'adminuser': self.database.get('ADMINUSER', self.database['USER']),
+                    'password': self.database['PASSWORD'],
+                    'databasename': self.database['NAME'],
+                    'host': self.database['HOST'],
+                    'port': str(self.database['PORT'])}
+        return formater
+
+    def replace(self, original_command):
+        return original_command.format(**self._get_command_formater())
+
     def translate_command(self, command):
         """ Translate the specified command or string. """
-        def replace(s):
-            s = (
-                s.replace('{username}', self.database['USER'])
-                 .replace('{adminuser}', self.database.get('ADMINUSER', self.database['USER']))
-                 .replace('{password}', self.database['PASSWORD'])
-                 .replace('{databasename}', self.database['NAME'])
-                 .replace('{host}', self.database['HOST'])
-                 .replace('{port}', str(self.database['PORT']))
-             )
-            return s
         if isinstance(command, six.string_types):
-            return replace(command)
+            return self.replace(command)
         command = copy.copy(command)
         for i in range(len(command)):
-            command[i] = replace(command[i])
+            command[i] = self.replace(command[i])
         return command
 
     # TODO: Clean wildcard
@@ -284,3 +339,35 @@ class DBCommands:
         self.logger.info("Writing: %s", filepath)
         with open(filepath, 'wb') as fd:
             copyfileobj(stdin, fd)
+
+
+class MongoDBCommands(DBCommands):
+    def __init__(self, database):
+        # Initializing the temp dir for storing mongo dump
+        self.mongo_temp_dir = tempfile.mkdtemp(dir=settings.TMP_DIR)
+        super(MongoDBCommands, self).__init__(database)
+
+    def _get_settings(self):
+        return MongoDBSettings(self.database)
+
+    def _get_command_formater(self):
+        formater = super(MongoDBCommands, self)._get_command_formater()
+        formater['temp_dir'] = self.mongo_temp_dir
+        return formater
+
+    def run_backup_commands(self, stdout):
+        '''The first command dumps the content off mongo in a temp dir
+           The second command tar the temp dir into a file which will be saved in the storage
+        '''
+        if not self.mongo_temp_dir:
+            raise Exception("Mongo temporary dump folder doesn't exist")
+        self.run_commands(self.settings.MONGO_BACKUP_COMMANDS)
+        return self.run_commands(self.settings.BACKUP_COMMANDS, stdout=stdout)
+
+    def run_restore_commands(self, stdin):
+        """ Translate and run the backup commands. """
+        if not self.mongo_temp_dir:
+            raise Exception("Mongo temporary dump folder doesn't exist")
+        stdin.seek(0)
+        self.run_commands(self.settings.RESTORE_COMMANDS, stdin=stdin)
+        return self.run_commands(self.settings.MONGO_RESTORE_COMMANDS)

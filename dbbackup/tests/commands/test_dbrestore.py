@@ -8,11 +8,11 @@ from django.utils.six import BytesIO
 
 from dbbackup.utils import unencrypt_file, uncompress_file
 from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
-from dbbackup.dbcommands import DBCommands
+from dbbackup.dbcommands import DBCommands, MongoDBCommands
 from dbbackup import utils
 from dbbackup.tests.utils import (FakeStorage, ENCRYPTED_FILE, TEST_DATABASE,
                                   add_private_gpg, DEV_NULL, COMPRESSED_FILE,
-                                  clean_gpg_keys, HANDLED_FILES)
+                                  clean_gpg_keys, HANDLED_FILES, TEST_MONGODB, TARED_FILE)
 
 
 @patch('dbbackup.management.commands.dbrestore.input', return_value='y')
@@ -80,6 +80,33 @@ class DbrestoreCommandGetDatabaseTest(TestCase):
     def test_no_given_db_multidb(self):
         with self.assertRaises(CommandError):
             self.command._get_database({})
+
+
+@patch('dbbackup.management.commands.dbrestore.input', return_value='y')
+@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils.FakeStorage')
+@patch('dbbackup.dbcommands.DBCommands.run_commands')
+class DbMongoRestoreCommandRestoreBackupTest(TestCase):
+    def setUp(self):
+        self.command = DbrestoreCommand()
+        self.command.stdout = DEV_NULL
+        self.command.uncompress = False
+        self.command.decrypt = False
+        self.command.backup_extension = 'bak'
+        self.command.filepath = 'foofile'
+        self.command.database = TEST_MONGODB
+        self.command.dbcommands = MongoDBCommands(TEST_MONGODB)
+        self.command.passphrase = None
+        self.command.interactive = True
+        self.command.storage = FakeStorage()
+        HANDLED_FILES.clean()
+        add_private_gpg()
+
+    def test_mongo_settings_backup_command(self, mock_runcommands, *args):
+        self.command.storage.file_read = TARED_FILE
+        self.command.filepath = TARED_FILE
+        HANDLED_FILES['written_files'].append((TARED_FILE, open(TARED_FILE, 'rb')))
+        self.command.restore_backup()
+        self.assertTrue(mock_runcommands.called)
 
 
 class DbrestoreCommandGetExtensionTest(TestCase):

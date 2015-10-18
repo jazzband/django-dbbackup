@@ -15,7 +15,7 @@ from django.db import connection
 
 from ._base import BaseDbBackupCommand
 from ... import utils
-from ...dbcommands import DBCommands
+from ...dbcommands import DBCommands, MongoDBCommands
 from ...storage.base import BaseStorage, StorageError
 
 input = raw_input if six.PY2 else input  # @ReservedAssignment
@@ -35,6 +35,7 @@ class Command(BaseDbBackupCommand):
         make_option("-c", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),
         make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
         make_option("-z", "--uncompress", help="Uncompress gzip data before restoring", action='store_true'),
+        make_option("-m", "--mongo", help="Perforn a mongo restore instead of sql", action='store_true', default=False),
     )
 
     def handle(self, **options):
@@ -52,7 +53,18 @@ class Command(BaseDbBackupCommand):
             self.interactive = options.get('interactive')
             self.database = self._get_database(options)
             self.storage = BaseStorage.storage_factory()
-            self.dbcommands = DBCommands(self.database)
+            if options.get('mongo'):
+                #Mongo specific handling.
+                # TODO: Add support for multiple mongo db defined in settings.
+                # TODO: Add support for credential given entirely in command line (db name, collection, user, password, host, port)
+                database = settings.MONGO_SETTINGS
+                self.dbcommands = MongoDBCommands(database)
+                self.database = settings.MONGO_SETTINGS
+            else:
+                self.database = self._get_database(options)
+                self.dbcommands = DBCommands(self.database)
+            if not self.backup_extension:
+                self.backup_extension = self.dbcommands.settings.extension or 'backup'
             if options.get('list'):
                 return self.list_backups()
             self.restore_backup()

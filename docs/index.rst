@@ -43,7 +43,7 @@ in the backup filename.
 
 ::
 
-    dbbackup [-s <servername>] [-d <database>] [--clean] [--compress] [--encrypt] [--backup-extension <file-extension>]
+    dbbackup [-s <servername>] [-d <database>] [--clean] [--compress] [--encrypt] [--backup-extension <file-extension>] [--mongo]
 
 dbrestore
 ~~~~~~~~~
@@ -56,7 +56,7 @@ backup from.
 
 ::
 
-    dbrestore [-d <database>] [-s <servername>] [-f <localfile>] [--uncompress] [--backup-extension <file-extension>]
+    dbrestore [-d <database>] [-s <servername>] [-f <localfile>] [--uncompress] [--backup-extension <file-extension>] [--mongo]
 
 mediabackup
 ~~~~~~~~~~~~
@@ -111,6 +111,48 @@ should also be backed up.
     Backing up media files
       Backup tempfile created: None (233.0 B)
       Writing file to Filesystem: /home/user/django-project/
+
+
+MongoDB backup example (BETA)
+--------
+You can backup a mongodb database by defining the following settings in your settings file.
+::
+
+    MONGO_SETTINGS = {
+        'USER': 'dumper_user',
+        'PASSWORD': '******',
+        'ENGINE': 'mongo',
+        'NAME': 'db_to_dump',
+        'HOST': 'localhost',
+        'PORT': '27017',
+    }
+
+the command is the same with the usage of the --mongo option
+
+::
+
+    $ python manage.py dbbackup --mongo
+
+    Backing Up Database: db_to_dump
+     Running: mongodump --username=dumper_user --password=****** --host=localhost --port=27017 -db db_to_dump -o /tmp/tmpxf8P7M
+     Running: tar -C /tmp/tmpxf8P7M -cf - .
+     Backup tempfile created: 10.0 KB
+     Writing file to  Filesystem: /home/user/django-project/, filename: db_to_dump-2015-07-05-150629.tar
+
+
+You can then restore the backup using the opposite command. (backup_extension currently have to be given)
+
+::
+
+    $ python manage.py dbrestore --mongo
+
+    Restoring backup for database: db_to_dump
+      Finding latest backup
+      Restoring: /home/user/django-project/db_to_dump-2015-07-05-150629.tar
+      Restore tempfile created: 10.0 KB
+    Are you sure you want to continue? [Y/n]Y
+      Running: tar -C /tmp/tmpiaeb0O -x
+      Running: mongorestore --username=dumper_user --password=****** --authenticationDatabase db_to_dump --host=localhost --port=27017 --objcheck --drop /tmp/tmpiaeb0O
 
 
 Other Resources

@@ -29,8 +29,6 @@ class Command(BaseDbBackupCommand):
         make_option("-s", "--servername", help="Specify server name to include in backup filename"),
         make_option("-z", "--compress", help="Compress the backup files", action="store_true", default=False),
         make_option("-e", "--encrypt", help="Encrypt the backup files", action="store_true", default=False),
-        make_option("-m", "--mongo", help="Backup a mongo db instead of sql. Uses MONGO_SETTINGS", action="store_true",
-                    default=False),
     )
 
     @utils.email_uncaught_exception
@@ -45,29 +43,19 @@ class Command(BaseDbBackupCommand):
         self.compress = options.get('compress')
         self.encrypt = options.get('encrypt')
         self.storage = BaseStorage.storage_factory()
-        if options.get('mongo'):
-            # Mongo specific handling.
-            # TODO: Add support for multiple mongo db defined in settings.
-            # TODO: Add support for credential given entirely in command line (db name, collection, user, password, host, port)
-            database = settings.MONGO_SETTINGS
-            self.dbcommands = MongoDBCommands(database)
+        database_keys = (self.database,) if self.database else dbbackup_settings.DATABASES
+        for database_key in database_keys:
+            database = settings.DATABASES[database_key]
+            if 'mongo' in database['ENGINE']:
+                self.dbcommands = MongoDBCommands(database)
+            else:
+                self.dbcommands = DBCommands(database)
             try:
                 self.save_new_backup(database)
                 if self.clean:
                     self.cleanup_old_backups(database)
             except StorageError as err:
                 raise CommandError(err)
-        else:
-            database_keys = (self.database,) if self.database else dbbackup_settings.DATABASES
-            for database_key in database_keys:
-                database = settings.DATABASES[database_key]
-                self.dbcommands = DBCommands(database)
-                try:
-                    self.save_new_backup(database)
-                    if self.clean:
-                        self.cleanup_old_backups(database)
-                except StorageError as err:
-                    raise CommandError(err)
 
     def save_new_backup(self, database):
         """

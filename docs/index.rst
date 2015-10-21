@@ -43,7 +43,7 @@ in the backup filename.
 
 ::
 
-    dbbackup [-s <servername>] [-d <database>] [--clean] [--compress] [--encrypt] [--backup-extension <file-extension>] [--mongo]
+    dbbackup [-s <servername>] [-d <database>] [--clean] [--compress] [--encrypt] [--backup-extension <file-extension>]
 
 dbrestore
 ~~~~~~~~~
@@ -56,7 +56,7 @@ backup from.
 
 ::
 
-    dbrestore [-d <database>] [-s <servername>] [-f <localfile>] [--uncompress] [--backup-extension <file-extension>] [--mongo]
+    dbrestore [-d <database>] [-s <servername>] [-f <localfile>] [--uncompress] [--backup-extension <file-extension>]
 
 mediabackup
 ~~~~~~~~~~~~
@@ -115,23 +115,22 @@ should also be backed up.
 
 MongoDB backup example (BETA)
 --------
-You can backup a mongodb database by defining the following settings in your settings file.
+You can backup a mongodb database defined in your DATABASES settings.
 ::
 
-    MONGO_SETTINGS = {
+    DATABASES['my_mongo'] = {
         'USER': 'dumper_user',
         'PASSWORD': '******',
-        'ENGINE': 'mongo',
+        'ENGINE': 'django_mongodb_engine',
         'NAME': 'db_to_dump',
         'HOST': 'localhost',
         'PORT': '27017',
     }
 
-the command is the same with the usage of the --mongo option
 
 ::
 
-    $ python manage.py dbbackup --mongo
+    $ python manage.py dbbackup -d my_mongo
 
     Backing Up Database: db_to_dump
      Running: mongodump --username=dumper_user --password=****** --host=localhost --port=27017 -db db_to_dump -o /tmp/tmpxf8P7M
@@ -144,7 +143,7 @@ You can then restore the backup using the opposite command. (backup_extension cu
 
 ::
 
-    $ python manage.py dbrestore --mongo
+    $ python manage.py dbrestore -d my_mongo
 
     Restoring backup for database: db_to_dump
       Finding latest backup

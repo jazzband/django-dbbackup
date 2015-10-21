@@ -12,7 +12,7 @@ COMPRESSED_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt.gz')
 TARED_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt.tar')
 ENCRYPTED_COMPRESSED_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt.gz.gpg')
 TEST_DATABASE = {'ENGINE': 'django.db.backends.sqlite3', 'NAME': '/tmp/foo.db', 'USER': 'foo', 'PASSWORD': 'bar', 'HOST': 'foo', 'PORT': 122}
-TEST_MONGODB = {'ENGINE': 'mongo', 'NAME': 'mongo_test', 'USER': 'foo', 'PASSWORD': 'bar', 'HOST': 'foo', 'PORT': 122}
+TEST_MONGODB = {'ENGINE': 'django_mongodb_engine', 'NAME': 'mongo_test', 'USER': 'foo', 'PASSWORD': 'bar', 'HOST': 'foo', 'PORT': 122}
 
 GPG_PRIVATE_PATH = os.path.join(settings.BASE_DIR, 'tests/gpg/secring.gpg')
 GPG_PUBLIC_PATH = os.path.join(settings.BASE_DIR, 'tests/gpg/pubring.gpg')

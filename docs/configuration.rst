@@ -104,8 +104,8 @@ The file name extension used for SQLite backups.
 
 Default: ``'sqlite'``
 
-SEND\_EMAIL
-~~~~~~~~~~~
+DBBACKUP_SEND_EMAIL
+~~~~~~~~~~~~~~~~~~~
 
 Controls whether or not django-dbbackup sends an error email when an uncaught
 exception is received.

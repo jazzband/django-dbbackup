@@ -4,10 +4,6 @@ language: python
 
 python:
   - "2.7"
-  - "3.2"
-  - "3.3"
-  - "3.4"
-  - "pypy"
 
 env:
   - TOXENV=py34-1.8.X,py32-1.8.X,py33-1.8.X,py27-1.8.X

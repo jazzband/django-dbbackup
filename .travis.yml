@@ -6,11 +6,10 @@ python:
   - "2.7"
 
 env:
-  - TOXENV=py34-1.8.X,py32-1.8.X,py33-1.8.X,py27-1.8.X
-  - TOXENV=py34-1.7.X,py32-1.7.X,py33-1.7.X,py27-1.7.X
-  - TOXENV=py34-1.6.X,py32-1.6.X,py33-1.6.X,py27-1.6.X
-  - TOXENV=flake8
-  - TOXENV=coverage
+  - TOXENV=py34-1.8.X,py32-1.8.X,py33-1.8.X,py27-1.8.X,pypy-1.8.X
+  - TOXENV=py34-1.7.X,py32-1.7.X,py33-1.7.X,py27-1.7.X,pypy-1.7.X
+  - TOXENV=py34-1.6.X,py32-1.6.X,py33-1.6.X,py27-1.6.X,pypy-1.6.X
+  - TOXENV=lint
   - TOXENV=docs
 
 install:

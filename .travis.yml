@@ -19,5 +19,9 @@ script:
   - tox
 
 after_success:
+<<<<<<< HEAD
   - pip install coverage==3.7.1
+=======
+  - pip install coverage<4
+>>>>>>> e3bc87e29680b9cf9708ded2ca30d6a9c5e235d5
   - coveralls

@@ -18,4 +18,6 @@ install:
 script:
   - tox
 
-after_success: coveralls $COVERALLS_OPTION
+after_success:
+  - pip install coverage==3.7.1
+  - coveralls

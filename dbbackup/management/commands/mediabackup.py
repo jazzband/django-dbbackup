@@ -24,6 +24,9 @@ class Command(BaseDbBackupCommand):
     help = """
     Backup media files, gather all in a tarball and encrypt or compress.
     """
+
+    content_type = "media"
+
     option_list = BaseDbBackupCommand.option_list + (
         make_option("-c", "--clean", help="Clean up old backup files", action="store_true", default=False),
         make_option("-s", "--servername", help="Specify server name to include in backup filename"),
@@ -62,7 +65,7 @@ class Command(BaseDbBackupCommand):
             sys.exit(1)
         self.logger.info("Backing up media files in %s", source_dir)
         filename = self.get_backup_basename(compress=compress)
-        output_file = self.create_backup_file(source_dir, filename,
+        output_file = self.create_tmp_backup_file(source_dir, filename,
                                               compress=compress)
         if encrypt:
             encrypted_file = utils.encrypt_file(output_file, filename)
@@ -76,9 +79,10 @@ class Command(BaseDbBackupCommand):
         extension = "tar%s" % ('.gz' if kwargs.get('compress') else '')
         return utils.filename_generate(extension,
                                        servername=self.servername,
-                                       content_type='media')
+                                       content_type=self.content_type)
 
-    def create_backup_file(self, source_dir, backup_basename, **kwargs):
+    def create_tmp_backup_file(self, source_dir, backup_basename, **kwargs):
+        backup_basename = backup_basename.replace("/", "_")
         temp_dir = tempfile.mkdtemp(dir=settings.TMP_DIR)
         try:
             backup_filename = os.path.join(temp_dir, backup_basename)

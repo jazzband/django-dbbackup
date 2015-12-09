@@ -84,7 +84,7 @@ complete, you can follow the required setup below.
 
 ::
 
-    pip install boto django-storage-redux
+    pip install boto django-storages-redux
 
 Add the following to your project's settings:
 

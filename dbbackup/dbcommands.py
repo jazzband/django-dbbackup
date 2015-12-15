@@ -24,8 +24,8 @@ class BaseEngineSettings:
     def __init__(self, database):
         self.database = database
         self.database_adminuser = self.database.get('ADMINUSER', self.database['USER'])
-        self.database_user = self.database['USER']
-        self.database_password = self.database['PASSWORD']
+        self.database_user = self.database.get('USER', '')
+        self.database_password = self.database.get('PASSWORD', '')
         self.database_name = self.database['NAME']
         self.database_host = self.database.get('HOST', '')
         self.database_port = str(self.database.get('PORT', ''))
@@ -203,13 +203,13 @@ class DBCommands:
         """ Translate the specified command or string. """
         def replace(s):
             s = (
-                s.replace('{username}', self.database['USER'])
-                 .replace('{adminuser}', self.database.get('ADMINUSER', self.database['USER']))
-                 .replace('{password}', self.database['PASSWORD'])
+                s.replace('{username}', self.database.get('USER', ''))
+                 .replace('{adminuser}', self.database.get('ADMINUSER') or self.database.get('USER', ''))
+                 .replace('{password}', self.database.get('PASSWORD', ''))
                  .replace('{databasename}', self.database['NAME'])
-                 .replace('{host}', self.database['HOST'])
-                 .replace('{port}', str(self.database['PORT']))
-             )
+                 .replace('{host}', self.database.get('HOST', ''))
+                 .replace('{port}', str(self.database.get('PORT', '')))
+            )
             return s
         if isinstance(command, six.string_types):
             return replace(command)

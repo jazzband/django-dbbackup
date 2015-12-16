@@ -4,34 +4,20 @@ language: python
 
 python:
   - "2.7"
-  - "3.2"
-  - "3.3"
-  - "3.4"
-  - "pypy"
 
 env:
-  - DJANGO_PACKAGE="Django>=1.6,<1.7"
-  - DJANGO_PACKAGE="Django>=1.7,<1.8"
-  - DJANGO_PACKAGE="Django>=1.8,<1.9"
+  - TOXENV=py34-1.8.X,py32-1.8.X,py33-1.8.X,py27-1.8.X,pypy-1.8.X
+  - TOXENV=py34-1.7.X,py32-1.7.X,py33-1.7.X,py27-1.7.X,pypy-1.7.X
+  - TOXENV=py34-1.6.X,py32-1.6.X,py33-1.6.X,py27-1.6.X,pypy-1.6.X
+  - TOXENV=lint
+  - TOXENV=docs
 
 install:
-  - pip install "${DJANGO_PACKAGE:-Django}"
-  - pip install -r requirements.txt
-  - pip install -r requirements-tests.txt
-  - pip install -r requirements-docs.txt
-  - pip install coveralls
+  - pip install tox coveralls
 
 script:
-  - coverage run setup.py test
-after_success: coveralls $COVERALLS_OPTION
+  - tox
 
-matrix:
-  include:
-    - python: "3.4"
-      env: COVERALLS_OPTION=debug DJANGO_PACKAGE="Django>=1.8,<1.9"
-      script: 
-        - pylint --rcfile=.pylintrc -E dbbackup/ || true
-        - flake8 dbbackup || true
-    - python: "3.4"
-      env: COVERALLS_OPTION=debug DJANGO_PACKAGE="Django>=1.8,<1.9"
-      script: make docs
+after_success:
+  - pip install coverage==3.7.1
+  - coveralls

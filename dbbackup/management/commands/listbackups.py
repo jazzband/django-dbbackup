@@ -37,6 +37,7 @@ class Command(BaseDbBackupCommand):
         filters = dict([(k, v) for k, v in options.items()
                         if k in FILTER_KEYS])
         filenames = self.storage.list_backups(**filters)
+        filenames = filter(None, filenames) # Remove empty entries from S3
         files_attr = [
             {'datetime': utils.filename_to_date(filename).strftime('%x %X'),
              'name': filename}

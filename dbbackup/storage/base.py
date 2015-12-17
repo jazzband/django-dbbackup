@@ -143,6 +143,8 @@ class BaseStorage(object):
         """
         files = self.list_backups(encrypted=encrypted, compressed=compressed,
                                   content_type=content_type, database=database)
+        files = filter(None, files) # Remove empty entries from S3                                                                                                                                                                                                                          
+
         if not files:
             raise FileNotFound("There's no backup file available.")
         return max(files, key=utils.filename_to_date)

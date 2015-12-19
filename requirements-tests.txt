@@ -8,3 +8,4 @@ django-storages-redux
 boto
 moto
 pytz
+dj-database-url

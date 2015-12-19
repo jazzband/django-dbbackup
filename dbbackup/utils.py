@@ -349,13 +349,14 @@ def filename_to_datestring(filename, datefmt=None):
                     if is ``None``
     :type datefmt: ``str`` or ``None``
 
-    :returns: Date part
-    :rtype: ``str``
+    :returns: Date part or nothing if not found
+    :rtype: ``str`` or ``NoneType``
     """
     datefmt = datefmt or settings.DATE_FORMAT 
     regex = datefmt_to_regex(datefmt)
     search = regex.search(filename)
-    return search.groups()[0]
+    if search:
+        return search.groups()[0]
 
 
 def filename_to_date(filename, datefmt=None):
@@ -364,14 +365,15 @@ def filename_to_date(filename, datefmt=None):
 
     :param datefmt: strftime format string, ``settings.DATE_FORMAT`` is used
                     if is ``None``
-    :type datefmt: ``str`` or ``None``
+    :type datefmt: ``str`` or ``NoneType``
 
-    :returns: Date guessed
-    :rtype: ``datetime.datetime``
+    :returns: Date guessed or nothing if no date found
+    :rtype: ``datetime.datetime`` or ``NoneType``
     """
     datefmt = datefmt or settings.DATE_FORMAT 
     datestring = filename_to_datestring(filename, datefmt)
-    return datetime.strptime(datestring, datefmt)
+    if datestring is not None:
+        return datetime.strptime(datestring, datefmt)
 
 
 def filename_generate(extension, database_name='', servername=None,

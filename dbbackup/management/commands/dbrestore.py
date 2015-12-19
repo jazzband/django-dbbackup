@@ -37,7 +37,7 @@ class Command(BaseDbBackupCommand):
         make_option("-z", "--uncompress", help="Uncompress gzip data before restoring", action='store_true'),
     )
 
-    def handle(self, **options):
+    def handle(self, *args, **options):
         """Django command handler."""
         self.verbosity = int(options.get('verbosity'))
         self.quiet = options.get('quiet')

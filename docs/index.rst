@@ -113,6 +113,47 @@ should also be backed up.
       Writing file to Filesystem: /home/user/django-project/
 
 
+MongoDB backup example (BETA)
+--------
+You can backup a mongodb database defined in your DATABASES settings.
+::
+
+    DATABASES['my_mongo'] = {
+        'USER': 'dumper_user',
+        'PASSWORD': '******',
+        'ENGINE': 'django_mongodb_engine',
+        'NAME': 'db_to_dump',
+        'HOST': 'localhost',
+        'PORT': '27017',
+    }
+
+
+::
+
+    $ python manage.py dbbackup -d my_mongo
+
+    Backing Up Database: db_to_dump
+     Running: mongodump --username=dumper_user --password=****** --host=localhost --port=27017 -db db_to_dump -o /tmp/tmpxf8P7M
+     Running: tar -C /tmp/tmpxf8P7M -cf - .
+     Backup tempfile created: 10.0 KB
+     Writing file to  Filesystem: /home/user/django-project/, filename: db_to_dump-2015-07-05-150629.tar
+
+
+You can then restore the backup using the opposite command. (backup_extension currently have to be given)
+
+::
+
+    $ python manage.py dbrestore -d my_mongo
+
+    Restoring backup for database: db_to_dump
+      Finding latest backup
+      Restoring: /home/user/django-project/db_to_dump-2015-07-05-150629.tar
+      Restore tempfile created: 10.0 KB
+    Are you sure you want to continue? [Y/n]Y
+      Running: tar -C /tmp/tmpiaeb0O -x
+      Running: mongorestore --username=dumper_user --password=****** --authenticationDatabase db_to_dump --host=localhost --port=27017 --objcheck --drop /tmp/tmpiaeb0O
+
+
 Other Resources
 ===============
 

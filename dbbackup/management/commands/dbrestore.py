@@ -15,7 +15,7 @@ from django.db import connection
 
 from ._base import BaseDbBackupCommand
 from ... import utils
-from ...dbcommands import DBCommands
+from ...dbcommands import DBCommands, MongoDBCommands
 from ...storage.base import BaseStorage, StorageError
 
 input = raw_input if six.PY2 else input  # @ReservedAssignment
@@ -52,7 +52,14 @@ class Command(BaseDbBackupCommand):
             self.interactive = options.get('interactive')
             self.database = self._get_database(options)
             self.storage = BaseStorage.storage_factory()
-            self.dbcommands = DBCommands(self.database)
+            self.database = self._get_database(options)
+            if 'mongo' in self.database['ENGINE']:
+                self.dbcommands = MongoDBCommands(self.database)
+            else:
+                self.dbcommands = DBCommands(self.database)
+
+            if not self.backup_extension:
+                self.backup_extension = self.dbcommands.settings.extension or 'backup'
             if options.get('list'):
                 return self.list_backups()
             self.restore_backup()

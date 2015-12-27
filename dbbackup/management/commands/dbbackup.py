@@ -14,7 +14,7 @@ from django.conf import settings
 from django.core.management.base import CommandError
 
 from ._base import BaseDbBackupCommand
-from ...dbcommands import DBCommands
+from ...dbcommands import DBCommands, MongoDBCommands
 from ...storage.base import BaseStorage, StorageError
 from ... import utils, settings as dbbackup_settings
 
@@ -46,7 +46,10 @@ class Command(BaseDbBackupCommand):
         database_keys = (self.database,) if self.database else dbbackup_settings.DATABASES
         for database_key in database_keys:
             database = settings.DATABASES[database_key]
-            self.dbcommands = DBCommands(database)
+            if 'mongo' in database['ENGINE']:
+                self.dbcommands = MongoDBCommands(database)
+            else:
+                self.dbcommands = DBCommands(database)
             try:
                 self.save_new_backup(database)
                 if self.clean:
@@ -73,7 +76,8 @@ class Command(BaseDbBackupCommand):
             outputfile = encrypted_file
         if not self.quiet:
             self.logger.info("Backup tempfile created: %s", utils.handle_size(outputfile))
-            self.logger.info("Writing file to %s: %s, filename: %s", self.storage.name, self.storage.backup_dir, filename)
+            self.logger.info("Writing file to %s: %s, filename: %s", self.storage.name, self.storage.backup_dir,
+                             filename)
         self.storage.write_file(outputfile, filename)
 
     def cleanup_old_backups(self, database):

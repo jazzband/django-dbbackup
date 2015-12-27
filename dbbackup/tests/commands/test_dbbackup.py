@@ -1,13 +1,13 @@
 import os
-from mock import patch
+from mock import patch, MagicMock
 
 from django.test import TestCase
 from django.utils import six
 
 from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
-from dbbackup.dbcommands import DBCommands
+from dbbackup.dbcommands import DBCommands, MongoDBCommands
 from dbbackup.tests.utils import (FakeStorage, TEST_DATABASE,
-                                  add_public_gpg, clean_gpg_keys, DEV_NULL)
+                                  add_public_gpg, clean_gpg_keys, DEV_NULL, TEST_MONGODB)
 
 
 @patch('dbbackup.settings.GPG_RECIPIENT', 'test@test')
@@ -40,6 +40,28 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         add_public_gpg()
         self.command.encrypt = True
         self.command.save_new_backup(TEST_DATABASE)
+
+
+@patch('dbbackup.settings.GPG_RECIPIENT', 'test@test')
+@patch('sys.stdout', DEV_NULL)
+@patch('dbbackup.dbcommands.DBCommands.run_commands')
+class DbbackupCommandSaveNewMongoBackupTest(TestCase):
+    def setUp(self):
+        self.command = DbbackupCommand()
+        self.command.servername = 'foo-server'
+        self.command.encrypt = False
+        self.command.compress = False
+        self.command.dbcommands = MongoDBCommands(TEST_MONGODB)
+        self.command.storage = FakeStorage()
+        self.command.stdout = DEV_NULL
+
+    def tearDown(self):
+        clean_gpg_keys()
+
+    def test_func(self, mock_run_commands):
+        self.command.save_new_backup(TEST_DATABASE)
+        self.assertTrue(mock_run_commands.called)
+
 
 
 @patch('sys.stdout', DEV_NULL)

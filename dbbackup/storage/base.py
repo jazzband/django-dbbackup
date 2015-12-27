@@ -7,7 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 from .. import settings, utils
 
 
-def get_storage(path=None, options={}):
+def get_storage(path=None, options=None):
     """
     Get the specified storage configured with options.
 
@@ -23,6 +23,7 @@ def get_storage(path=None, options={}):
     :rtype: :class:`.Storage`
     """
     path = path or settings.STORAGE
+    option = options or {}
     options = options or settings.STORAGE_OPTIONS
     if not path:
         raise ImproperlyConfigured('You must specify a storage class using '
@@ -100,7 +101,8 @@ class BaseStorage(object):
             msg = "Bad content_type %s, must be 'db', 'media', or None" % (
                 content_type)
             raise TypeError(msg)
-        files = self.list_directory()
+        # TODO: Make better filter for include only backups
+        files = [f for f in self.list_directory() if utils.filename_to_datestring(f)]
         if encrypted is not None:
             files = [f for f in files if ('.gpg' in f) == encrypted]
         if compressed is not None:
@@ -110,12 +112,6 @@ class BaseStorage(object):
         if database is not None:
             files = [f for f in files if '%s' % database in f]
         return files
-
-    def write_file(self, filehandle, filename):
-        raise NotImplementedError("Programming Error: write_file() not defined.")
-
-    def read_file(self, filepath):
-        raise NotImplementedError("Programming Error: read_file() not defined.")
 
     def get_latest_backup(self, encrypted=None, compressed=None,
                           content_type=None, database=None):

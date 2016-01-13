@@ -31,11 +31,11 @@ FAKE_HTTP_REQUEST.META['HTTP_HOST'] = settings.HOSTNAME
 FAKE_HTTP_REQUEST.path = '/DJANGO-DBBACKUP-EXCEPTION'
 
 BYTES = (
-    ('PB', 1125899906842624.0),
-    ('TB', 1099511627776.0),
-    ('GB', 1073741824.0),
-    ('MB', 1048576.0),
-    ('KB', 1024.0),
+    ('PiB', 1125899906842624.0),
+    ('TiB', 1099511627776.0),
+    ('GiB', 1073741824.0),
+    ('MiB', 1048576.0),
+    ('KiB', 1024.0),
     ('B', 1.0)
 )
 
@@ -352,7 +352,7 @@ def filename_to_datestring(filename, datefmt=None):
     :returns: Date part or nothing if not found
     :rtype: ``str`` or ``NoneType``
     """
-    datefmt = datefmt or settings.DATE_FORMAT 
+    datefmt = datefmt or settings.DATE_FORMAT
     regex = datefmt_to_regex(datefmt)
     search = regex.search(filename)
     if search:
@@ -370,7 +370,7 @@ def filename_to_date(filename, datefmt=None):
     :returns: Date guessed or nothing if no date found
     :rtype: ``datetime.datetime`` or ``NoneType``
     """
-    datefmt = datefmt or settings.DATE_FORMAT 
+    datefmt = datefmt or settings.DATE_FORMAT
     datestring = filename_to_datestring(filename, datefmt)
     if datestring is not None:
         return datetime.strptime(datestring, datefmt)

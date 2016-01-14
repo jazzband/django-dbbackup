@@ -6,14 +6,12 @@ from __future__ import (absolute_import, division,
 import pickle
 import os
 import tempfile
+import dropbox
 from django.conf import settings
-from dropbox import session
-from dropbox.client import DropboxClient
-from dropbox.rest import ErrorResponse
 from shutil import copyfileobj
 from .base import BaseStorage, StorageError
+from .. import settings as dbbackup_settings
 
-DEFAULT_ACCESS_TYPE = 'app_folder'
 MAX_SPOOLED_SIZE = 10 * 1024 * 1024
 FILE_SIZE_LIMIT = 10 * 1024 * 1024 * 1024
 CHUNK_SIZE = 10 * 1024 * 1024
@@ -31,9 +29,7 @@ class Storage(BaseStorage):
     DROPBOX_DIRECTORY = getattr(settings, 'DBBACKUP_DROPBOX_DIRECTORY', '').strip('/')
     DBBACKUP_DROPBOX_APP_KEY = getattr(settings, 'DBBACKUP_DROPBOX_APP_KEY', None)
     DBBACKUP_DROPBOX_APP_SECRET = getattr(settings, 'DBBACKUP_DROPBOX_APP_SECRET', None)
-    DBBACKUP_DROPBOX_ACCESS_TYPE = getattr(settings, 'DBBACKUP_DROPBOX_ACCESS_TYPE', DEFAULT_ACCESS_TYPE)
     DBBACKUP_DROPBOX_FILE_SIZE_LIMIT = getattr(settings, 'DBBACKUP_DROPBOX_FILE_SIZE_LIMIT', FILE_SIZE_LIMIT)
-    _request_token = None
     _access_token = None
 
     def __init__(self, server_name=None):
@@ -104,7 +100,7 @@ class Storage(BaseStorage):
                     try:
                         numbered_file_offset, upload_id = self.dropbox.upload_chunk(chunk, chunk_size, numbered_file_offset, upload_id)
                         chunk = None
-                    except ErrorResponse:
+                    except dropbox.rest.ErrorResponse:
                         print('    Chunk upload failed')
                         if try_number == RETRY_COUNT:
                             raise
@@ -129,7 +125,7 @@ class Storage(BaseStorage):
         total_files = 0
         filehandle = tempfile.SpooledTemporaryFile(
             max_size=MAX_SPOOLED_SIZE,
-            dir=settings.TMP_DIR)
+            dir=dbbackup_settings.TMP_DIR)
         try:
             while True:
                 response = self.run_dropbox_action(self.dropbox.get_file,
@@ -149,7 +145,7 @@ class Storage(BaseStorage):
         ignore_404 = kwargs.pop("ignore_404", False)
         try:
             response = method(*args, **kwargs)
-        except ErrorResponse as e:
+        except dropbox.rest.ErrorResponse as e:
             if ignore_404 and e.status == 404:
                 return None
             errmsg = "ERROR %s" % (e,)
@@ -163,61 +159,32 @@ class Storage(BaseStorage):
     def get_dropbox_client(self):
         """ Connect and return a Dropbox client object. """
         self.read_token_file()
-        sess = session.DropboxSession(self.DBBACKUP_DROPBOX_APP_KEY,
-            self.DBBACKUP_DROPBOX_APP_SECRET, self.DBBACKUP_DROPBOX_ACCESS_TYPE)
-        # Get existing or new access token and use it for this session
-        access_token = self.get_access_token(sess)
-        sess.set_token(access_token.key, access_token.secret)
-        dropbox = DropboxClient(sess)
-        # Test the connection by making call to get account_info
-        dropbox.account_info()
-        return dropbox
+        flow = dropbox.client.DropboxOAuth2FlowNoRedirect(self.DBBACKUP_DROPBOX_APP_KEY,
+            self.DBBACKUP_DROPBOX_APP_SECRET)
+        access_token = self.get_access_token(flow)
+        client = dropbox.client.DropboxClient(access_token)
+        return client
 
-    def get_request_token(self, sess):
-        """ Return Request Token. If not available, a new one will be created, saved
-            and a RequestUrl object will be returned.
-        """
-        if not self._request_token:
-            return self.create_request_token(sess)
-        return self._request_token
-
-    def create_request_token(self, sess):
-        """ Return Request Token. If not available, a new one will be created, saved
-            and a RequestUrl object will be returned.
-        """
-        self._request_token = sess.obtain_request_token()
-        self.save_token_file()
-        return self._request_token
-
-    def prompt_for_authorization(self, sess, request_token):
-        """ Generate the authorization url, show it to the user and exit """
-        message = "Dropbox not authorized, visit the following URL to authorize:\n"
-        message += sess.build_authorize_url(request_token)
-        raise StorageError(message)
-
-    def get_access_token(self, sess):
+    def get_access_token(self, flow):
         """ Return Access Token. If not available, a new one will be created and saved. """
         if not self._access_token:
-            return self.create_access_token(sess)
+            return self.create_access_token(flow)
         return self._access_token
 
-    def create_access_token(self, sess):
+    def create_access_token(self, flow):
         """ Create and save a new access token to self.TOKENFILEPATH. """
-        request_token = self.get_request_token(sess)
-        try:
-            self._access_token = sess.obtain_access_token(request_token)
-        except ErrorResponse:
-            # If we get an error, it means the request token has expired or is not authorize, generate a new request
-            # token and prompt the user to complete the authorization process
-            request_token = self.create_request_token(sess)
-            self.prompt_for_authorization(sess, request_token)
-        # We've got a good access token, save it.
+        authorize_url = flow.start()
+        print("1. Go to: %s" % authorize_url)
+        print("2. Click 'Allow' (you might have to log in first)")
+        print("3. Copy the authorization code.")
+        code = input("Enter the authorization code here: ").strip()
+        self._access_token, userid = flow.finish(code)
         self.save_token_file()
         return self._access_token
 
     def save_token_file(self):
         """ Save the request and access tokens to disk. """
-        tokendata = dict(request_token=self._request_token, access_token=self._access_token)
+        tokendata = dict(access_token=self._access_token)
         with open(self.TOKENS_FILEPATH, 'wb') as tokenhandle:
             pickle.dump(tokendata, tokenhandle, -1)
 
@@ -226,5 +193,4 @@ class Storage(BaseStorage):
         if os.path.exists(self.TOKENS_FILEPATH):
             with open(self.TOKENS_FILEPATH, 'rb') as tokenhandle:
                 tokendata = pickle.load(tokenhandle)
-            self._request_token = tokendata.get('request_token')
             self._access_token = tokendata.get('access_token')

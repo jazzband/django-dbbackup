@@ -19,7 +19,6 @@ Contents:
    configuration
    storage
    contributing
-   faq
 
 .. warning::
    django-dbbackup is currently under heavy refactoring, stay tuned for
@@ -173,4 +172,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

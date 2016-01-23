@@ -18,7 +18,7 @@ from dbbackup.tests.utils import (ENCRYPTED_FILE, clean_gpg_keys,
 class Bytes_To_StrTest(TestCase):
     def test_get_gb(self):
         value = utils.bytes_to_str(byteVal=2**31)
-        self.assertEqual(value, "2.0 GB")
+        self.assertEqual(value, "2.0 GiB")
 
     def test_0_decimal(self):
         value = utils.bytes_to_str(byteVal=1.01, decimals=0)

@@ -13,8 +13,7 @@ import logging
 from shutil import copyfileobj
 from subprocess import Popen
 from django.core.management.base import CommandError
-from django.utils import timezone
-from dbbackup import (settings, utils)
+from dbbackup import settings
 
 from .utils import filename_generate
 
@@ -248,6 +247,7 @@ class DBCommands(object):
             return PostgreSQLSettings(self.database)
         elif any(e in self.engine for e in ['sqlite']):
             return SQLiteSettings(self.database)
+        raise Exception('Unknown db engine: ' % self.engine)
 
     def _clean_passwd(self, instr):
         return instr.replace(self.database['PASSWORD'], '******')

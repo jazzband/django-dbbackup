@@ -1,9 +1,7 @@
 """
 Utility functions for dbbackup.
 """
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 import sys
 import os
 import tempfile
@@ -13,16 +11,14 @@ from getpass import getpass
 from shutil import copyfileobj
 from functools import wraps
 from datetime import datetime
-
 from django.core.mail import EmailMessage
 from django.db import connection
 from django.http import HttpRequest
 from django.views.debug import ExceptionReporter
 from django.utils import six, timezone
-
 from . import settings
 
-input = raw_input if six.PY2 else input  # @ReservedAssignment
+input = raw_input if six.PY2 else input  # noqa
 
 FAKE_HTTP_REQUEST = HttpRequest()
 FAKE_HTTP_REQUEST.META['SERVER_NAME'] = ''
@@ -376,8 +372,7 @@ def filename_to_date(filename, datefmt=None):
         return datetime.strptime(datestring, datefmt)
 
 
-def filename_generate(extension, database_name='', servername=None,
-                      content_type='db'):
+def filename_generate(extension, database_name='', servername=None, content_type='db', wildcard=None):
     """
     Create a new backup filename.
 
@@ -393,17 +388,20 @@ def filename_generate(extension, database_name='', servername=None,
     :param content_type: Content type to backup, ``'media'`` or ``'db'``
     :type content_type: ``str``
 
+    :param wildcard: Replace datetime with this wilecard regex
+    :type content_type: ``str``
+
     :returns: Computed file name
     :rtype: ``str`
     """
     if content_type == 'db':
-        name_format = settings.FILENAME_TEMPLATE
-        database_name = database_name.replace("/", "_")
-    else:
-         name_format = settings.MEDIA_FILENAME_TEMPLATE
+        if '/' in database_name:
+            database_name = os.path.basename(database_name)
+        if '.' in database_name:
+            database_name = database_name.split('.')[0]
     params = {
         'servername': servername or settings.HOSTNAME,
-        'datetime': timezone.now().strftime(settings.DATE_FORMAT),
+        'datetime': wildcard or timezone.now().strftime(settings.DATE_FORMAT),
         'databasename': database_name,
         'extension': extension,
         'content_type': content_type

@@ -65,3 +65,7 @@ We use `Travis`_ coupled with `Coveralls`_ as continious integration tools.
 .. _`pull requests`: https://github.com/django-dbbackup/django-dbbackup/pulls
 .. _Travis: https://travis-ci.org/django-dbbackup/django-dbbackup
 .. _Coveralls: https://coveralls.io/github/django-dbbackup/django-dbbackup
+
+
+.. image:: https://ga-beacon.appspot.com/UA-87461-7/django-dbbackup/home
+        :target: https://github.com/igrigorik/ga-beacon

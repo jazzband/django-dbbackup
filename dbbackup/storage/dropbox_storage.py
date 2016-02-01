@@ -48,7 +48,9 @@ class Storage(BaseStorage):
             if not self.DBBACKUP_DROPBOX_APP_SECRET:
                 raise StorageError('%s storage requires DBBACKUP_DROPBOX_APP_SECRET to be specified.' % self.name)
         else:
-            raise StorageError('%s storage requires DROPBOX_ACCESS_TOKEN to be defined in settings.' % self.name)
+            if not self.DROPBOX_ACCESS_TOKEN:
+                raise StorageError('%s storage requires DROPBOX_ACCESS_TOKEN to be defined in settings.' % self.name)
+
     ###################################
     #  DBBackup Storage Attributes
     ###################################

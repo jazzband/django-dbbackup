@@ -23,7 +23,7 @@ input = raw_input if six.PY2 else input  # noqa
 FAKE_HTTP_REQUEST = HttpRequest()
 FAKE_HTTP_REQUEST.META['SERVER_NAME'] = ''
 FAKE_HTTP_REQUEST.META['SERVER_PORT'] = ''
-FAKE_HTTP_REQUEST.META['HTTP_HOST'] = settings.HOSTNAME
+FAKE_HTTP_REQUEST.META['HTTP_HOST'] = settings.DBBACKUP_HOSTNAME
 FAKE_HTTP_REQUEST.path = '/DJANGO-DBBACKUP-EXCEPTION'
 
 BYTES = (
@@ -382,7 +382,7 @@ def filename_generate(extension, database_name='', servername=None, content_type
     :param database_name: If it is database backup specify its name
     :type database_name: ``str``
 
-    :param servername: Specify server name or by default ``settings.HOSTNAME``
+    :param servername: Specify server name or by default ``settings.DBBACKUP_HOSTNAME``
     :type servername: ``str``
 
     :param content_type: Content type to backup, ``'media'`` or ``'db'``
@@ -400,7 +400,7 @@ def filename_generate(extension, database_name='', servername=None, content_type
         if '.' in database_name:
             database_name = database_name.split('.')[0]
     params = {
-        'servername': servername or settings.HOSTNAME,
+        'servername': servername or settings.DBBACKUP_HOSTNAME,
         'datetime': wildcard or timezone.now().strftime(settings.DATE_FORMAT),
         'databasename': database_name,
         'extension': extension,

@@ -193,7 +193,7 @@ class Filename_To_DateTest(TestCase):
         datestring = utils.filename_to_date(filename)
 
 
-@patch('dbbackup.settings.HOSTNAME', 'test')
+@patch('dbbackup.settings.DBBACKUP_HOSTNAME', 'test')
 class Filename_GenerateTest(TestCase):
     @patch('dbbackup.settings.FILENAME_TEMPLATE', '---{databasename}--{servername}-{datetime}.{extension}')
     def test_func(self, *args):
@@ -205,13 +205,13 @@ class Filename_GenerateTest(TestCase):
     def test_db(self, *args):
         extension = 'foo'
         generated_name = utils.filename_generate(extension)
-        self.assertTrue(generated_name.startswith(dbbackup_settings.HOSTNAME))
+        self.assertTrue(generated_name.startswith(dbbackup_settings.DBBACKUP_HOSTNAME))
         self.assertTrue(generated_name.endswith(extension))
 
     def test_media(self, *args):
         extension = 'foo'
         generated_name = utils.filename_generate(extension, content_type='media')
-        self.assertTrue(generated_name.startswith(dbbackup_settings.HOSTNAME))
+        self.assertTrue(generated_name.startswith(dbbackup_settings.DBBACKUP_HOSTNAME))
         self.assertTrue(generated_name.endswith(extension))
 
     @patch('dbbackup.settings.FILENAME_TEMPLATE', callable_for_filename_template)

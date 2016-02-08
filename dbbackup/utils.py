@@ -382,7 +382,7 @@ def filename_generate(extension, database_name='', servername=None, content_type
     :param database_name: If it is database backup specify its name
     :type database_name: ``str``
 
-    :param servername: Specify server name or by default ``settings.HOSTNAME``
+    :param servername: Specify server name or by default ``settings.DBBACKUP_HOSTNAME``
     :type servername: ``str``
 
     :param content_type: Content type to backup, ``'media'`` or ``'db'``

@@ -112,12 +112,12 @@ exception is received.
 
 Default: ``True``
 
-HOSTNAME
-~~~~~~~~
+DBBACKUP_HOSTNAME
+~~~~~~~~~~~~~~~~~
 
 Hostname needed by django-dbbackup's uncaught exception email sender for
 well described error reporting. If you are using ``ALLOWED_HOSTS`` you should
-set ``HOSTNAME`` to any host from ``ALLOWED_HOSTS`` setting. Otherwise
+set ``DBBACKUP_HOSTNAME`` to any host from ``ALLOWED_HOSTS`` setting. Otherwise
 django-dbbackup can not send email to the ``SERVER_EMAIL``.
 
 Default: ``socket.gethostname()``

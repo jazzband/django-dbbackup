@@ -11,7 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 DATABASES = getattr(settings, 'DBBACKUP_DATABASES', list(settings.DATABASES.keys()))
 
 # Fake host
-HOSTNAME = getattr(settings, 'DBBACKUP_HOSTNAME', socket.gethostname())
+DBBACKUP_HOSTNAME = getattr(settings, 'DBBACKUP_HOSTNAME', socket.gethostname())
 
 # Directory to use for temporary files
 TMP_DIR = getattr(settings, 'DBBACKUP_TMP_DIR', tempfile.gettempdir())
@@ -82,7 +82,7 @@ if hasattr(settings, 'DBBACKUP_BACKUP_DIRECTORY'):  # pragma: no cover
 
 if hasattr(settings, 'DBBACKUP_FAKE_HOST'):  # pragma: no cover
     warnings.warn("DBBACKUP_FAKE_HOST is deprecated, use DBBACKUP_HOSTNAME", DeprecationWarning)
-    HOSTNAME = settings.DBBACKUP_FAKE_HOST
+    DBBACKUP_HOSTNAME = settings.DBBACKUP_FAKE_HOST
 
 UNSED_AWS_SETTINGS = ('DIRECTORY',)
 DEPRECATED_AWS_SETTINGS = (

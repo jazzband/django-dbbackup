@@ -38,7 +38,7 @@ class Command(BaseDbBackupCommand):
     def handle(self, *args, **options):
         self.encrypt = options.get('encrypt')
         self.compress = not options.get('no_compress')
-        self.servername = options.get('servername') or settings.HOSTNAME
+        self.servername = options.get('servername') or settings.DBBACKUP_HOSTNAME
         try:
             self.storage = BaseStorage.storage_factory()
             self.backup_mediafiles(self.encrypt, self.compress)

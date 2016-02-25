@@ -28,11 +28,11 @@ after_success:
   - tox -e $TOX_ENV -- coveralls $COVERALLS_OPTION
 
 matrix:
-  # include:
+  include:
   #   - python: "3.4"
   #     TOX_ENV=lint
-  #   - python: "3.4"
-  #     TOX_ENV=docs
+    - python: "3.4"
+      TOX_ENV=docs
   exclude:
     - python: "3.5"
       env: DJANGO=1.6

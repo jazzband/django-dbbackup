@@ -1,3 +1,6 @@
+"""
+Tests for mediabackup command.
+"""
 from mock import patch
 from django.test import TestCase
 from dbbackup.management.commands.mediabackup import Command as DbbackupCommand
@@ -93,5 +96,5 @@ class MediabackupCleanUpOldBackupsTest(TestCase):
 
     @patch('dbbackup.settings.CLEANUP_KEEP_MEDIA', 1)
     def test_func(self):
-        self.command.cleanup_old_backups()
+        self.command._cleanup_old_backups()
         self.assertEqual(2, len(HANDLED_FILES['deleted_files']))

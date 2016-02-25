@@ -1,5 +1,5 @@
 """
-Save database.
+List backups.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
@@ -15,10 +15,14 @@ FILTER_KEYS = ('encrypted', 'compressed', 'content_type', 'database')
 class Command(BaseDbBackupCommand):
     option_list = BaseDbBackupCommand.option_list + (
         make_option("-d", "--database", help="Filter by database name"),
-        make_option("-z", "--compressed", help="Exclude non-compressed", action="store_true", default=None, dest="compressed"),
-        make_option("-Z", "--not-compressed", help="Exclude compressed", action="store_false", default=None, dest="compressed"),
-        make_option("-e", "--encrypted", help="Exclude non-encrypted", action="store_true", default=None, dest="encrypted"),
-        make_option("-E", "--not-encrypted", help="Exclude encrypted", action="store_false", default=None, dest="encrypted"),
+        make_option("-z", "--compressed", help="Exclude non-compressed", action="store_true",
+                    default=None, dest="compressed"),
+        make_option("-Z", "--not-compressed", help="Exclude compressed", action="store_false",
+                    default=None, dest="compressed"),
+        make_option("-e", "--encrypted", help="Exclude non-encrypted", action="store_true",
+                    default=None, dest="encrypted"),
+        make_option("-E", "--not-encrypted", help="Exclude encrypted", action="store_false",
+                    default=None, dest="encrypted"),
         make_option("-c", "--content-type", help="Filter by content type 'db' or 'media'"),
     )
 

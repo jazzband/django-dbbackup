@@ -32,7 +32,9 @@ matrix:
   #   - python: "3.4"
   #     TOX_ENV=lint
     - python: "3.4"
-      TOX_ENV=docs
+      env: ENV=docs
+      install: pip install tox
+      script: tox -e docs
   exclude:
     - python: "3.5"
       env: DJANGO=1.6

@@ -18,7 +18,7 @@ env:
 
 install:
   - TOX_ENV=py${TRAVIS_PYTHON_VERSION}-django${DJANGO}
-  - pip install tox coveralls
+  - pip install 'virtualenv<14.0.0' tox coveralls
   - tox -e $TOX_ENV --notest
 
 script:

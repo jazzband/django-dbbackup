@@ -113,7 +113,8 @@ should also be backed up.
 
 
 MongoDB backup example (BETA)
---------
+-----------------------------
+
 You can backup a mongodb database defined in your DATABASES settings.
 ::
 

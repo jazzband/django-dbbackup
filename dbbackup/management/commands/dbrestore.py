@@ -62,8 +62,8 @@ class Command(BaseDbBackupCommand):
             if not self.backup_extension:
                 self.backup_extension = self.dbcommands.settings.extension or 'backup'
             if options.get('list'):
-                return self.list_backups()
-            self.restore_backup()
+                return self._list_backups()
+            self._restore_backup()
         except StorageError as err:
             raise CommandError(err)
 
@@ -78,9 +78,8 @@ class Command(BaseDbBackupCommand):
             database_key = list(settings.DATABASES.keys())[0]
         return settings.DATABASES[database_key]
 
-    def restore_backup(self):
+    def _restore_backup(self):
         """Restore the specified database."""
-        database_name = self.database['NAME']
         self.logger.info("Restoring backup for database: %s", self.database['NAME'])
         # Fetch the latest backup if filepath not specified
         if not self.filepath:
@@ -94,14 +93,18 @@ class Command(BaseDbBackupCommand):
         self.logger.info("Restoring: %s" % self.filepath)
         input_filename = self.filepath
         inputfile = self.storage.read_file(input_filename)
+
         if self.decrypt:
-            unencrypted_file, input_filename = utils.unencrypt_file(inputfile, input_filename, self.passphrase)
+            unencrypted_file, input_filename = utils.unencrypt_file(inputfile, input_filename,
+                                                                    self.passphrase)
             inputfile.close()
             inputfile = unencrypted_file
+
         if self.uncompress:
             uncompressed_file, input_filename = utils.uncompress_file(inputfile, input_filename)
             inputfile.close()
             inputfile = uncompressed_file
+
         self.logger.info("Restore tempfile created: %s", utils.handle_size(inputfile))
         if self.interactive:
             answer = input("Are you sure you want to continue? [Y/n]")
@@ -111,11 +114,8 @@ class Command(BaseDbBackupCommand):
         inputfile.seek(0)
         self.dbcommands.run_restore_commands(inputfile)
 
-    def get_extension(self, filename):
-        _, extension = os.path.splitext(filename)
-        return extension
-
-    def list_backups(self):
+    # TODO: Remove this
+    def _list_backups(self):
         """List backups in the backup directory."""
         msg = "'dbbrestore --list' is deprecated, use 'listbackup'."
         warnings.warn(msg, DeprecationWarning)

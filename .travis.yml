@@ -18,7 +18,7 @@ env:
 
 install:
   - TOX_ENV=py${TRAVIS_PYTHON_VERSION}-django${DJANGO}
-  - pip install tox coveralls
+  - pip install 'virtualenv<14.0.0' tox coveralls
   - tox -e $TOX_ENV --notest
 
 script:
@@ -28,11 +28,13 @@ after_success:
   - tox -e $TOX_ENV -- coveralls $COVERALLS_OPTION
 
 matrix:
-  # include:
+  include:
   #   - python: "3.4"
   #     TOX_ENV=lint
-  #   - python: "3.4"
-  #     TOX_ENV=docs
+    - python: "3.4"
+      env: ENV=docs
+      install: pip install tox
+      script: tox -e docs
   exclude:
     - python: "3.5"
       env: DJANGO=1.6

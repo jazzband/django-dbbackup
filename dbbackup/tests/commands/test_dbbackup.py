@@ -1,8 +1,10 @@
+"""
+Tests for dbbackup command.
+"""
 import os
-from mock import patch, MagicMock
+from mock import patch
 
 from django.test import TestCase
-from django.utils import six
 
 from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
 from dbbackup.dbcommands import DBCommands, MongoDBCommands
@@ -30,16 +32,16 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         os.remove(TEST_DATABASE['NAME'])
 
     def test_func(self):
-        self.command.save_new_backup(TEST_DATABASE)
+        self.command._save_new_backup(TEST_DATABASE)
 
     def test_compress(self):
         self.command.compress = True
-        self.command.save_new_backup(TEST_DATABASE)
+        self.command._save_new_backup(TEST_DATABASE)
 
     def test_encrypt(self):
         add_public_gpg()
         self.command.encrypt = True
-        self.command.save_new_backup(TEST_DATABASE)
+        self.command._save_new_backup(TEST_DATABASE)
 
 
 @patch('dbbackup.settings.GPG_RECIPIENT', 'test@test')
@@ -59,9 +61,8 @@ class DbbackupCommandSaveNewMongoBackupTest(TestCase):
         clean_gpg_keys()
 
     def test_func(self, mock_run_commands):
-        self.command.save_new_backup(TEST_DATABASE)
+        self.command._save_new_backup(TEST_DATABASE)
         self.assertTrue(mock_run_commands.called)
-
 
 
 @patch('sys.stdout', DEV_NULL)
@@ -76,8 +77,8 @@ class DbbackupCommandCleanupOldBackupsTest(TestCase):
         self.command.stdout = DEV_NULL
 
     def test_cleanup_old_backups(self):
-        self.command.cleanup_old_backups(TEST_DATABASE)
+        self.command._cleanup_old_backups(TEST_DATABASE)
 
     def test_cleanup_empty(self):
         self.command.storage.list_files = []
-        self.command.cleanup_old_backups(TEST_DATABASE)
+        self.command._cleanup_old_backups(TEST_DATABASE)

@@ -71,7 +71,7 @@ The file system permissions that the file will receive when it is saved.
 Amazon S3
 ---------
 
-Our S3 backend uses Django Storage Redux which it uses `boto`_.
+Our S3 backend uses Django Storage Redux which uses `boto`_.
 
 .. _`boto`: http://docs.pythonboto.org/en/latest/#
 
@@ -150,6 +150,15 @@ For example, this can be set to ``'s3-eu-west-1.amazonaws.com'``.
 .. note::
 
     ``settings.DBBACKUP_S3_IS_SECURE`` was used before but is deprecated.
+
+**default_acl** - Required
+
+If bucket doesn't exist, it will be created with the given ACL.
+
+.. warning::
+
+    The default ACL is `'public-read'`, please take care of this possible
+    security issue.
 
 Dropbox
 -------

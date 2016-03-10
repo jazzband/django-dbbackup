@@ -1,9 +1,11 @@
+"""
+Tests for dbrestore command.
+"""
 from mock import patch
 
 from django.test import TestCase
 from django.core.management.base import CommandError
 from django.conf import settings
-from django.utils import six
 from django.utils.six import BytesIO
 
 from dbbackup.utils import unencrypt_file, uncompress_file
@@ -42,26 +44,26 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
             (utils.filename_generate('foo'), BytesIO(b'bar')))
         # Check
         self.command.filepath = None
-        self.command.restore_backup()
+        self.command._restore_backup()
 
     def test_no_backup_found(self, *args):
         self.command.filepath = None
         with self.assertRaises(CommandError):
-            self.command.restore_backup()
+            self.command._restore_backup()
 
     def test_uncompress(self, *args):
         self.command.storage.file_read = COMPRESSED_FILE
         self.command.filepath = COMPRESSED_FILE
         HANDLED_FILES['written_files'].append((COMPRESSED_FILE, open(COMPRESSED_FILE, 'rb')))
         self.command.uncompress = True
-        self.command.restore_backup()
+        self.command._restore_backup()
 
     @patch('dbbackup.utils.getpass', return_value=None)
     def test_decrypt(self, *args):
         self.command.decrypt = True
         self.command.filepath = ENCRYPTED_FILE
         HANDLED_FILES['written_files'].append((ENCRYPTED_FILE, open(ENCRYPTED_FILE, 'rb')))
-        self.command.restore_backup()
+        self.command._restore_backup()
 
 
 class DbrestoreCommandGetDatabaseTest(TestCase):
@@ -105,25 +107,8 @@ class DbMongoRestoreCommandRestoreBackupTest(TestCase):
         self.command.storage.file_read = TARED_FILE
         self.command.filepath = TARED_FILE
         HANDLED_FILES['written_files'].append((TARED_FILE, open(TARED_FILE, 'rb')))
-        self.command.restore_backup()
+        self.command._restore_backup()
         self.assertTrue(mock_runcommands.called)
-
-
-class DbrestoreCommandGetExtensionTest(TestCase):
-    def setUp(self):
-        self.command = DbrestoreCommand()
-
-    def test_tar(self):
-        ext = self.command.get_extension('foo.tar')
-        self.assertEqual(ext, '.tar')
-
-    def test_tar_gz(self):
-        ext = self.command.get_extension('foo.tar.gz')
-        self.assertEqual(ext, '.gz')
-
-    def test_no_extension(self):
-        ext = self.command.get_extension('foo')
-        self.assertEqual(ext, '')
 
 
 class DbrestoreCommandUncompressTest(TestCase):

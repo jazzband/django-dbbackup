@@ -72,7 +72,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
 
     def test_path(self, *args):
         self.command.path = COMPRESSED_FILE
-        self.command.restore_backup()
+        self.command._restore_backup()
 
 
 class DbrestoreCommandGetDatabaseTest(TestCase):

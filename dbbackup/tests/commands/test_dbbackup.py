@@ -48,7 +48,7 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
 
     def test_path(self):
         self.command.path = '/tmp/foo.bak'
-        self.command.save_new_backup(TEST_DATABASE)
+        self.command._save_new_backup(TEST_DATABASE)
         self.assertTrue(os.path.exists(self.command.path))
         # tearDown
         os.remove(self.command.path)

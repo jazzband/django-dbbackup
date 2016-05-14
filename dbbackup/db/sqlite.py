@@ -20,6 +20,10 @@ WHERE "sql" NOT NULL AND "type" IN ('index', 'trigger', 'view')
 
 
 class SqliteConnector(BaseDBConnetor):
+    """
+    Create a dump at SQL layer like could make ``.dumps`` in sqlite3.
+    Restore by evaluate the created SQL.
+    """
     def _write_dump(self, fileobj):
         cursor = self.connection.cursor()
         cursor.execute(DUMP_TABLES)
@@ -56,11 +60,11 @@ class SqliteConnector(BaseDBConnetor):
         dump_file.seek(0)
         return dump_file
 
-    def restore_dump(self, backup_file):
+    def restore_dump(self, dump):
         if not self.connection.is_usable():
             self.connection.connect()
         cursor = self.connection.cursor()
-        for line in backup_file:
+        for line in dump:
             try:
                 cursor.execute(line)
             except OperationalError as err:
@@ -70,6 +74,10 @@ class SqliteConnector(BaseDBConnetor):
 
 
 class SqliteCPConnector(BaseDBConnetor):
+    """
+    Create a dump by copy the binary data file.
+    Restore by simply copy to the good location.
+    """
     def create_dump(self):
         path = self.connection.settings_dict['NAME']
         dump = BytesIO()

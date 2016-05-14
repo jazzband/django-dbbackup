@@ -19,7 +19,7 @@ def get_connector(database_name=None):
 
 
 class BaseDBConnetor(object):
-    def __init__(self, database_name):
+    def __init__(self, database_name=None):
         from django.db import connections, DEFAULT_DB_ALIAS
         database_name = database_name or DEFAULT_DB_ALIAS
         self.connection = connections[database_name]

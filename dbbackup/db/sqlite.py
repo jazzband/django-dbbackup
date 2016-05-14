@@ -1,6 +1,8 @@
 import warnings
 from tempfile import SpooledTemporaryFile
+from shutil import copyfileobj
 from django.db import IntegrityError, OperationalError
+from django.utils.six import BytesIO
 from .base import BaseDBConnetor
 
 
@@ -51,6 +53,7 @@ class SqliteConnector(BaseDBConnetor):
             self.connection.connect()
         dump_file = SpooledTemporaryFile(max_size=10 * 1024 * 1024)
         self._write_dump(dump_file)
+        dump_file.seek(0)
         return dump_file
 
     def restore_dump(self, backup_file):
@@ -64,3 +67,18 @@ class SqliteConnector(BaseDBConnetor):
                 warnings.warn("Error in db restore: %s" % err.message)
             except IntegrityError as err:
                 warnings.warn("Error in db restore: %s" % err.message)
+
+
+class SqliteCPConnector(BaseDBConnetor):
+    def create_dump(self):
+        path = self.connection.settings_dict['NAME']
+        dump = BytesIO()
+        with open(path, 'rb') as db_file:
+            copyfileobj(db_file, dump)
+        dump.seek(0)
+        return dump
+
+    def restore_dump(self, dump):
+        path = self.connection.settings_dict['NAME']
+        with open(path, 'wb') as db_file:
+            copyfileobj(dump, db_file)

@@ -2,6 +2,7 @@ import shlex
 from tempfile import SpooledTemporaryFile
 from subprocess import Popen
 from importlib import import_module
+from dbbackup import settings
 
 CONNECTOR_MAPPING = {
     'django.db.backends.sqlite3': 'dbbackup.db.sqlite.SqliteConnector',
@@ -32,8 +33,16 @@ class BaseDBConnetor(object):
     """
     def __init__(self, database_name=None):
         from django.db import connections, DEFAULT_DB_ALIAS
-        database_name = database_name or DEFAULT_DB_ALIAS
+        self.database_name = database_name or DEFAULT_DB_ALIAS
         self.connection = connections[database_name]
+
+    @property
+    def settings(self):
+        if not hasattr(self, '_settings'):
+            sett = self.connection.settings_dict.copy()
+            sett.update(settings.CONNECTORS.get(self.database_name, {}))
+            self._settings = sett
+        return self._settings
 
     def create_dump(self):
         raise NotImplementedError("create_dump not implemented")

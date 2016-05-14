@@ -1,13 +1,13 @@
 from .base import BaseCommandDBConnetor
 
 
-class MysqlDumpConnetor(BaseCommandDBConnetor):
+class PgDumpConnetor(BaseCommandDBConnetor):
     """
-    MySQL connector, creates dump with ``mysqldump`` and restore with
-    ``mysql``.
+    PostgreSQL connector, creates dump with ``pg_dump`` and restore with
+    ``pg_restore``.
     """
     def create_dump(self):
-        cmd = 'mysqldump %s' % self.settings['NAME']
+        cmd = 'pg_dump %s' % self.settings['NAME']
         cmd += ' --host=%s' % self.settings['HOST']
         cmd += ' --port=%i' % self.settings['PORT']
         cmd += ' --user=%s' % self.settings['USER']
@@ -15,7 +15,7 @@ class MysqlDumpConnetor(BaseCommandDBConnetor):
         return self.run_command(cmd)
 
     def restore_dump(self, dump):
-        cmd = 'mysql %s' % self.settings['NAME']
+        cmd = 'pg_restore -d %s' % self.settings['NAME']
         cmd += ' --host=%s' % self.settings.get('HOST', 'localhost')
         cmd += ' --port=%i' % self.settings.get('PORT', 3306)
         cmd += ' --user=%s' % self.settings['USER']

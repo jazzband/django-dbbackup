@@ -16,7 +16,6 @@ from django.db import connection
 
 from ._base import BaseDbBackupCommand
 from ... import utils
-from ...dbcommands import DBCommands, MongoDBCommands
 from ...db import get_connector
 from ...storage.base import BaseStorage, StorageError
 
@@ -31,7 +30,6 @@ class Command(BaseDbBackupCommand):
         make_option("-d", "--database", help="Database to restore"),
         make_option("-i", "--input-filename", help="Specify filename to backup from"),
         make_option("-I", "--input-path", help="Specify path on local filesystem to backup from"),
-        make_option("-x", "--backup-extension", help="The extension to use when scanning for files to restore from."),
         make_option("-s", "--servername", help="Use a different servername backup"),
         make_option("-l", "--list", action='store_true', default=False, help="List backups in the backup directory"),
 
@@ -49,7 +47,6 @@ class Command(BaseDbBackupCommand):
             connection.close()
             self.filename = options.get('input_filename')
             self.path = options.get('input_path')
-            self.backup_extension = options.get('backup_extension') or 'backup'
             self.servername = options.get('servername')
             self.decrypt = options.get('decrypt')
             self.uncompress = options.get('uncompress')
@@ -57,14 +54,6 @@ class Command(BaseDbBackupCommand):
             self.interactive = options.get('interactive')
             self.database = self._get_database(options)
             self.storage = BaseStorage.storage_factory()
-            self.database = self._get_database(options)
-            if 'mongo' in self.database['ENGINE']:
-                self.dbcommands = MongoDBCommands(self.database)
-            else:
-                self.dbcommands = DBCommands(self.database)
-
-            if not self.backup_extension:
-                self.backup_extension = self.dbcommands.settings.extension or 'backup'
             if options.get('list'):
                 return self._list_backups()
             self._restore_backup()
@@ -118,7 +107,6 @@ class Command(BaseDbBackupCommand):
                 self.logger.info("Quitting")
                 sys.exit(0)
         input_file.seek(0)
-        # self.dbcommands.run_restore_commands(input_file)
         self.connector.restore_dump(input_file)
 
     # TODO: Remove this

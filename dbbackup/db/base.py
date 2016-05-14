@@ -2,14 +2,14 @@ import shlex
 from tempfile import SpooledTemporaryFile
 from subprocess import Popen
 from importlib import import_module
-from dbbackup import settings
+from dbbackup import settings, utils
 
 CONNECTOR_MAPPING = {
     'django.db.backends.sqlite3': 'dbbackup.db.sqlite.SqliteConnector',
     'django.db.backends.mysql': 'dbbackup.db.mysql.MysqlDumpConnector',
     'django.db.backends.postgresql': 'dbbackup.db.postgres.PgDumpConnector',
     'django.db.backends.oracle': None,
-    'django_mongodb_engine': 'dbbackup.db.mongo.MongoDumpConnetor',
+    'django_mongodb_engine': 'dbbackup.db.mongo.MongoDumpConnector',
 }
 
 
@@ -35,6 +35,8 @@ class BaseDBConnetor(object):
     Base class for create database connector. This kind of object creates
     interaction with database and allow backup and restore operations.
     """
+    extension = 'dump'
+
     def __init__(self, database_name=None):
         from django.db import connections, DEFAULT_DB_ALIAS
         self.database_name = database_name or DEFAULT_DB_ALIAS
@@ -48,6 +50,10 @@ class BaseDBConnetor(object):
             sett.update(settings.CONNECTORS.get(self.database_name, {}))
             self._settings = sett
         return self._settings
+
+    def generate_filename(self, server_name=None):
+        return utils.filename_generate(self.extension, self.settings['NAME'],
+                                       server_name)
 
     def create_dump(self, exclude=None):
         """
@@ -70,6 +76,11 @@ class BaseCommandDBConnetor(BaseDBConnetor):
     """
     Base class for create database connector based on command line tools.
     """
+    def __init__(self, *args, **kwargs):
+        super(BaseCommandDBConnetor, self).__init__(*args, **kwargs)
+        self.dump_cmd = self.settings.get('DUMP_CMD') or self.dump_cmd
+        self.restore_cmd = self.settings.get('RESTORE_CMD') or self.restore_cmd
+
     def run_command(self, command, stdin=None):
         """
         Launch a shell command.

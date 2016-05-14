@@ -36,26 +36,6 @@ WRITE_FILE = '<WRITE_FILE>'
 BACKUP_ENVIRONMENT = {}
 RESTORE_ENVIRONMENT = {}
 
-# TODO: Unify backup and restore commands to support adding extra flags instead
-# of just having full statements.
-
-SQLITE_BACKUP_COMMANDS = getattr(settings, 'DBBACKUP_SQLITE_BACKUP_COMMANDS', [
-    [READ_FILE, '{databasename}'],
-])
-SQLITE_RESTORE_COMMANDS = getattr(settings, 'DBBACKUP_SQLITE_RESTORE_COMMANDS', [
-    [WRITE_FILE, '{databasename}'],
-])
-
-# TODO: Why are these even here? The MySQL commands are built in a dynamic
-# fashion through MySQLSettings
-MYSQL_BACKUP_COMMANDS = getattr(settings, 'DBBACKUP_MYSQL_BACKUP_COMMANDS', None)
-MYSQL_RESTORE_COMMANDS = getattr(settings, 'DBBACKUP_MYSQL_RESTORE_COMMANDS', None)
-
-POSTGRESQL_BACKUP_COMMANDS = getattr(settings, 'DBBACKUP_POSTGRESQL_BACKUP_COMMANDS', None)
-POSTGRESQL_RESTORE_COMMANDS = getattr(settings, 'DBBACKUP_POSTGRESQL_RESTORE_COMMANDS', None)
-POSTGRESQL_RESTORE_SINGLE_TRANSACTION = getattr(settings, 'DBBACKUP_POSTGRESQL_RESTORE_SINGLE_TRANSACTION', True)
-POSTGIS_SPATIAL_REF = getattr(settings, 'DBBACKUP_POSTGIS_SPACIAL_REF', False)
-
 FAILURE_RECIPIENTS = getattr(settings, 'DBBACKUP_FAILURE_RECIPIENTS', settings.ADMINS)
 SEND_EMAIL = getattr(settings, 'DBBACKUP_SEND_EMAIL', True)
 SERVER_EMAIL = getattr(settings, 'DBBACKUP_SERVER_EMAIL', settings.SERVER_EMAIL)

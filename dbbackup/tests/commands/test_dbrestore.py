@@ -12,9 +12,8 @@ from django.conf import settings
 from django.utils.six import BytesIO
 
 from dbbackup import utils
-from dbbackup.db import get_connector
+from dbbackup.db import get_connector, MongoDumpConnector
 from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
-from dbbackup.dbcommands import DBCommands, MongoDBCommands
 from dbbackup.tests.utils import (FakeStorage, ENCRYPTED_FILE, TEST_DATABASE,
                                   add_private_gpg, DEV_NULL, COMPRESSED_FILE,
                                   clean_gpg_keys, HANDLED_FILES, TEST_MONGODB, TARED_FILE,
@@ -33,7 +32,6 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.backup_extension = 'bak'
         self.command.filename = 'foofile'
         self.command.database = TEST_DATABASE
-        self.command.dbcommands = DBCommands(TEST_DATABASE)
         self.command.passphrase = None
         self.command.interactive = True
         self.command.storage = FakeStorage()
@@ -109,7 +107,7 @@ class DbrestoreCommandGetDatabaseTest(TestCase):
 
 @patch('dbbackup.management.commands.dbrestore.input', return_value='y')
 @patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils.FakeStorage')
-@patch('dbbackup.dbcommands.DBCommands.run_commands')
+@patch('dbbackup.db.mongodb.MongoDumpConnector.restore_dump')
 class DbMongoRestoreCommandRestoreBackupTest(TestCase):
     def setUp(self):
         self.command = DbrestoreCommand()
@@ -120,11 +118,10 @@ class DbMongoRestoreCommandRestoreBackupTest(TestCase):
         self.command.path = None
         self.command.filename = 'foofile'
         self.command.database = TEST_MONGODB
-        self.command.dbcommands = MongoDBCommands(TEST_MONGODB)
         self.command.passphrase = None
         self.command.interactive = True
         self.command.storage = FakeStorage()
-        self.command.connector = get_connector()
+        self.command.connector = MongoDumpConnector()
         HANDLED_FILES.clean()
         add_private_gpg()
 

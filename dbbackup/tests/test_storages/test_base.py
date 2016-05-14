@@ -124,14 +124,12 @@ class StorageGetMostRecentTest(TestCase):
 class StorageCleanOldBackupsTest(TestCase):
     def setUp(self):
         self.storage = FakeStorage()
+        HANDLED_FILES.clean()
         HANDLED_FILES['written_files'] = [(f, None) for f in [
             '2015-02-06-042810.bak',
             '2015-02-07-042810.bak',
             '2015-02-08-042810.bak',
         ]]
-
-    def tearDown(self):
-        HANDLED_FILES.clean()
 
     def test_func(self):
         self.storage.clean_old_backups(keep_number=1)

@@ -1,2 +1,4 @@
-include requirements.txt
-include requirements-tests.txt
+include requirements*.txt
+include README.rst
+include LICENSE.txt
+recursive-include dbbackup/tests/testapp/blobs/ *.gpg *.txt *.gz *.tar

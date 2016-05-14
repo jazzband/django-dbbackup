@@ -17,7 +17,7 @@ def main():
         test_runner = TestRunner()
         failures = test_runner.run_tests(["dbbackup.tests"])
         sys.exit(bool(failures))
-    execute_from_command_line(sys.argv[:])
+    execute_from_command_line(sys.argv)
 
 if __name__ == '__main__':
     main()

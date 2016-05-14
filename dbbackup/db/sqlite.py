@@ -24,11 +24,11 @@ class SqliteConnector(BaseDBConnetor):
     Create a dump at SQL layer like could make ``.dumps`` in sqlite3.
     Restore by evaluate the created SQL.
     """
-    def _write_dump(self, fileobj):
+    def _write_dump(self, fileobj, exclude):
         cursor = self.connection.cursor()
         cursor.execute(DUMP_TABLES)
         for table_name, type, sql in cursor.fetchall():
-            if table_name.startswith('sqlite_'):
+            if table_name.startswith('sqlite_') or table_name in exclude:
                 continue
             elif sql.startswith('CREATE TABLE'):
                 sql = sql.replace('CREATE TABLE', 'CREATE TABLE IF NOT EXISTS')
@@ -52,11 +52,11 @@ class SqliteConnector(BaseDBConnetor):
                 fileobj.write('%s;\n' % sql)
         cursor.close()
 
-    def create_dump(self):
+    def create_dump(self, exclude=None):
         if not self.connection.is_usable():
             self.connection.connect()
         dump_file = SpooledTemporaryFile(max_size=10 * 1024 * 1024)
-        self._write_dump(dump_file)
+        self._write_dump(dump_file, exclude or [])
         dump_file.seek(0)
         return dump_file
 
@@ -78,7 +78,7 @@ class SqliteCPConnector(BaseDBConnetor):
     Create a dump by copy the binary data file.
     Restore by simply copy to the good location.
     """
-    def create_dump(self):
+    def create_dump(self, exclude=None):
         path = self.connection.settings_dict['NAME']
         dump = BytesIO()
         with open(path, 'rb') as db_file:

@@ -6,7 +6,10 @@ from dbbackup import settings
 
 CONNECTOR_MAPPING = {
     'django.db.backends.sqlite3': 'dbbackup.db.sqlite.SqliteConnector',
-    'django.db.backends.mysql': 'dbbackup.db.mysql.MysqldumpConnector',
+    'django.db.backends.mysql': 'dbbackup.db.mysql.MysqlDumpConnector',
+    'django.db.backends.postgresql': 'dbbackup.db.postgres.PgDumpConnector',
+    'django.db.backends.oracle': None,
+    'django_mongodb_engine': 'dbbackup.db.mongo.MongoDumpConnetor',
 }
 
 
@@ -17,8 +20,9 @@ def get_connector(database_name=None):
     from django.db import connections, DEFAULT_DB_ALIAS
     database_name = database_name or DEFAULT_DB_ALIAS
     connection = connections[database_name]
+    connector_settings = settings.CONNECTORS.get(database_name, {})
     engine = connection.settings_dict['ENGINE']
-    connector_path = CONNECTOR_MAPPING[engine]
+    connector_path = connector_settings.get('CONNECTOR', CONNECTOR_MAPPING[engine])
     connector_module_path = '.'.join(connector_path.split('.')[:-1])
     module = import_module(connector_module_path)
     connector_name = connector_path.split('.')[-1]
@@ -34,20 +38,31 @@ class BaseDBConnetor(object):
     def __init__(self, database_name=None):
         from django.db import connections, DEFAULT_DB_ALIAS
         self.database_name = database_name or DEFAULT_DB_ALIAS
-        self.connection = connections[database_name]
+        self.connection = connections[self.database_name]
 
     @property
     def settings(self):
+        """Mix of database and connector settings."""
         if not hasattr(self, '_settings'):
             sett = self.connection.settings_dict.copy()
             sett.update(settings.CONNECTORS.get(self.database_name, {}))
             self._settings = sett
         return self._settings
 
-    def create_dump(self):
+    def create_dump(self, exclude=None):
+        """
+        :param exclude: Table not included in dump
+        :type exclude: list of str
+        :return: File object
+        :rtype: file
+        """
         raise NotImplementedError("create_dump not implemented")
 
     def restore_dump(self, dump):
+        """
+        :param dump: Dump file
+        :type dump: file
+        """
         raise NotImplementedError("restore_dump not implemented")
 
 
@@ -56,6 +71,15 @@ class BaseCommandDBConnetor(BaseDBConnetor):
     Base class for create database connector based on command line tools.
     """
     def run_command(self, command, stdin=None):
+        """
+        Launch a shell command.
+        :param command: Command line to launch
+        :type command: str
+        :param stdin: Standard input of command
+        :type stdin: file
+        :return: Standard output of command
+        :rtype: file
+        """
         stdout = SpooledTemporaryFile(max_size=10 * 1024 * 1024)
         cmd = shlex.split(command)
         process = Popen(cmd, stdin=stdin, stdout=stdout)

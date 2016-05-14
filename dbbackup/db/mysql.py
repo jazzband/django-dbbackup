@@ -6,12 +6,14 @@ class MysqlDumpConnetor(BaseCommandDBConnetor):
     MySQL connector, creates dump with ``mysqldump`` and restore with
     ``mysql``.
     """
-    def create_dump(self):
+    def create_dump(self, exclude=None):
         cmd = 'mysqldump %s' % self.settings['NAME']
         cmd += ' --host=%s' % self.settings['HOST']
         cmd += ' --port=%i' % self.settings['PORT']
         cmd += ' --user=%s' % self.settings['USER']
         cmd += ' --password=%s' % self.settings['PASSWORD']
+        for table in exclude or []:
+            cmd += ' --ignore-table=%s.%s' % (self.settings['NAME'], table)
         return self.run_command(cmd)
 
     def restore_dump(self, dump):

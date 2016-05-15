@@ -9,7 +9,7 @@ clean:
 	       *.egg
 
 test:
-	python setup.py test
+	python runtests.py
 
 install:
 	python setup.py install

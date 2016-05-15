@@ -26,8 +26,7 @@ setup(
     license='BSD',
     url=dbbackup.__url__,
     keywords=keywords,
-    packages=find_packages(exclude=['tests.runtests.main']),
-    test_suite='tests.runtests.main',
+    packages=find_packages(),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',

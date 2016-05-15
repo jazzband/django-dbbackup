@@ -8,7 +8,6 @@ class PgDumpConnector(BaseCommandDBConnector):
     """
     dump_cmd = 'pg_dump'
     restore_cmd = 'pg_restore'
-    psql_cmd = 'psql'
     single_transaction = True
 
     def create_dump(self):
@@ -26,6 +25,29 @@ class PgDumpConnector(BaseCommandDBConnector):
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
         return self.run_command(cmd)
 
+    def restore_dump(self, dump):
+        cmd = '{} -d {}'.format(self.restore_cmd, self.settings['NAME'])
+        if 'HOST' in self.settings:
+            cmd += ' --host={}'.format(self.settings['HOST'])
+        if 'PORT' in self.settings:
+            cmd += ' --port={}'.format(self.settings['PORT'])
+        if 'USER' in self.settings:
+            cmd += ' --user={}'.format(self.settings['USER'])
+        if 'PASSWORD' in self.settings:
+            cmd += ' --password={}'.format(self.settings['PASSWORD'])
+        if self.single_transaction:
+            cmd += ' --single-transaction'
+        cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
+        return self.run_command(cmd, stdin=dump)
+
+
+class PgDumpGisConnector(BaseCommandDBConnector):
+    """
+    PostgreGIS connector, same than :class:`PgDumpGisConnector` but enable
+    postgis if not made.
+    """
+    psql_cmd = 'psql'
+
     def _enable_postgis(self):
         cmd = '{} -c "CREATE EXTENSION IF NOT EXISTS postgis;"'.format(
             self.psql_cmd)
@@ -41,16 +63,4 @@ class PgDumpConnector(BaseCommandDBConnector):
     def restore_dump(self, dump):
         if self.settings.get('USE_POSTGIS') and self.settings.get('ADMINUSER'):
             self._enable_postgis()
-        cmd = '{} -d {}'.format(self.restore_cmd, self.settings['NAME'])
-        if 'HOST' in self.settings:
-            cmd += ' --host={}'.format(self.settings['HOST'])
-        if 'PORT' in self.settings:
-            cmd += ' --port={}'.format(self.settings['PORT'])
-        if 'USER' in self.settings:
-            cmd += ' --user={}'.format(self.settings['USER'])
-        if 'PASSWORD' in self.settings:
-            cmd += ' --password={}'.format(self.settings['PASSWORD'])
-        if self.single_transaction:
-            cmd += ' --single-transaction'
-        cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
-        return self.run_command(cmd, stdin=dump)
+        return super(PgDumpConnector, self).restore_dump(dump)

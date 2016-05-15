@@ -128,11 +128,11 @@ cause a rollback.
 
 Default: ``True``
 
-USE_POSTGIS
-~~~~~~~~~~~
+PostGis
+-------
 
-When on PostGIS, set this setting to True enable add a 
-``CREATE EXTENSION IF NOT EXISTS postgis;`` Postgres command.
+Same than PostgreSQL but launch ``CREATE EXTENSION IF NOT EXISTS postgis;``
+before restore database.
 
 PSQL_CMD
 ~~~~~~~~

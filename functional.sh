@@ -1,6 +1,7 @@
 #!/bin/bash
+
 make_test () {
-    python runtests.py migrate --noinput
+    python runtests.py migrate --noinput || exit 1
 
     python runtests.py feed
     python runtests.py dbbackup
@@ -30,10 +31,10 @@ main () {
     export STORAGE="dbbackup.storage.filesystem_storage"
     export STORAGE_OPTIONS="location=/tmp/"
 
-    make_test >> /dev/null 2>&1
+    make_test 
     test_results
 
-    [[ -n "DATABASE_FILE" ]] && rm "$DATABASE_FILE"
+    [[ -n "$DATABASE_FILE" ]] && rm "$DATABASE_FILE"
     return $success
 }
 

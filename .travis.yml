@@ -9,6 +9,11 @@ python:
   - "pypy"
   - "pypy3"
 
+services:
+  - mysql
+  - postgresql
+  - mongodb
+
 env:
   matrix:
     - DJANGO=1.6
@@ -25,9 +30,11 @@ script:
   - tox -e $TOX_ENV
 
 after_success:
+  - tox -e $TOX_ENV -- pip install coveralls 
   - tox -e $TOX_ENV -- coveralls $COVERALLS_OPTION
 
 matrix:
+  fast_finish: true
   include:
   #   - python: "3.4"
   #     TOX_ENV=lint
@@ -35,6 +42,17 @@ matrix:
       env: ENV=docs
       install: pip install tox
       script: tox -e docs
+    - python: "3.4"
+      env: ENV=functional
+      install:
+        - pip install tox
+      before_install: 
+        - mysql -e 'CREATE DATABASE test;'
+        - psql -c 'CREATE DATABASE test;' -U postgres
+      script:
+        - DATABASE_URL=sqlite:////tmp/db.sqlite tox -e functional
+        - DATABASE_URL=mysql://travis:@localhost/test tox -e functional
+        - DATABASE_URL=postgres://postgres:@localhost/test tox -e functional
   exclude:
     - python: "3.5"
       env: DJANGO=1.6
@@ -48,3 +66,4 @@ matrix:
       env: DJANGO=1.9
   allow_failures:
     - python: pypy3
+    - env: ENV=functional

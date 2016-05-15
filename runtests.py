@@ -10,7 +10,7 @@ from django.core.management import execute_from_command_line
 def main(argv=None):
     os.environ['DJANGO_SETTINGS_MODULE'] = 'dbbackup.tests.settings'
     argv = argv or []
-    if len(argv) == 1 or argv:
+    if len(argv) <= 1:
         from django.test.utils import get_runner
         if django.VERSION >= (1, 7):
             django.setup()

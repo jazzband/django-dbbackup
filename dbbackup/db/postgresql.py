@@ -1,7 +1,7 @@
-from .base import BaseCommandDBConnetor
+from .base import BaseCommandDBConnector
 
 
-class PgDumpConnector(BaseCommandDBConnetor):
+class PgDumpConnector(BaseCommandDBConnector):
     """
     PostgreSQL connector, creates dump with ``pg_dump`` and restore with
     ``pg_restore``.

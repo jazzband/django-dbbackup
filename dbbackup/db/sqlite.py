@@ -3,7 +3,7 @@ from tempfile import SpooledTemporaryFile
 from shutil import copyfileobj
 from django.db import IntegrityError, OperationalError
 from django.utils.six import BytesIO
-from .base import BaseDBConnetor
+from .base import BaseDBConnector
 
 
 DUMP_TABLES = """
@@ -19,7 +19,7 @@ WHERE "sql" NOT NULL AND "type" IN ('index', 'trigger', 'view')
 """
 
 
-class SqliteConnector(BaseDBConnetor):
+class SqliteConnector(BaseDBConnector):
     """
     Create a dump at SQL layer like could make ``.dumps`` in sqlite3.
     Restore by evaluate the created SQL.
@@ -68,14 +68,14 @@ class SqliteConnector(BaseDBConnetor):
         cursor = self.connection.cursor()
         for line in dump.readlines():
             try:
-                cursor.execute(line.decode('UTF-8') )
+                cursor.execute(line.decode('UTF-8'))
             except OperationalError as err:
                 warnings.warn("Error in db restore: %s" % err)
             except IntegrityError as err:
                 warnings.warn("Error in db restore: %s" % err)
 
 
-class SqliteCPConnector(BaseDBConnetor):
+class SqliteCPConnector(BaseDBConnector):
     """
     Create a dump by copy the binary data file.
     Restore by simply copy to the good location.

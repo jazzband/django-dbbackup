@@ -27,20 +27,22 @@ def get_connector(database_name=None):
     module = import_module(connector_module_path)
     connector_name = connector_path.split('.')[-1]
     connector = getattr(module, connector_name)
-    return connector(database_name)
+    return connector(database_name, **connector_settings)
 
 
-class BaseDBConnetor(object):
+class BaseDBConnector(object):
     """
     Base class for create database connector. This kind of object creates
     interaction with database and allow backup and restore operations.
     """
     extension = 'dump'
 
-    def __init__(self, database_name=None):
+    def __init__(self, database_name=None, **kwargs):
         from django.db import connections, DEFAULT_DB_ALIAS
         self.database_name = database_name or DEFAULT_DB_ALIAS
         self.connection = connections[self.database_name]
+        for attr, value in kwargs.iteritems():
+            setattr(self, attr.lower(), value)
 
     @property
     def settings(self):
@@ -72,15 +74,10 @@ class BaseDBConnetor(object):
         raise NotImplementedError("restore_dump not implemented")
 
 
-class BaseCommandDBConnetor(BaseDBConnetor):
+class BaseCommandDBConnector(BaseDBConnector):
     """
     Base class for create database connector based on command line tools.
     """
-    def __init__(self, *args, **kwargs):
-        super(BaseCommandDBConnetor, self).__init__(*args, **kwargs)
-        self.dump_cmd = self.settings.get('DUMP_CMD') or self.dump_cmd
-        self.restore_cmd = self.settings.get('RESTORE_CMD') or self.restore_cmd
-
     def run_command(self, command, stdin=None):
         """
         Launch a shell command.

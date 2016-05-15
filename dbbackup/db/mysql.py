@@ -1,7 +1,7 @@
-from .base import BaseCommandDBConnetor
+from .base import BaseCommandDBConnector
 
 
-class MysqlDumpConnector(BaseCommandDBConnetor):
+class MysqlDumpConnector(BaseCommandDBConnector):
     """
     MySQL connector, creates dump with ``mysqldump`` and restore with
     ``mysql``.

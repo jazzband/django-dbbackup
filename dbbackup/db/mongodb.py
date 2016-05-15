@@ -1,7 +1,7 @@
-from .base import BaseCommandDBConnetor
+from .base import BaseCommandDBConnector
 
 
-class MongoDumpConnector(BaseCommandDBConnetor):
+class MongoDumpConnector(BaseCommandDBConnector):
     """
     MongoDB connector, creates dump with ``mongodump`` and restore with
     ``mongorestore``.

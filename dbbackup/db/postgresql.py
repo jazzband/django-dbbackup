@@ -23,6 +23,7 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += ' --password={}'.format(self.settings['PASSWORD'])
         for table in self.exclude:
             cmd += ' --exclude-table={}'.format(table)
+        cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
         return self.run_command(cmd)
 
     def _enable_postgis(self):
@@ -51,4 +52,5 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += ' --password={}'.format(self.settings['PASSWORD'])
         if self.single_transaction:
             cmd += ' --single-transaction'
+        cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
         return self.run_command(cmd, stdin=dump)

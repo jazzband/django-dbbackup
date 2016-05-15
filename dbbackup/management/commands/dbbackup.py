@@ -20,13 +20,20 @@ class Command(BaseDbBackupCommand):
     Backup a database, encrypt and/or compress and write to storage.
     """
     option_list = BaseDbBackupCommand.option_list + (
-        make_option("-c", "--clean", help="Clean up old backup files", action="store_true", default=False),
-        make_option("-d", "--database", help="Database to backup (default: everything)"),
-        make_option("-s", "--servername", help="Specify server name to include in backup filename"),
-        make_option("-z", "--compress", help="Compress the backup files", action="store_true", default=False),
-        make_option("-e", "--encrypt", help="Encrypt the backup files", action="store_true", default=False),
-        make_option("-o", "--output-filename", help="Specify filename on storage", default=None),
-        make_option("-O", "--output-path", help="Specify where to store on local filesystem", default=None),
+        make_option("-c", "--clean", dest='clean', action="store_true",
+                    default=False, help="Clean up old backup files"),
+        make_option("-d", "--database",
+                    help="Database to backup (default: everything)"),
+        make_option("-s", "--servername",
+                    help="Specify server name to include in backup filename"),
+        make_option("-z", "--compress", action="store_true", default=False,
+                    help="Compress the backup files"),
+        make_option("-e", "--encrypt", action="store_true", default=False,
+                    help="Encrypt the backup files"),
+        make_option("-o", "--output-filename", default=None,
+                    help="Specify filename on storage"),
+        make_option("-O", "--output-path", default=None,
+                    help="Specify where to store on local filesystem",)
     )
 
     @utils.email_uncaught_exception

@@ -77,6 +77,11 @@ class BaseCommandDBConnector(BaseDBConnector):
     """
     Base class for create database connector based on command line tools.
     """
+    dump_prefix = ''
+    dump_suffix = ''
+    restore_prefix = ''
+    restore_suffix = ''
+
     def run_command(self, command, stdin=None):
         """
         Launch a shell command line.

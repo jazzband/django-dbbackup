@@ -48,12 +48,19 @@ All built-in connectors are listed below.
 EXCLUDE
 ~~~~~~~
 
-Tables to exclude from backup as list.
+Tables to exclude from backup as list. This option can be unavailable for
+connectors making snapshots.
 
 EXTENSION
 ~~~~~~~~~
 
 Extension of backup file name, default ``'dump'``.
+
+Command connectors
+~~~~~~~~~~~~~~~~~~
+
+Some connectors use command line tools as dump engine, ``mysqldump`` for
+example. This kind of tools has common attributes:
 
 DUMP_CMD
 ~~~~~~~~
@@ -68,6 +75,18 @@ RESTORE_CMD
 ~~~~~~~~~~~
 
 Same as ``DUMP_CMD`` but for restoring action.
+
+DUMP_PREFIX and RESTORE_PREFIX
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+String to include as prefix of dump or restore command. It will be add with
+a space between launched command and its prefix.
+
+DUMP_SUFFIX and RESTORE_PREFIX
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+String to include as suffix of dump or restore command. It will be add with
+a space between launched command and its suffix.
 
 SQLite
 ------

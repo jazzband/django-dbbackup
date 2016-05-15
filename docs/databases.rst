@@ -41,6 +41,7 @@ Absolute path to a connector class by default it is:
 - :class:`dbbackup.db.sqlite.SqliteConnector` for ``'django.db.backends.sqlite3'``
 - :class:`dbbackup.db.mysql.MysqlDumpConnector` for ``django.db.backends.mysql``
 - :class:`dbbackup.db.postgresql.PgDumpConnector` for ``django.db.backends.postgresql``
+- :class:`dbbackup.db.postgresql.PgDumpGisConnector` for ``django.contrib.gis.db.backends.postgis``
 - :class:`dbbackup.db.mongodb.MongoDumpConnector` for ``django_mongodb_engine``
 
 All built-in connectors are listed below.

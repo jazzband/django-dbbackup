@@ -12,13 +12,13 @@ class PgDumpConnector(BaseCommandDBConnector):
 
     def create_dump(self):
         cmd = '{} {}'.format(self.dump_cmd, self.settings['NAME'])
-        if 'HOST' in self.settings:
+        if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
-        if 'PORT' in self.settings:
+        if self.settings.get('PORT'):
             cmd += ' --port={}'.format(self.settings['PORT'])
-        if 'USER' in self.settings:
+        if self.settings.get('USER'):
             cmd += ' --user={}'.format(self.settings['USER'])
-        if 'PASSWORD' in self.settings:
+        if self.settings.get('PASSWORD'):
             cmd += ' --password={}'.format(self.settings['PASSWORD'])
         for table in self.exclude:
             cmd += ' --exclude-table={}'.format(table)
@@ -27,13 +27,13 @@ class PgDumpConnector(BaseCommandDBConnector):
 
     def restore_dump(self, dump):
         cmd = '{} -d {}'.format(self.restore_cmd, self.settings['NAME'])
-        if 'HOST' in self.settings:
+        if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
-        if 'PORT' in self.settings:
+        if self.settings.get('PORT'):
             cmd += ' --port={}'.format(self.settings['PORT'])
-        if 'USER' in self.settings:
+        if self.settings.get('USER'):
             cmd += ' --user={}'.format(self.settings['USER'])
-        if 'PASSWORD' in self.settings:
+        if self.settings.get('PASSWORD'):
             cmd += ' --password={}'.format(self.settings['PASSWORD'])
         if self.single_transaction:
             cmd += ' --single-transaction'
@@ -54,9 +54,9 @@ class PgDumpGisConnector(BaseCommandDBConnector):
         cmd += ' --user={}'.format(self.settings['ADMIN_USER'])
         if self.settings.get('ADMIN_PASSWORD'):
             cmd += ' --password={}'.format(self.settings['ADMIN_PASSWORD'])
-        if 'HOST' in self.settings:
+        if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
-        if 'PORT' in self.settings:
+        if self.settings.get('PORT'):
             cmd += ' --port={}'.format(self.settings['PORT'])
         return self.run_command(cmd)
 

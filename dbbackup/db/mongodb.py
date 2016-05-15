@@ -14,9 +14,9 @@ class MongoDumpConnector(BaseCommandDBConnector):
     def create_dump(self):
         cmd = '{} --db {}'.format(self.dump_cmd, self.settings['NAME'])
         cmd += ' --host {}:{}'.format(self.settings['HOST'], self.settings['PORT'])
-        if 'USER' in self.settings:
+        if self.settings.get('USER'):
             cmd += ' --username {}'.format(self.settings['USER'])
-        if 'PASSWORD' in self.settings:
+        if self.settings.get('PASSWORD'):
             cmd += ' --password {}'.format(self.settings['PASSWORD'])
         for collection in self.exclude:
             cmd += ' --excludeCollection {}'.format(collection)
@@ -27,9 +27,9 @@ class MongoDumpConnector(BaseCommandDBConnector):
     def restore_dump(self, dump):
         cmd = self.restore_cmd
         cmd += ' --host {}:{}'.format(self.settings['HOST'], self.settings['PORT'])
-        if 'USER' in self.settings:
+        if self.settings.get('USER'):
             cmd += ' --username {}'.format(self.settings['USER'])
-        if 'PASSWORD' in self.settings:
+        if self.settings.get('PASSWORD'):
             cmd += ' --password {}'.format(self.settings['PASSWORD'])
         if self.object_check:
             cmd += ' --objcheck'

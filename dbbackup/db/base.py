@@ -79,7 +79,8 @@ class BaseCommandDBConnector(BaseDBConnector):
     """
     def run_command(self, command, stdin=None):
         """
-        Launch a shell command.
+        Launch a shell command line.
+
         :param command: Command line to launch
         :type command: str
         :param stdin: Standard input of command

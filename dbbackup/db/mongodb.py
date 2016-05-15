@@ -8,24 +8,31 @@ class MongoDumpConnector(BaseCommandDBConnector):
     """
     dump_cmd = 'mongodump'
     restore_cmd = 'mongorestore'
+    object_check = True
+    drop = True
 
     def create_dump(self):
         cmd = '%s --db %s' % (self.dump_cmd, self.settings['NAME'])
         cmd += ' --host %s:%s' % (self.settings['HOST'], self.settings['PORT'])
-        cmd += ' --username %s' % self.settings['USER']
-        cmd += ' --password %s' % self.settings['PASSWORD']
+        if 'USER' in self.settings:
+            cmd += ' --username %s' % self.settings['USER']
+        if 'PASSWORD' in self.settings:
+            cmd += ' --password %s' % self.settings['PASSWORD']
         for collection in self.exclude:
             cmd += ' --excludeCollection %s' % collection
-        cmd += ' -'
+        cmd += ' --archive'
         return self.run_command(cmd)
 
-    def restore_dump(self, dump, object_check=True, drop=True):
+    def restore_dump(self, dump):
         cmd = self.restore_cmd
         cmd += ' --host %s:%s' % (self.settings['HOST'], self.settings['PORT'])
-        cmd += ' --username %s' % self.settings['USER']
-        cmd += ' --password %s' % self.settings['PASSWORD']
-        if object_check:
+        if 'USER' in self.settings:
+            cmd += ' --username %s' % self.settings['USER']
+        if 'PASSWORD' in self.settings:
+            cmd += ' --password %s' % self.settings['PASSWORD']
+        if self.object_check:
             cmd += ' --objcheck'
-        if drop:
+        if self.drop:
             cmd += ' --drop'
+        cmd += ' --archive'
         return self.run_command(cmd, stdin=dump)

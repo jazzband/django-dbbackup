@@ -140,6 +140,16 @@ MongoDB
 MongoDB uses by default :class:`dbbackup.db.mongodb.MongoDumpConnector`. it
 uses ``mongodump`` and ``mongorestore`` for its job.
 
+OBJECT_CHECK
+~~~~~~~~~~~~
+
+Validate documents before insert in database (option ``--objcheck`` in command line), default is ``True``.
+
+DROP
+~~~~
+
+Replace objects that are already in database, (option ``--drop`` in command line), default is ``True``.
+
 Custom connector
 ----------------
 

@@ -5,7 +5,8 @@ from django.core.management import execute_from_command_line
 
 from dbbackup.tests.utils import (TEST_DATABASE, HANDLED_FILES,
                                   clean_gpg_keys, add_public_gpg,
-                                  add_private_gpg)
+                                  add_private_gpg, get_dump,
+                                  get_dump_name)
 
 from testapp import models
 
@@ -79,12 +80,16 @@ class DbRestoreCommandTest(TestCase):
     def test_encrypted(self, *args):
         # Create backup
         execute_from_command_line(['', 'dbbackup', '--encrypt'])
+        self.instance.delete()
         # Restore
         execute_from_command_line(['', 'dbrestore', '--decrypt'])
+        restored = models.CharModel.objects.all().exists()
+        self.assertTrue(restored)
 
     def test_compressed(self, *args):
         # Create backup
         execute_from_command_line(['', 'dbbackup', '--compress'])
+        self.instance.delete()
         # Restore
         execute_from_command_line(['', 'dbrestore', '--uncompress'])
 
@@ -148,10 +153,6 @@ class MediaBackupCommandTest(TestCase):
         outputfile = HANDLED_FILES['written_files'][0][1]
         outputfile.seek(0)
         self.assertTrue(outputfile.read().startswith(b'-----BEGIN PGP MESSAGE-----'))
-        with self.assertRaises(Exception):
-            execute_from_command_line(['', 'dbrestore', '--decrypt'])
-        self.assertTrue(getpass_mock.called)
-        self.assertTrue(confirm_mock.called)
 
     # def test_available_but_not_compressed(self, *args):
     #     # Create backup

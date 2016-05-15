@@ -54,6 +54,7 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
 @patch('dbbackup.settings.GPG_RECIPIENT', 'test@test')
 @patch('sys.stdout', DEV_NULL)
 @patch('dbbackup.db.sqlite.SqliteConnector.create_dump')
+@patch('dbbackup.utils.handle_size', returned_value=4.2)
 class DbbackupCommandSaveNewMongoBackupTest(TestCase):
     def setUp(self):
         self.command = DbbackupCommand()
@@ -69,7 +70,7 @@ class DbbackupCommandSaveNewMongoBackupTest(TestCase):
     def tearDown(self):
         clean_gpg_keys()
 
-    def test_func(self, mock_run_commands):
+    def test_func(self, mock_run_commands, mock_handle_size):
         self.command._save_new_backup(TEST_DATABASE)
         self.assertTrue(mock_run_commands.called)
 

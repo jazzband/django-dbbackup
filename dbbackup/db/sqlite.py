@@ -32,7 +32,9 @@ class SqliteConnector(BaseDBConnetor):
                 continue
             elif sql.startswith('CREATE TABLE'):
                 sql = sql.replace('CREATE TABLE', 'CREATE TABLE IF NOT EXISTS')
-                fileobj.write("%s;\n" % sql)
+                sql = sql.replace('\n    ', '')
+                sql = sql.replace('\n)', ')')
+                fileobj.write(("%s;\n" % sql).encode('UTF-8'))
             else:
                 fileobj.write("%s;\n" % sql)
             table_name_ident = table_name.replace('"', '""')
@@ -44,12 +46,12 @@ class SqliteConnector(BaseDBConnetor):
                          for col in column_names))
             query_res = cursor.execute(q)
             for row in query_res:
-                fileobj.write("%s;\n" % row[0])
+                fileobj.write(("%s;\n" % row[0]).encode('UTF-8'))
             schema_res = cursor.execute(DUMP_ETC)
             for name, type, sql in schema_res.fetchall():
                 if sql.startswith("CREATE INDEX"):
                     sql = sql.replace('CREATE INDEX', 'CREATE INDEX IF NOT EXISTS')
-                fileobj.write('%s;\n' % sql)
+                fileobj.write(('%s;\n' % sql).encode('UTF-8'))
         cursor.close()
 
     def create_dump(self, exclude=None):
@@ -64,13 +66,13 @@ class SqliteConnector(BaseDBConnetor):
         if not self.connection.is_usable():
             self.connection.connect()
         cursor = self.connection.cursor()
-        for line in dump:
+        for line in dump.readlines():
             try:
-                cursor.execute(line)
+                cursor.execute(line.decode('UTF-8') )
             except OperationalError as err:
-                warnings.warn("Error in db restore: %s" % err.message)
+                warnings.warn("Error in db restore: %s" % err)
             except IntegrityError as err:
-                warnings.warn("Error in db restore: %s" % err.message)
+                warnings.warn("Error in db restore: %s" % err)
 
 
 class SqliteCPConnector(BaseDBConnetor):

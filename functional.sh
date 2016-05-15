@@ -1,16 +1,16 @@
 #!/bin/bash
 
 make_test () {
-    python runtests.py migrate --noinput || exit 1
+    $PYTHON runtests.py migrate --noinput || exit 1
 
-    python runtests.py feed
-    python runtests.py dbbackup
-    count1=$(python runtests.py count)
+    $PYTHON runtests.py feed
+    $PYTHON runtests.py dbbackup
+    count1=$($PYTHON runtests.py count)
 
-    python runtests.py flush --noinput
+    $PYTHON runtests.py flush --noinput
 
-    python runtests.py dbrestore --noinput
-    count2=$(python runtests.py count)
+    $PYTHON runtests.py dbrestore --noinput
+    count2=$($PYTHON runtests.py count)
 }
 
 test_results () {
@@ -30,6 +30,7 @@ main () {
     fi
     export STORAGE="dbbackup.storage.filesystem_storage"
     export STORAGE_OPTIONS="location=/tmp/"
+    export PYTHON=${PYTHON:-python}
 
     make_test 
     test_results

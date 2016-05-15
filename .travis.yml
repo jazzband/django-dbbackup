@@ -13,6 +13,8 @@ services:
   - mysql
   - postgresql
   - mongodb
+addons:
+  postgresql: "9.4"
 
 env:
   matrix:
@@ -43,9 +45,10 @@ matrix:
       install: pip install tox
       script: tox -e docs
     - python: "3.4"
-      env: ENV=functional
+      env: TOX_ENV=functional
       install:
         - pip install tox
+        - export PYTHON='coverage run -a'
       before_install: 
         - mysql -e 'CREATE DATABASE test;'
         - psql -c 'CREATE DATABASE test;' -U postgres
@@ -66,4 +69,3 @@ matrix:
       env: DJANGO=1.9
   allow_failures:
     - python: pypy3
-    - env: ENV=functional

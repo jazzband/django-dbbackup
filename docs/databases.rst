@@ -44,7 +44,7 @@ Absolute path to a connector class by default it is:
 - :class:`dbbackup.db.postgresql.PgDumpGisConnector` for ``django.contrib.gis.db.backends.postgis``
 - :class:`dbbackup.db.mongodb.MongoDumpConnector` for ``django_mongodb_engine``
 
-All built-in connectors are listed below.
+All supported built-in connectors are listed below.
 
 EXCLUDE
 ~~~~~~~
@@ -118,8 +118,8 @@ PostgreSQL
 ----------
 
 Postgres uses by default :class:`dbbackup.db.postgres.PgDumpConnector`. It
-allows PostGIS usage, and uses ``pg_dump`` and ``pg_restore`` for its job.
-It can also uses ``psql`` for launch administration command.
+allows PostGIS usage, and uses ``pg_dump`` and ``pqsl`` for its job.
+It can also use ``psql`` for launch administration command.
 
 SINGLE_TRANSACTION
 ~~~~~~~~~~~~~~~~~~
@@ -129,11 +129,17 @@ cause a rollback.
 
 Default: ``True``
 
+DROP
+~~~~
+
+Include tables dropping statements in dump. Default: ``True``
+
 PostGis
 -------
 
-Same than PostgreSQL but launch ``CREATE EXTENSION IF NOT EXISTS postgis;``
-before restore database.
+Set in :class:`dbbackup.db.postgres.PgDumpGisConnector`, it does the same than
+PostgreSQL but launch ``CREATE EXTENSION IF NOT EXISTS postgis;`` before
+restore database.
 
 PSQL_CMD
 ~~~~~~~~

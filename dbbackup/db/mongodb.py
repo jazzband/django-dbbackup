@@ -11,7 +11,7 @@ class MongoDumpConnector(BaseCommandDBConnector):
     object_check = True
     drop = True
 
-    def create_dump(self):
+    def _create_dump(self):
         cmd = '{} --db {}'.format(self.dump_cmd, self.settings['NAME'])
         cmd += ' --host {}:{}'.format(self.settings['HOST'], self.settings['PORT'])
         if self.settings.get('USER'):
@@ -22,9 +22,10 @@ class MongoDumpConnector(BaseCommandDBConnector):
             cmd += ' --excludeCollection {}'.format(collection)
         cmd += ' --archive'
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
-        return self.run_command(cmd)
+        stdout, stderr = self.run_command(cmd)
+        return stdout
 
-    def restore_dump(self, dump):
+    def _restore_dump(self, dump):
         cmd = self.restore_cmd
         cmd += ' --host {}:{}'.format(self.settings['HOST'], self.settings['PORT'])
         if self.settings.get('USER'):

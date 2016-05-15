@@ -29,8 +29,9 @@ class BaseDBConnectorTest(TestCase):
 class BaseCommandDBConnectorTest(TestCase):
     def test_run_command(self):
         connector = BaseCommandDBConnector()
-        stdout = connector.run_command('echo 123')
+        stdout, stderr = connector.run_command('echo 123')
         self.assertEqual(stdout.read(), b'123\n')
+        self.assertEqual(stderr.read(), b'')
 
 
 class SqliteConnectorTest(TestCase):

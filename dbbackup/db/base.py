@@ -3,6 +3,7 @@ from tempfile import SpooledTemporaryFile
 from subprocess import Popen
 from importlib import import_module
 from dbbackup import settings, utils
+from . import exceptions
 
 CONNECTOR_MAPPING = {
     'django.db.backends.sqlite3': 'dbbackup.db.sqlite.SqliteConnector',
@@ -68,14 +69,32 @@ class BaseDBConnector(object):
         :return: File object
         :rtype: file
         """
-        raise NotImplementedError("create_dump not implemented")
+        dump = self._create_dump()
+        return dump
+
+    def _create_dump(self):
+        """
+        Override this method to define dump creation.
+        :return: File object
+        :rtype: file
+        """
+        raise NotImplementedError("_create_dump not implemented")
 
     def restore_dump(self, dump):
         """
         :param dump: Dump file
         :type dump: file
         """
-        raise NotImplementedError("restore_dump not implemented")
+        result = self._restore_dump(dump)
+        return result
+
+    def _restore_dump(self, dump):
+        """
+        Override this method to define dump creation.
+        :param dump: Dump file
+        :type dump: file
+        """
+        raise NotImplementedError("_restore_dump not implemented")
 
 
 class BaseCommandDBConnector(BaseDBConnector):
@@ -99,10 +118,14 @@ class BaseCommandDBConnector(BaseDBConnector):
         :rtype: file
         """
         stdout = SpooledTemporaryFile(max_size=10 * 1024 * 1024)
+        stderr = SpooledTemporaryFile(max_size=10 * 1024 * 1024)
         cmd = shlex.split(command)
-        process = Popen(cmd, stdin=stdin, stdout=stdout)
+        process = Popen(cmd, stdin=stdin, stdout=stdout, stderr=stderr)
         process.wait()
         if process.poll():
-            raise Exception("Error running: {}".format(command))
+            stderr.seek(0)
+            raise exceptions.CommandConnectorError(
+                "Error running: {}\n{}".format(command, stderr.read()))
         stdout.seek(0)
-        return stdout
+        stderr.seek(0)
+        return stdout, stderr

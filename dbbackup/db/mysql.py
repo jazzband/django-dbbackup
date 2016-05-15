@@ -9,7 +9,7 @@ class MysqlDumpConnector(BaseCommandDBConnector):
     dump_cmd = 'mysqldump'
     restore_cmd = 'mysql'
 
-    def create_dump(self):
+    def _create_dump(self):
         cmd = '{} {} --quick'.format(self.dump_cmd, self.settings['NAME'])
         if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
@@ -22,9 +22,10 @@ class MysqlDumpConnector(BaseCommandDBConnector):
         for table in self.exclude:
             cmd += ' --ignore-table={}.{}'.format(self.settings['NAME'], table)
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
-        return self.run_command(cmd)
+        stdout, stderr = self.run_command(cmd)
+        return stdout
 
-    def restore_dump(self, dump):
+    def _restore_dump(self, dump):
         cmd = '{} {}'.format(self.restore_cmd, self.settings['NAME'])
         if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
@@ -35,4 +36,5 @@ class MysqlDumpConnector(BaseCommandDBConnector):
         if self.settings.get('PASSWORD'):
             cmd += ' --password={}'.format(self.settings['PASSWORD'])
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
-        return self.run_command(cmd, stdin=dump)
+        stdout, stderr = self.run_command(cmd, stdin=dump)
+        return stdout, stderr

@@ -3,14 +3,16 @@ from .base import BaseCommandDBConnector
 
 class PgDumpConnector(BaseCommandDBConnector):
     """
-    PostgreSQL connector, creates dump with ``pg_dump`` and restore with
-    ``pg_restore``.
+    PostgreSQL connector, it uses pg_dump`` to create an SQL text file
+    and ``psql`` for restore it.
     """
+    extension = 'psql'
     dump_cmd = 'pg_dump'
-    restore_cmd = 'pg_restore'
+    restore_cmd = 'psql'
     single_transaction = True
+    drop = True
 
-    def create_dump(self):
+    def _create_dump(self):
         cmd = '{} {}'.format(self.dump_cmd, self.settings['NAME'])
         if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
@@ -20,13 +22,18 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += ' --user={}'.format(self.settings['USER'])
         if self.settings.get('PASSWORD'):
             cmd += ' --password={}'.format(self.settings['PASSWORD'])
+        else:
+            cmd += ' --no-password'
         for table in self.exclude:
             cmd += ' --exclude-table={}'.format(table)
+        if self.drop:
+            cmd += ' --clean'
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
-        return self.run_command(cmd)
+        stdout, stderr = self.run_command(cmd)
+        return stdout
 
-    def restore_dump(self, dump):
-        cmd = '{} -d {}'.format(self.restore_cmd, self.settings['NAME'])
+    def _restore_dump(self, dump):
+        cmd = '{} {}'.format(self.restore_cmd, self.settings['NAME'])
         if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
         if self.settings.get('PORT'):
@@ -35,13 +42,16 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += ' --user={}'.format(self.settings['USER'])
         if self.settings.get('PASSWORD'):
             cmd += ' --password={}'.format(self.settings['PASSWORD'])
+        else:
+            cmd += ' --no-password'
         if self.single_transaction:
             cmd += ' --single-transaction'
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
-        return self.run_command(cmd, stdin=dump)
+        stdout, stderr = self.run_command(cmd, stdin=dump)
+        return stdout, stderr
 
 
-class PgDumpGisConnector(BaseCommandDBConnector):
+class PgDumpGisConnector(PgDumpConnector):
     """
     PostgreGIS connector, same than :class:`PgDumpGisConnector` but enable
     postgis if not made.
@@ -54,13 +64,15 @@ class PgDumpGisConnector(BaseCommandDBConnector):
         cmd += ' --user={}'.format(self.settings['ADMIN_USER'])
         if self.settings.get('ADMIN_PASSWORD'):
             cmd += ' --password={}'.format(self.settings['ADMIN_PASSWORD'])
+        else:
+            cmd += ' --no-password'
         if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
         if self.settings.get('PORT'):
             cmd += ' --port={}'.format(self.settings['PORT'])
         return self.run_command(cmd)
 
-    def restore_dump(self, dump):
-        if self.settings.get('USE_POSTGIS') and self.settings.get('ADMINUSER'):
+    def _restore_dump(self, dump):
+        if self.settings.get('ADMINUSER'):
             self._enable_postgis()
-        return super(PgDumpConnector, self).restore_dump(dump)
+        return super(PgDumpGisConnector, self)._restore_dump(dump)

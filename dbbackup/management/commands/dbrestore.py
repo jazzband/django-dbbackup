@@ -16,7 +16,7 @@ from django.db import connection
 
 from ._base import BaseDbBackupCommand
 from ... import utils
-from ...db import get_connector
+from ...db.base import get_connector
 from ...storage.base import BaseStorage, StorageError
 
 input = raw_input if six.PY2 else input  # @ReservedAssignment

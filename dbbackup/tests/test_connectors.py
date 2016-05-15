@@ -27,7 +27,7 @@ class BaseCommandDBConnectorTest(TestCase):
     def test_run_command(self):
         connector = BaseCommandDBConnector()
         stdout = connector.run_command('echo 123')
-        self.assertEqual(stdout.read(), '123\n')
+        self.assertEqual(stdout.read(), b'123\n')
 
 
 class SqliteConnectorTest(TestCase):
@@ -37,7 +37,7 @@ class SqliteConnectorTest(TestCase):
         connector._write_dump(dump_file)
         dump_file.seek(0)
         for line in dump_file:
-            self.assertTrue(line.strip().endswith(';'))
+            self.assertTrue(line.strip().endswith(b';'))
 
     def test_create_dump(self):
         connector = SqliteConnector()

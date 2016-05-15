@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.utils import six
 
 from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
-from dbbackup.db import get_connector
+from dbbackup.db.base import get_connector
 from dbbackup.tests.utils import (FakeStorage, TEST_DATABASE,
                                   add_public_gpg, clean_gpg_keys, DEV_NULL, TEST_MONGODB)
 

@@ -4,7 +4,7 @@ import logging
 from django.conf import settings
 from django.utils import six
 from dbbackup.storage.base import BaseStorage
-from dbbackup.db import get_connector
+from dbbackup.db.base import get_connector
 
 BASE_FILE = os.path.join(settings.BLOB_DIR, 'test.txt')
 ENCRYPTED_FILE = os.path.join(settings.BLOB_DIR, 'test.txt.gpg')

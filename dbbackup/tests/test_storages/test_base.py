@@ -34,6 +34,7 @@ class BaseStorageTest(TestCase):
 
 class StorageListBackupsTest(TestCase):
     def setUp(self):
+        HANDLED_FILES.clean()
         self.storage = FakeStorage()
         HANDLED_FILES['written_files'] += [
             (utils.filename_generate(ext, 'foo'), None) for ext in
@@ -46,9 +47,6 @@ class StorageListBackupsTest(TestCase):
         HANDLED_FILES['written_files'] += [
             ('file_without_date', None)
         ]
-
-    def tearDown(self):
-        HANDLED_FILES.clean()
 
     def test_nofilter(self):
         files = self.storage.list_backups()

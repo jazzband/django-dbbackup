@@ -12,43 +12,43 @@ class PgDumpConnector(BaseCommandDBConnector):
     single_transaction = True
 
     def create_dump(self):
-        cmd = '%s %s' % (self.dump_cmd, self.settings['NAME'])
+        cmd = '{} {}'.format(self.dump_cmd, self.settings['NAME'])
         if 'HOST' in self.settings:
-            cmd += ' --host=%s' % self.settings['HOST']
+            cmd += ' --host={}'.format(self.settings['HOST'])
         if 'PORT' in self.settings:
-            cmd += ' --port=%i' % self.settings['PORT']
+            cmd += ' --port={}'.format(self.settings['PORT'])
         if 'USER' in self.settings:
-            cmd += ' --user=%s' % self.settings['USER']
+            cmd += ' --user={}'.format(self.settings['USER'])
         if 'PASSWORD' in self.settings:
-            cmd += ' --password=%s' % self.settings['PASSWORD']
+            cmd += ' --password={}'.format(self.settings['PASSWORD'])
         for table in self.exclude:
-            cmd += ' --exclude-table=%s' % table
+            cmd += ' --exclude-table={}'.format(table)
         return self.run_command(cmd)
 
     def _enable_postgis(self):
-        cmd = '%s -c "CREATE EXTENSION IF NOT EXISTS postgis;"' % \
-            self.psql_cmd
-        cmd += ' --user=%s' % self.settings['ADMIN_USER']
+        cmd = '{} -c "CREATE EXTENSION IF NOT EXISTS postgis;"'.format(
+            self.psql_cmd)
+        cmd += ' --user={}'.format(self.settings['ADMIN_USER'])
         if self.settings.get('ADMIN_PASSWORD'):
-            cmd += ' --password=%s' % self.settings['ADMIN_PASSWORD']
+            cmd += ' --password={}'.format(self.settings['ADMIN_PASSWORD'])
         if 'HOST' in self.settings:
-            cmd += ' --host=%s' % self.settings['HOST']
+            cmd += ' --host={}'.format(self.settings['HOST'])
         if 'PORT' in self.settings:
-            cmd += ' --port=%i' % self.settings['PORT']
+            cmd += ' --port={}'.format(self.settings['PORT'])
         return self.run_command(cmd)
 
     def restore_dump(self, dump):
         if self.settings.get('USE_POSTGIS') and self.settings.get('ADMINUSER'):
             self._enable_postgis()
-        cmd = '%s -d %s' % (self.restore_cmd, self.settings['NAME'])
+        cmd = '{} -d {}'.format(self.restore_cmd, self.settings['NAME'])
         if 'HOST' in self.settings:
-            cmd += ' --host=%s' % self.settings['HOST']
+            cmd += ' --host={}'.format(self.settings['HOST'])
         if 'PORT' in self.settings:
-            cmd += ' --port=%i' % self.settings['PORT']
+            cmd += ' --port={}'.format(self.settings['PORT'])
         if 'USER' in self.settings:
-            cmd += ' --user=%s' % self.settings['USER']
+            cmd += ' --user={}'.format(self.settings['USER'])
         if 'PASSWORD' in self.settings:
-            cmd += ' --password=%s' % self.settings['PASSWORD']
+            cmd += ' --password={}'.format(self.settings['PASSWORD'])
         if self.single_transaction:
             cmd += ' --single-transaction'
         return self.run_command(cmd, stdin=dump)

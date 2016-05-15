@@ -11,7 +11,8 @@ from django.core.management.base import CommandError
 from django.conf import settings
 
 from dbbackup import utils
-from dbbackup.db import get_connector, MongoDumpConnector
+from dbbackup.db.base import get_connector
+from dbbackup.db.mongodb import MongoDumpConnector
 from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
 from dbbackup.tests.utils import (FakeStorage, TEST_DATABASE,
                                   add_private_gpg, DEV_NULL,

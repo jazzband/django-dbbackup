@@ -42,7 +42,7 @@ class BaseDBConnector(object):
         from django.db import connections, DEFAULT_DB_ALIAS
         self.database_name = database_name or DEFAULT_DB_ALIAS
         self.connection = connections[self.database_name]
-        for attr, value in kwargs.iteritems():
+        for attr, value in kwargs.items():
             setattr(self, attr.lower(), value)
 
     @property
@@ -93,6 +93,6 @@ class BaseCommandDBConnector(BaseDBConnector):
         process = Popen(cmd, stdin=stdin, stdout=stdout)
         process.wait()
         if process.poll():
-            raise Exception("Error running: %s" % command)
+            raise Exception("Error running: {}".format(command))
         stdout.seek(0)
         return stdout

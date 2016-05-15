@@ -36,6 +36,7 @@ class BaseDBConnector(object):
     interaction with database and allow backup and restore operations.
     """
     extension = 'dump'
+    exclude = []
 
     def __init__(self, database_name=None, **kwargs):
         from django.db import connections, DEFAULT_DB_ALIAS
@@ -57,10 +58,8 @@ class BaseDBConnector(object):
         return utils.filename_generate(self.extension, self.settings['NAME'],
                                        server_name)
 
-    def create_dump(self, exclude=None):
+    def create_dump(self):
         """
-        :param exclude: Table not included in dump
-        :type exclude: list of str
         :return: File object
         :rtype: file
         """

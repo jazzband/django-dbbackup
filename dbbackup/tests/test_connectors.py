@@ -34,7 +34,7 @@ class SqliteConnectorTest(TestCase):
     def test_write_dump(self):
         dump_file = BytesIO()
         connector = SqliteConnector()
-        connector._write_dump(dump_file, [])
+        connector._write_dump(dump_file)
         dump_file.seek(0)
         for line in dump_file:
             self.assertTrue(line.strip().endswith(';'))

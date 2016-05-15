@@ -9,12 +9,12 @@ class MongoDumpConnector(BaseCommandDBConnector):
     dump_cmd = 'mongodump'
     restore_cmd = 'mongorestore'
 
-    def create_dump(self, exclude=None):
+    def create_dump(self):
         cmd = '%s --db %s' % (self.dump_cmd, self.settings['NAME'])
         cmd += ' --host %s:%s' % (self.settings['HOST'], self.settings['PORT'])
         cmd += ' --username %s' % self.settings['USER']
         cmd += ' --password %s' % self.settings['PASSWORD']
-        for collection in exclude or []:
+        for collection in self.exclude:
             cmd += ' --excludeCollection %s' % collection
         cmd += ' -'
         return self.run_command(cmd)

@@ -24,14 +24,14 @@ class SqliteConnector(BaseDBConnector):
     Create a dump at SQL layer like could make ``.dumps`` in sqlite3.
     Restore by evaluate the created SQL.
     """
-    def _write_dump(self, fileobj, exclude):
+    def _write_dump(self, fileobj):
         cursor = self.connection.cursor()
         cursor.execute(DUMP_TABLES)
         for table_name, type, sql in cursor.fetchall():
-            if table_name.startswith('sqlite_') or table_name in exclude:
+            if table_name.startswith('sqlite_') or table_name in self.exclude:
                 continue
             elif sql.startswith('CREATE TABLE'):
-                sql = sql.replace('CREATE TABLE', 'CREATE TABLE IF NOT EXISTS')
+                # Make SQL commands in 1 line
                 sql = sql.replace('\n    ', '')
                 sql = sql.replace('\n)', ')')
                 fileobj.write(("%s;\n" % sql).encode('UTF-8'))
@@ -54,11 +54,11 @@ class SqliteConnector(BaseDBConnector):
                 fileobj.write(('%s;\n' % sql).encode('UTF-8'))
         cursor.close()
 
-    def create_dump(self, exclude=None):
+    def create_dump(self):
         if not self.connection.is_usable():
             self.connection.connect()
         dump_file = SpooledTemporaryFile(max_size=10 * 1024 * 1024)
-        self._write_dump(dump_file, exclude or [])
+        self._write_dump(dump_file)
         dump_file.seek(0)
         return dump_file
 
@@ -80,7 +80,7 @@ class SqliteCPConnector(BaseDBConnector):
     Create a dump by copy the binary data file.
     Restore by simply copy to the good location.
     """
-    def create_dump(self, exclude=None):
+    def create_dump(self):
         path = self.connection.settings_dict['NAME']
         dump = BytesIO()
         with open(path, 'rb') as db_file:

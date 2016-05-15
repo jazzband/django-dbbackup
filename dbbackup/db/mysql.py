@@ -9,13 +9,13 @@ class MysqlDumpConnector(BaseCommandDBConnector):
     dump_cmd = 'mysqldump'
     restore_cmd = 'mysql'
 
-    def create_dump(self, exclude=None):
+    def create_dump(self):
         cmd = '%s %s' % (self.dump_cmd, self.settings['NAME'])
         cmd += ' --host=%s' % self.settings['HOST']
         cmd += ' --port=%i' % self.settings['PORT']
         cmd += ' --user=%s' % self.settings['USER']
         cmd += ' --password=%s' % self.settings['PASSWORD']
-        for table in exclude or []:
+        for table in self.exclude:
             cmd += ' --ignore-table=%s.%s' % (self.settings['NAME'], table)
         return self.run_command(cmd)
 

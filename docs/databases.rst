@@ -43,15 +43,50 @@ Absolute path to a connector class by default it is:
 - :class:`dbbackup.db.postgresql.PgDumpConnector` for ``django.db.backends.postgresql``
 - :class:`dbbackup.db.mongodb.MongoDumpConnector` for ``django_mongodb_engine``
 
+All built-in connectors are listed below.
+
+EXCLUDE
+~~~~~~~
+
+Tables to exclude from backup as list.
+
+EXTENSION
+~~~~~~~~~
+
+Extension of backup file name, default ``'dump'``.
+
+DUMP_CMD
+~~~~~~~~
+
+Path to the command used for create a backup, default is the appropriate
+command supposed to be in your PATH, for example: ``'mysqldump'`` for MySQL.
+
+This setting is useful only for connectors using command line tools (children
+of :class:`dbbackup.db.base.BaseCommandDBConnector`)
+
+RESTORE_CMD
+~~~~~~~~~~~
+
+Same as ``DUMP_CMD`` but for restoring action.
 
 SQLite
 ------
 
-SQLite uses by default :class:`dbbackup.db.sqlite.SqliteConnector`. It is in
-pure Python and copy the behavior of ``.dump`` command for create a SQL dump.
+SQLite uses by default :class:`dbbackup.db.sqlite.SqliteConnector`.
+
+SqliteConnector
+~~~~~~~~~~~~~~~
+
+It is in pure Python and copy the behavior of ``.dump`` command for create a
+SQL dump.
+
+SqliteCPConnector
+~~~~~~~~~~~~~~~~~
 
 You can also use :class:`dbbackup.db.sqlite.SqliteCPConnector` for make simple
-raw copy of your database file.
+raw copy of your database file, like a snapshot.
+
+In-memory database aren't dumpable with it.
 
 MySQL
 -----
@@ -64,6 +99,7 @@ PostgreSQL
 
 Postgres uses by default :class:`dbbackup.db.postgres.PgDumpConnector`. It
 allows PostGIS usage, and uses ``pg_dump`` and ``pg_restore`` for its job.
+It can also uses ``psql`` for launch administration command.
 
 SINGLE_TRANSACTION
 ~~~~~~~~~~~~~~~~~~
@@ -78,6 +114,13 @@ USE_POSTGIS
 
 When on PostGIS, set this setting to True enable add a 
 ``CREATE EXTENSION IF NOT EXISTS postgis;`` Postgres command.
+
+PSQL_CMD
+~~~~~~~~
+
+Path to ``psql`` command used for administration tasks like enable PostGIS
+for example, default is ``psql``.
+
 
 ADMIN_USER
 ~~~~~~~~~~

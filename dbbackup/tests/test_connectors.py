@@ -1,5 +1,8 @@
+from mock import patch, mock_open
+
 from django.test import TestCase
 from django.utils.six import BytesIO
+
 from dbbackup.db.base import get_connector, BaseDBConnector, BaseCommandDBConnector
 from dbbackup.db.sqlite import SqliteConnector, SqliteCPConnector
 
@@ -50,11 +53,14 @@ class SqliteConnectorTest(TestCase):
         connector.restore_dump(dump)
 
 
+@patch('dbbackup.db.sqlite.open', mock_open(read_data=b'foo'), create=True)
 class SqliteCPConnectorTest(TestCase):
     def test_create_dump(self):
         connector = SqliteCPConnector()
         dump = connector.create_dump()
-        self.assertTrue(dump.read())
+        dump_content = dump.read()
+        self.assertTrue(dump_content)
+        self.assertEqual(dump_content, b'foo')
 
     def test_restore_dump(self):
         connector = SqliteCPConnector()

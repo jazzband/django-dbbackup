@@ -8,7 +8,7 @@ from dbbackup.tests.utils import (TEST_DATABASE, HANDLED_FILES,
                                   add_private_gpg, get_dump,
                                   get_dump_name)
 
-from testapp import models
+from dbbackup.tests.testapp import models
 
 
 @patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})

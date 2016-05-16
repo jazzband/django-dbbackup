@@ -1,10 +1,15 @@
 from mock import patch, mock_open
+from tempfile import SpooledTemporaryFile
 
 from django.test import TestCase
 from django.utils.six import BytesIO
 
 from dbbackup.db.base import get_connector, BaseDBConnector, BaseCommandDBConnector
+from dbbackup.db import exceptions
 from dbbackup.db.sqlite import SqliteConnector, SqliteCPConnector
+from dbbackup.db.mysql import MysqlDumpConnector
+from dbbackup.db.postgresql import PgDumpConnector
+from dbbackup.db.mongodb import MongoDumpConnector
 
 
 class GetConnectorTest(TestCase):
@@ -32,6 +37,21 @@ class BaseCommandDBConnectorTest(TestCase):
         stdout, stderr = connector.run_command('echo 123')
         self.assertEqual(stdout.read(), b'123\n')
         self.assertEqual(stderr.read(), b'')
+
+    def test_run_command_error(self):
+        connector = BaseCommandDBConnector()
+        with self.assertRaises(exceptions.CommandConnectorError):
+            connector.run_command('echa 123')
+
+    def test_run_command_stdin(self):
+        connector = BaseCommandDBConnector()
+        stdin = SpooledTemporaryFile()
+        stdin.write(b'foo')
+        stdin.seek(0)
+        # Run
+        stdout, stderr = connector.run_command('cat', stdin=stdin)
+        self.assertEqual(stdout.read(), b'foo')
+        self.assertFalse(stderr.read())
 
 
 class SqliteConnectorTest(TestCase):
@@ -67,3 +87,73 @@ class SqliteCPConnectorTest(TestCase):
         connector = SqliteCPConnector()
         dump = connector.create_dump()
         connector.restore_dump(dump)
+
+
+@patch('dbbackup.db.mysql.MysqlDumpConnector.run_command',
+       return_value=(BytesIO(b'foo'), BytesIO()))
+class MysqlDumpConnectorTest(TestCase):
+    def test_create_dump(self, mock_dump_cmd):
+        connector = MysqlDumpConnector()
+        dump = connector.create_dump()
+        # Test dump
+        dump_content = dump.read()
+        self.assertTrue(dump_content)
+        self.assertEqual(dump_content, b'foo')
+        # Test cmd
+        self.assertTrue(mock_dump_cmd.called)
+
+
+    @patch('dbbackup.db.mysql.MysqlDumpConnector.run_command',
+           return_value=(BytesIO(), BytesIO()))
+    def test_restore_dump(self, mock_dump_cmd, mock_restore_cmd):
+        connector = MysqlDumpConnector()
+        dump = connector.create_dump()
+        connector.restore_dump(dump)
+        # Test cmd
+        self.assertTrue(mock_restore_cmd.called)
+
+
+@patch('dbbackup.db.postgresql.PgDumpConnector.run_command',
+       return_value=(BytesIO(b'foo'), BytesIO()))
+class PgDumpConnectorTest(TestCase):
+    def test_create_dump(self, mock_dump_cmd):
+        connector = PgDumpConnector()
+        dump = connector.create_dump()
+        # Test dump
+        dump_content = dump.read()
+        self.assertTrue(dump_content)
+        self.assertEqual(dump_content, b'foo')
+        # Test cmd
+        self.assertTrue(mock_dump_cmd.called)
+
+    @patch('dbbackup.db.postgresql.PgDumpConnector.run_command',
+           return_value=(BytesIO(), BytesIO()))
+    def test_restore_dump(self, mock_dump_cmd, mock_restore_cmd):
+        connector = PgDumpConnector()
+        dump = connector.create_dump()
+        connector.restore_dump(dump)
+        # Test cmd
+        self.assertTrue(mock_restore_cmd.called)
+
+
+@patch('dbbackup.db.mongodb.MongoDumpConnector.run_command',
+       return_value=(BytesIO(b'foo'), BytesIO()))
+class MongoDumpConnectorTest(TestCase):
+    def test_create_dump(self, mock_dump_cmd):
+        connector = MongoDumpConnector()
+        dump = connector.create_dump()
+        # Test dump
+        dump_content = dump.read()
+        self.assertTrue(dump_content)
+        self.assertEqual(dump_content, b'foo')
+        # Test cmd
+        self.assertTrue(mock_dump_cmd.called)
+
+    @patch('dbbackup.db.mongodb.MongoDumpConnector.run_command',
+           return_value=(BytesIO(), BytesIO()))
+    def test_restore_dump(self, mock_dump_cmd, mock_restore_cmd):
+        connector = MongoDumpConnector()
+        dump = connector.create_dump()
+        connector.restore_dump(dump)
+        # Test cmd
+        self.assertTrue(mock_restore_cmd.called)

@@ -120,12 +120,16 @@ class BaseCommandDBConnector(BaseDBConnector):
         stdout = SpooledTemporaryFile(max_size=10 * 1024 * 1024)
         stderr = SpooledTemporaryFile(max_size=10 * 1024 * 1024)
         cmd = shlex.split(command)
-        process = Popen(cmd, stdin=stdin, stdout=stdout, stderr=stderr)
-        process.wait()
-        if process.poll():
+        try:
+            process = Popen(cmd, stdin=stdin, stdout=stdout, stderr=stderr)
+            process.wait()
+            if process.poll():
+                stderr.seek(0)
+                raise exceptions.CommandConnectorError(
+                    "Error running: {}\n{}".format(command, stderr.read()))
+            stdout.seek(0)
             stderr.seek(0)
+            return stdout, stderr
+        except OSError as err:
             raise exceptions.CommandConnectorError(
-                "Error running: {}\n{}".format(command, stderr.read()))
-        stdout.seek(0)
-        stderr.seek(0)
-        return stdout, stderr
+                "Error running: {}\n{}".format(command, str(err)))

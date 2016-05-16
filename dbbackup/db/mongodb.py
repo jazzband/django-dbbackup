@@ -22,7 +22,7 @@ class MongoDumpConnector(BaseCommandDBConnector):
             cmd += ' --excludeCollection {}'.format(collection)
         cmd += ' --archive'
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
-        stdout, stderr = self.run_command(cmd)
+        stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
 
     def _restore_dump(self, dump):
@@ -38,4 +38,4 @@ class MongoDumpConnector(BaseCommandDBConnector):
             cmd += ' --drop'
         cmd += ' --archive'
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
-        return self.run_command(cmd, stdin=dump)
+        return self.run_command(cmd, stdin=dump, env=self.restore_env)

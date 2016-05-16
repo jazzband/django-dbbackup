@@ -89,6 +89,13 @@ DUMP_SUFFIX and RESTORE_PREFIX
 String to include as suffix of dump or restore command. It will be add with
 a space between launched command and its suffix.
 
+ENV, DUMP_ENV and RESTORE_ENV
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Environment variables used during command running, default are ``{}``. ``ENV``
+is used for every command, ``DUMP_ENV`` and ``RESTORE_ENV``  override the
+values defined in ``ENV`` during the dedicated commands.
+
 SQLite
 ------
 

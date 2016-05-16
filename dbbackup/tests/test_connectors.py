@@ -53,6 +53,19 @@ class BaseCommandDBConnectorTest(TestCase):
         self.assertEqual(stdout.read(), b'foo')
         self.assertFalse(stderr.read())
 
+    def test_run_command_with_env(self):
+        connector = BaseCommandDBConnector()
+        # Empty env
+        stdout, stderr = connector.run_command('env')
+        self.assertFalse(stdout.read())
+        # env from self.env
+        connector.env = {'foo': 'bar'}
+        stdout, stderr = connector.run_command('env')
+        self.assertEqual(stdout.read(), b'foo=bar\n')
+        # method overide gloabal env
+        stdout, stderr = connector.run_command('env', env={'foo': 'ham'})
+        self.assertEqual(stdout.read(), b'foo=ham\n')
+
 
 class SqliteConnectorTest(TestCase):
     def test_write_dump(self):

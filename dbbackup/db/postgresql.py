@@ -29,7 +29,7 @@ class PgDumpConnector(BaseCommandDBConnector):
         if self.drop:
             cmd += ' --clean'
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
-        stdout, stderr = self.run_command(cmd)
+        stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
 
     def _restore_dump(self, dump):
@@ -47,7 +47,7 @@ class PgDumpConnector(BaseCommandDBConnector):
         if self.single_transaction:
             cmd += ' --single-transaction'
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
-        stdout, stderr = self.run_command(cmd, stdin=dump)
+        stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr
 
 

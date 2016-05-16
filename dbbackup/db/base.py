@@ -105,8 +105,11 @@ class BaseCommandDBConnector(BaseDBConnector):
     dump_suffix = ''
     restore_prefix = ''
     restore_suffix = ''
+    env = {}
+    dump_env = {}
+    restore_env = {}
 
-    def run_command(self, command, stdin=None):
+    def run_command(self, command, stdin=None, env=None):
         """
         Launch a shell command line.
 
@@ -114,14 +117,19 @@ class BaseCommandDBConnector(BaseDBConnector):
         :type command: str
         :param stdin: Standard input of command
         :type stdin: file
+        :param env: Environment variable used in command
+        :type env: dict
         :return: Standard output of command
         :rtype: file
         """
+        cmd = shlex.split(command)
         stdout = SpooledTemporaryFile(max_size=10 * 1024 * 1024)
         stderr = SpooledTemporaryFile(max_size=10 * 1024 * 1024)
-        cmd = shlex.split(command)
+        full_env = self.env.copy()
+        full_env.update(env or {})
         try:
-            process = Popen(cmd, stdin=stdin, stdout=stdout, stderr=stderr)
+            process = Popen(cmd, stdin=stdin, stdout=stdout, stderr=stderr,
+                            env=full_env)
             process.wait()
             if process.poll():
                 stderr.seek(0)

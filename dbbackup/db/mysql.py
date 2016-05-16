@@ -22,7 +22,7 @@ class MysqlDumpConnector(BaseCommandDBConnector):
         for table in self.exclude:
             cmd += ' --ignore-table={}.{}'.format(self.settings['NAME'], table)
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
-        stdout, stderr = self.run_command(cmd)
+        stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
 
     def _restore_dump(self, dump):
@@ -36,5 +36,5 @@ class MysqlDumpConnector(BaseCommandDBConnector):
         if self.settings.get('PASSWORD'):
             cmd += ' --password={}'.format(self.settings['PASSWORD'])
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
-        stdout, stderr = self.run_command(cmd, stdin=dump)
+        stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr

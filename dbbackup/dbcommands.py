@@ -31,6 +31,7 @@ class BaseEngineSettings(object):
         self.database_port = str(self.database.get('PORT', ''))
         self.extension = self.get_extension()
         self.BACKUP_COMMANDS = self.get_backup_commands()
+        self.BACKUP_COMMANDS[0][1:1] = self.database.get('DBBACKUP_COMMAND_EXTRA_ARGS', [])
         self.MONGO_BACKUP_COMMANDS = self.get_mongo_backup_commands()
         self.MONGO_RESTORE_COMMANDS = self.get_mongo_restore_commands()
         self.RESTORE_COMMANDS = self.get_restore_commands()
@@ -231,6 +232,7 @@ class SQLiteSettings(BaseEngineSettings):
 
 class DBCommands(object):
     """ Process the Backup or Restore commands. """
+
     def __init__(self, database):
         self.database = database
         self.engine = settings.FORCE_ENGINE or self.database['ENGINE'].split('.')[-1]
@@ -340,6 +342,7 @@ class DBCommands(object):
 
 
 class MongoDBCommands(DBCommands):
+
     def __init__(self, database):
         # Initializing the temp dir for storing mongo dump
         self.mongo_temp_dir = tempfile.mkdtemp(dir=settings.TMP_DIR)

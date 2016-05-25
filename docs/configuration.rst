@@ -136,11 +136,17 @@ Database-Specific Settings
 These settings can be used to configure backup behaviour on a per-DB basis. 
 They should be specified as part of the database configuration dictionary.
 
-DBBACKUP_COMMAND_EXTRA_ARGS
+DBBACKUP_BACKUP_COMMAND_EXTRA_ARGS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A list of arguments that will be added before the normal arguments when the
 database's backup command is invoked.
+
+DBBACKUP_RESTORE_COMMAND_EXTRA_ARGS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A list of arguments that will be added before the normal arguments when the
+database's restore command is invoked.
 
 
 Database settings

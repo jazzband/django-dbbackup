@@ -3,19 +3,18 @@ import subprocess
 import logging
 from django.conf import settings
 from django.utils import six
-from django.utils.six import StringIO
 from dbbackup.storage.base import BaseStorage
 
-BASE_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt')
-ENCRYPTED_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt.gpg')
-COMPRESSED_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt.gz')
-TARED_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt.tar')
-ENCRYPTED_COMPRESSED_FILE = os.path.join(settings.BASE_DIR, 'tests/test.txt.gz.gpg')
+BASE_FILE = os.path.join(settings.BLOB_DIR, 'test.txt')
+ENCRYPTED_FILE = os.path.join(settings.BLOB_DIR, 'test.txt.gpg')
+COMPRESSED_FILE = os.path.join(settings.BLOB_DIR, 'test.txt.gz')
+TARED_FILE = os.path.join(settings.BLOB_DIR, 'test.txt.tar')
+ENCRYPTED_COMPRESSED_FILE = os.path.join(settings.BLOB_DIR, 'test.txt.gz.gpg')
 TEST_DATABASE = {'ENGINE': 'django.db.backends.sqlite3', 'NAME': '/tmp/foo.db', 'USER': 'foo', 'PASSWORD': 'bar', 'HOST': 'foo', 'PORT': 122}
 TEST_MONGODB = {'ENGINE': 'django_mongodb_engine', 'NAME': 'mongo_test', 'USER': 'foo', 'PASSWORD': 'bar', 'HOST': 'foo', 'PORT': 122}
 
-GPG_PRIVATE_PATH = os.path.join(settings.BASE_DIR, 'tests/gpg/secring.gpg')
-GPG_PUBLIC_PATH = os.path.join(settings.BASE_DIR, 'tests/gpg/pubring.gpg')
+GPG_PRIVATE_PATH = os.path.join(settings.BLOB_DIR, 'gpg/secring.gpg')
+GPG_PUBLIC_PATH = os.path.join(settings.BLOB_DIR, 'gpg/pubring.gpg')
 GPG_FINGERPRINT = '7438 8D4E 02AF C011 4E2F  1E79 F7D1 BBF0 1F63 FDE9'
 DEV_NULL = open(os.devnull, 'w')
 

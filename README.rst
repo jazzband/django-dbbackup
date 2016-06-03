@@ -69,3 +69,43 @@ We use `Travis`_ coupled with `Coveralls`_ as continious integration tools.
 
 .. image:: https://ga-beacon.appspot.com/UA-87461-7/django-dbbackup/home
         :target: https://github.com/igrigorik/ga-beacon
+
+Tests
+=====
+
+Tests are stored in :mod:`dbbackup.tests` and for run them you must launch:
+
+::
+
+    python runtests.py
+
+In fact, ``runtests.py`` acts as a ``manage.py`` file and all Django command
+are available. So you could launch:
+
+::
+
+    python runtests.py shell
+
+For get a Python shell configured with the test project. Also all test
+command options are available and usable for run only some chosen tests.
+See `Django test command documentation`_ for more informations about it.
+
+.. _`Django test command documentation`: https://docs.djangoproject.com/en/stable/topics/testing/overview/#running-tests
+
+To run the tests across all supported versions of Django and Python, you
+can use Tox.  First install Tox:
+
+::
+
+    pip install tox
+
+To run the tests just use the command ``tox`` in the command line.  If you
+want to run the tests against just one specific test environment you can run
+``tox -e <testenv>``.  For example, to run the tests with Python3.3 and
+Django1.7 you would run:
+
+::
+
+    tox -e py3.3-django1.9
+
+The available test environments can be found in ``tox.ini``.

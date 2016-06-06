@@ -130,6 +130,25 @@ Default: ``socket.gethostname()``
 when specifying the --clean flag. Defaults to keeping 10 + the first
 backup of each month.
 
+Database-Specific Settings
+==========================
+
+These settings can be used to configure backup behaviour on a per-DB basis. 
+They should be specified as part of the database configuration dictionary.
+
+DBBACKUP_BACKUP_COMMAND_EXTRA_ARGS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A list of arguments that will be added before the normal arguments when the
+database's backup command is invoked.
+
+DBBACKUP_RESTORE_COMMAND_EXTRA_ARGS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A list of arguments that will be added before the normal arguments when the
+database's restore command is invoked.
+
+
 Database settings
 =================
 

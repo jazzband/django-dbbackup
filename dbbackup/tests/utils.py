@@ -4,6 +4,7 @@ import logging
 from django.conf import settings
 from django.utils import six
 from dbbackup.storage.base import BaseStorage
+from dbbackup.db.base import get_connector
 
 BASE_FILE = os.path.join(settings.BLOB_DIR, 'test.txt')
 ENCRYPTED_FILE = os.path.join(settings.BLOB_DIR, 'test.txt.gpg')
@@ -12,6 +13,7 @@ TARED_FILE = os.path.join(settings.BLOB_DIR, 'test.txt.tar')
 ENCRYPTED_COMPRESSED_FILE = os.path.join(settings.BLOB_DIR, 'test.txt.gz.gpg')
 TEST_DATABASE = {'ENGINE': 'django.db.backends.sqlite3', 'NAME': '/tmp/foo.db', 'USER': 'foo', 'PASSWORD': 'bar', 'HOST': 'foo', 'PORT': 122}
 TEST_MONGODB = {'ENGINE': 'django_mongodb_engine', 'NAME': 'mongo_test', 'USER': 'foo', 'PASSWORD': 'bar', 'HOST': 'foo', 'PORT': 122}
+TEST_DATABASE = settings.DATABASES['default']
 
 GPG_PRIVATE_PATH = os.path.join(settings.BLOB_DIR, 'gpg/secring.gpg')
 GPG_PUBLIC_PATH = os.path.join(settings.BLOB_DIR, 'gpg/pubring.gpg')
@@ -95,3 +97,11 @@ def skip_py3(testcase, reason="Not in Python 3"):
 
 def callable_for_filename_template(datetime, **kwargs):
     return '%s_foo' % datetime
+
+
+def get_dump(database=TEST_DATABASE):
+    return get_connector().create_dump()
+
+
+def get_dump_name(database=TEST_DATABASE):
+    return get_connector().generate_filename()

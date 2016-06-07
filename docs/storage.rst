@@ -1,5 +1,5 @@
-Remote storage
-==============
+Storage
+=======
 
 django-dbbackup comes with a variety of remote storage options and it can deal
 with Django Storage API for extend its possibilities.

@@ -3,21 +3,24 @@ Tests for dbrestore command.
 """
 import os
 from mock import patch
+from tempfile import mktemp
+from shutil import copyfileobj
 
 from django.test import TestCase
 from django.core.management.base import CommandError
 from django.conf import settings
-from django.utils.six import BytesIO
 
-from dbbackup.utils import unencrypt_file, uncompress_file
-from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
-from dbbackup.dbcommands import DBCommands, MongoDBCommands
 from dbbackup import utils
-from dbbackup.tests.utils import (FakeStorage, ENCRYPTED_FILE, TEST_DATABASE,
-                                  add_private_gpg, DEV_NULL, COMPRESSED_FILE,
-                                  clean_gpg_keys, HANDLED_FILES, TEST_MONGODB, TARED_FILE)
+from dbbackup.db.base import get_connector
+from dbbackup.db.mongodb import MongoDumpConnector
+from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
+from dbbackup.tests.utils import (FakeStorage, TEST_DATABASE,
+                                  add_private_gpg, DEV_NULL,
+                                  clean_gpg_keys, HANDLED_FILES, TEST_MONGODB, TARED_FILE,
+                                  get_dump, get_dump_name)
 
 
+@patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})
 @patch('dbbackup.management.commands.dbrestore.input', return_value='y')
 @patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils.FakeStorage')
 class DbrestoreCommandRestoreBackupTest(TestCase):
@@ -29,12 +32,11 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.backup_extension = 'bak'
         self.command.filename = 'foofile'
         self.command.database = TEST_DATABASE
-        self.command.dbcommands = DBCommands(TEST_DATABASE)
         self.command.passphrase = None
         self.command.interactive = True
         self.command.storage = FakeStorage()
+        self.command.connector = get_connector()
         HANDLED_FILES.clean()
-        add_private_gpg()
 
     def tearDown(self):
         clean_gpg_keys()
@@ -42,7 +44,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
     def test_no_filename(self, *args):
         # Prepare backup
         HANDLED_FILES['written_files'].append(
-            (utils.filename_generate('foo'), BytesIO(b'bar')))
+            (utils.filename_generate('foo'), get_dump()))
         # Check
         self.command.path = None
         self.command.filename = None
@@ -55,10 +57,11 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
             self.command._restore_backup()
 
     def test_uncompress(self, *args):
-        self.command.storage.file_read = COMPRESSED_FILE
         self.command.path = None
-        self.command.filename = COMPRESSED_FILE
-        HANDLED_FILES['written_files'].append((COMPRESSED_FILE, open(COMPRESSED_FILE, 'rb')))
+        compressed_file, self.command.filename = utils.compress_file(get_dump(), get_dump_name())
+        HANDLED_FILES['written_files'].append(
+            (self.command.filename, compressed_file)
+        )
         self.command.uncompress = True
         self.command._restore_backup()
 
@@ -66,12 +69,24 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
     def test_decrypt(self, *args):
         self.command.path = None
         self.command.decrypt = True
-        self.command.filename = ENCRYPTED_FILE
-        HANDLED_FILES['written_files'].append((ENCRYPTED_FILE, open(ENCRYPTED_FILE, 'rb')))
+        encrypted_file, self.command.filename = utils.encrypt_file(get_dump(), get_dump_name())
+        HANDLED_FILES['written_files'].append(
+            (self.command.filename, encrypted_file)
+        )
         self.command._restore_backup()
 
     def test_path(self, *args):
-        self.command.path = COMPRESSED_FILE
+        temp_dump = get_dump()
+        dump_path = mktemp()
+        with open(dump_path, 'wb') as dump:
+            copyfileobj(temp_dump, dump)
+        self.command.path = dump.name
+        self.command._restore_backup()
+        self.command.decrypt = False
+        self.command.filepath = get_dump_name()
+        HANDLED_FILES['written_files'].append(
+            (self.command.filepath, get_dump())
+        )
         self.command._restore_backup()
 
 
@@ -95,7 +110,7 @@ class DbrestoreCommandGetDatabaseTest(TestCase):
 
 @patch('dbbackup.management.commands.dbrestore.input', return_value='y')
 @patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils.FakeStorage')
-@patch('dbbackup.dbcommands.DBCommands.run_commands')
+@patch('dbbackup.db.mongodb.MongoDumpConnector.restore_dump')
 class DbMongoRestoreCommandRestoreBackupTest(TestCase):
     def setUp(self):
         self.command = DbrestoreCommand()
@@ -106,10 +121,10 @@ class DbMongoRestoreCommandRestoreBackupTest(TestCase):
         self.command.path = None
         self.command.filename = 'foofile'
         self.command.database = TEST_MONGODB
-        self.command.dbcommands = MongoDBCommands(TEST_MONGODB)
         self.command.passphrase = None
         self.command.interactive = True
         self.command.storage = FakeStorage()
+        self.command.connector = MongoDumpConnector()
         HANDLED_FILES.clean()
         add_private_gpg()
 
@@ -119,35 +134,6 @@ class DbMongoRestoreCommandRestoreBackupTest(TestCase):
         HANDLED_FILES['written_files'].append((TARED_FILE, open(TARED_FILE, 'rb')))
         self.command._restore_backup()
         self.assertTrue(mock_runcommands.called)
-
-
-class DbrestoreCommandUncompressTest(TestCase):
-    def setUp(self):
-        self.command = DbrestoreCommand()
-
-    def test_uncompress(self):
-        inputfile = open(COMPRESSED_FILE, 'rb')
-        fd, basename = uncompress_file(inputfile, "whatever")
-        fd.seek(0)
-        self.assertEqual(fd.read(), b'foo\n')
-
-
-class DbrestoreCommandDecryptTest(TestCase):
-    def setUp(self):
-        self.command = DbrestoreCommand()
-        self.command.passphrase = None
-        add_private_gpg()
-
-    def tearDown(self):
-        clean_gpg_keys()
-
-    @patch('dbbackup.management.commands.dbrestore.input', return_value=None)
-    @patch('dbbackup.utils.getpass', return_value=None)
-    def test_decrypt(self, *args):
-        inputfile = open(ENCRYPTED_FILE, 'r+b')
-        uncryptfile, filename = unencrypt_file(inputfile, 'foofile.gpg')
-        uncryptfile.seek(0)
-        self.assertEqual(b'foo\n', uncryptfile.read())
 
 
 class DbbackupReadLocalFileTest(TestCase):

@@ -17,6 +17,7 @@ Contents:
 
    installation
    configuration
+   databases
    storage
    contributing
 

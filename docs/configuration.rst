@@ -83,27 +83,6 @@ DBBACKUP_MEDIA_FILENAME_TEMPLATE
 Same as ``DBBACKUP_FILENAME_TEMPLATE`` but for media files backups.
 
 
-DBBACKUP_MYSQL_EXTENSION
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-The file name extension used for MySQL backups.
-
-Default: ``'mysql'``
-
-DBBACKUP_POSTGRESQL_EXTENSION
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The file name extension used for Postgres and PostGIS backups.
-
-Default: ``'psql'``
-
-DBBACKUP_SQLITE_EXTENSION
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The file name extension used for SQLite backups.
-
-Default: ``'sqlite'``
-
 DBBACKUP_SEND_EMAIL
 ~~~~~~~~~~~~~~~~~~~
 
@@ -129,39 +108,6 @@ Default: ``socket.gethostname()``
 **DBBACKUP\_CLEANUP\_KEEP (optional)** - The number of backups to keep
 when specifying the --clean flag. Defaults to keeping 10 + the first
 backup of each month.
-
-Database settings
-=================
-
-The following databases are supported by this application. You can
-customize the commands used for backup and the resulting filenames with
-the following settings.
-
-NOTE: The {adminuser} settings below will first check for the variable
-ADMINUSER specified on the database, then fall back to USER. This allows
-you supplying a different user to perform the admin commands dropdb,
-createdb as a different user from the one django uses to connect. If you
-need more fine grain control you might consider fully customizing the
-admin commands.
-
-Postgresql
-----------
-
-DBBACKUP_POSTGRESQL_RESTORE_SINGLE_TRANSACTION
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When doing a restore with postgres, wrap everything in a single transaction
-so that errors cause a rollback.
-
-Default: ``True``
-
-DBBACKUP_POSTGIS_SPACIAL_REF
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When on Postgis, using this setting currently disables
-``CREATE EXTENSION POSTGIS;``. Ideally, it should run the good old Postgis
-templates for version 1.5 of Postgis.
-
 
 Encrypting your backups
 =======================
@@ -198,11 +144,29 @@ Requirements:
 -  Set the setting 'DBBACKUP\_GPG\_RECIPIENT' to the name of the gpg
    key.
 
-**DBBACKUP\_GPG\_ALWAYS\_TRUST (optional)** - The encryption of the
-backup file fails if gpg does not trust the public encryption key. The
-solution is to set the option 'trust-model' to 'always'. By default this
-value is False. Set this to True to enable this option.
+DBBACKUP_GPG_ALWAYS_TRUST
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**DBBACKUP\_GPG\_RECIPIENT (optional)** - The name of the key that is
-used for encryption. This setting is only used when making a backup with
-the ``--encrypt`` or ``--decrypt`` option.
+The encryption of the backup file fails if gpg does not trust the public
+encryption key. The solution is to set the option 'trust-model' to 'always'.
+By default this value is ``False``. Set this to ``True`` to enable this option.
+
+DBBACKUP_GPG_RECIPIENT
+~~~~~~~~~~~~~~~~~~~~~~
+
+The name of the key that is used for encryption. This setting is only used
+when making a backup with the ``--encrypt`` or ``--decrypt`` option.
+
+Database configuration
+======================
+
+By default, DBBackup uses parameters from ``settings.DATABASES`` but you can
+make an independant configuration, see `Database settings`_
+
+Storage configuration
+=====================
+
+You have to use a storage for your backups, see `Storage settings`_ for more.
+
+.. _`Database settings`: /databases.html
+.. _`Storage settings`: /storage.html

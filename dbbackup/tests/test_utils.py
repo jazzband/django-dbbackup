@@ -1,5 +1,6 @@
 import os
 import pytz
+import tempfile
 from mock import patch
 from datetime import datetime
 
@@ -62,7 +63,7 @@ class Email_Uncaught_ExceptionTest(TestCase):
 
 class Encrypt_FileTest(TestCase):
     def setUp(self):
-        self.path = '/tmp/foo'
+        self.path = tempfile.mktemp()
         with open(self.path, 'a') as fd:
             fd.write('foo')
         add_public_gpg()
@@ -97,7 +98,7 @@ class Unencrypt_FileTest(TestCase):
 
 class Compress_FileTest(TestCase):
     def setUp(self):
-        self.path = '/tmp/foo'
+        self.path = tempfile.mktemp()
         with open(self.path, 'a+b') as fd:
             fd.write(b'foo')
 
@@ -120,7 +121,7 @@ class Uncompress_FileTest(TestCase):
 
 class Create_Spooled_Temporary_FileTest(TestCase):
     def setUp(self):
-        self.path = '/tmp/foo'
+        self.path = tempfile.mktemp()
         with open(self.path, 'a') as fd:
             fd.write('foo')
 

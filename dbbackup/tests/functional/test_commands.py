@@ -1,7 +1,11 @@
+import os
+import tempfile
+from shutil import rmtree
 from mock import patch
 
 from django.test import TransactionTestCase as TestCase
 from django.core.management import execute_from_command_line
+from django.conf import settings
 
 from dbbackup.tests.utils import (TEST_DATABASE, HANDLED_FILES,
                                   clean_gpg_keys, add_public_gpg,
@@ -160,3 +164,75 @@ class MediaBackupCommandTest(TestCase):
     #     # Restore
     #     with self.assertRaises(Exception):
     #         execute_from_command_line(['', 'dbrestore', '--uncompress'])
+
+
+@patch('dbbackup.management.commands.mediarestore.input', return_value='y')
+class MediaRestoreCommandTest(TestCase):
+    def setUp(self):
+        HANDLED_FILES.clean()
+        add_public_gpg()
+        add_private_gpg()
+
+    def tearDown(self):
+        clean_gpg_keys()
+        self._emtpy_media()
+
+    def _create_file(self, name=None):
+        name = name or tempfile._RandomNameSequence().next()
+        path = os.path.join(settings.MEDIA_ROOT, name)
+        with open(path, 'a+b') as fd:
+            fd.write(b'foo')
+
+    def _emtpy_media(self):
+        for fi in os.listdir(settings.MEDIA_ROOT):
+            os.remove(os.path.join(settings.MEDIA_ROOT, fi))
+
+    def _is_restored(self):
+        return bool(os.listdir(settings.MEDIA_ROOT))
+
+    def test_restore(self, *args):
+        # Create backup
+        self._create_file('foo')
+        execute_from_command_line(['', 'mediabackup', '--no-compress'])
+        self._emtpy_media()
+        # Restore
+        execute_from_command_line(['', 'mediarestore'])
+        self.assertTrue(self._is_restored())
+
+    @patch('dbbackup.utils.getpass', return_value=None)
+    def test_encrypted(self, *args):
+        # Create backup
+        self._create_file('foo')
+        execute_from_command_line(['', 'mediabackup', '--no-compress', '--encrypt'])
+        self._emtpy_media()
+        # Restore
+        execute_from_command_line(['', 'mediarestore', '--decrypt'])
+        self.assertTrue(self._is_restored())
+
+    def test_compressed(self, *args):
+        # Create backup
+        self._create_file('foo')
+        execute_from_command_line(['', 'mediabackup'])
+        self._emtpy_media()
+        # Restore
+        execute_from_command_line(['', 'mediarestore', '--uncompress'])
+        self.assertTrue(self._is_restored())
+
+    def test_no_backup_available(self, *args):
+        with self.assertRaises(SystemExit):
+            execute_from_command_line(['', 'mediarestore'])
+
+    @patch('dbbackup.utils.getpass', return_value=None)
+    def test_available_but_not_encrypted(self, *args):
+        # Create backup
+        execute_from_command_line(['', 'mediabackup'])
+        # Restore
+        with self.assertRaises(SystemExit):
+            execute_from_command_line(['', 'mediarestore', '--decrypt'])
+
+    def test_available_but_not_compressed(self, *args):
+        # Create backup
+        execute_from_command_line(['', 'mediabackup', '--no-compress'])
+        # Restore
+        with self.assertRaises(SystemExit):
+            execute_from_command_line(['', 'mediarestore', '--uncompress'])

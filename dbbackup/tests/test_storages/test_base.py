@@ -42,7 +42,7 @@ class StorageListBackupsTest(TestCase):
         ]
         HANDLED_FILES['written_files'] += [
             (utils.filename_generate(ext, 'foo', None, 'media'), None) for ext in
-            ('media', 'media.gz', 'media.gpg', 'media.gz.gpg')
+            ('media.tar', 'media.tar.gz', 'media.tar.gpg', 'media.tar.gz.gpg')
         ]
         HANDLED_FILES['written_files'] += [
             ('file_without_date', None)

@@ -22,7 +22,6 @@ class Command(BaseDbBackupCommand):
         make_option("-d", "--database", help="Database to restore"),
         make_option("-i", "--input-filename", help="Specify filename to backup from"),
         make_option("-I", "--input-path", help="Specify path on local filesystem to backup from"),
-        make_option("-s", "--servername", help="Use a different servername backup"),
         make_option("-l", "--list", action='store_true', default=False, help="List backups in the backup directory"),
 
         make_option("-c", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),
@@ -74,10 +73,7 @@ class Command(BaseDbBackupCommand):
                                                                     self.passphrase)
             input_file.close()
             input_file = unencrypted_file
-        if self.uncompress:
-            uncompressed_file, input_filename = utils.uncompress_file(input_file, input_filename)
-            input_file.close()
-            input_file = uncompressed_file
+
         self.logger.info("Restore tempfile created: %s", utils.handle_size(input_file))
         if self.interactive:
             answer = input("Are you sure you want to continue? [Y/n]")

@@ -29,12 +29,12 @@ class ListbackupsCommandArgComputingTest(TestCase):
         HANDLED_FILES['written_files'] = [(f, None) for f in [
             '2015-02-06-042810_foo.db', '2015-02-06-042810_foo.db.gz',
             '2015-02-06-042810_foo.db.gpg', '2015-02-06-042810_foo.db.gz.gpg',
-            '2015-02-06-042810_foo.media', '2015-02-06-042810_foo.media.gz',
-            '2015-02-06-042810_foo.media.gpg', '2015-02-06-042810_foo.media.gz.gpg',
+            '2015-02-06-042810_foo.media.tar', '2015-02-06-042810_foo.media.tar.gz',
+            '2015-02-06-042810_foo.media.tar.gpg', '2015-02-06-042810_foo.media.tar.gz.gpg',
             '2015-02-06-042810_bar.db', '2015-02-06-042810_bar.db.gz',
             '2015-02-06-042810_bar.db.gpg', '2015-02-06-042810_bar.db.gz.gpg',
-            '2015-02-06-042810_bar.media', '2015-02-06-042810_bar.media.gz',
-            '2015-02-06-042810_bar.media.gpg', '2015-02-06-042810_bar.media.gz.gpg',
+            '2015-02-06-042810_bar.media.tar', '2015-02-06-042810_bar.media.tar.gz',
+            '2015-02-06-042810_bar.media.tar.gpg', '2015-02-06-042810_bar.media.tar.tar.gz.gpg',
         ]]
 
     def test_list(self):

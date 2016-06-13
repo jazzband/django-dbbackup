@@ -16,7 +16,7 @@ MIDDLEWARE_CLASSES = ()
 ROOT_URLCONF = 'dbbackup.tests.testapp.urls'
 SECRET_KEY = "it's a secret to everyone"
 SITE_ID = 1
-MEDIA_ROOT = tempfile.mkdtemp()
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT') or tempfile.mkdtemp()
 INSTALLED_APPS = (
     'dbbackup',
     'dbbackup.tests.testapp',

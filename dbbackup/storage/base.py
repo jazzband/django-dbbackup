@@ -107,8 +107,10 @@ class BaseStorage(object):
             files = [f for f in files if ('.gpg' in f) == encrypted]
         if compressed is not None:
             files = [f for f in files if ('.gz' in f) == compressed]
-        if content_type is not None:
-            files = [f for f in files if '%s' % content_type in f]
+        if content_type == 'media':
+            files = [f for f in files if '.tar' in f]
+        elif content_type == 'db':
+            files = [f for f in files if '.tar' not in f]
         if database is not None:
             files = [f for f in files if '%s' % database in f]
         return files

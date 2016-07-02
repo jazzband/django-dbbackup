@@ -65,7 +65,7 @@ Absolute path to the directory that will hold the files.
 
 **file_permissions_mode** - Default: ``settings.FILE_UPLOAD_PERMISSIONS``
 
-The file system permissions that the file will receive when it is saved. 
+The file system permissions that the file will receive when it is saved.
 
 
 Amazon S3
@@ -159,6 +159,78 @@ If bucket doesn't exist, it will be created with the given ACL.
 
     The default ACL is `'public-read'`, please take care of this possible
     security issue.
+
+
+
+Azure Storage
+-------------
+
+Our Azure Storage backend uses `django-azure-storage`_.
+
+.. _`django-azure-storage`: https://github.com/Rediker-Software/django-azure-storage#
+
+Setup
+~~~~~
+
+In order to backup to Azure Storage Cloud, you'll first need to create a Microsoft
+Account, setup your Azure account and create your `Storage account`. Once that is
+complete, you can follow the required setup below.
+
+::
+
+    pip install django-azure-storage
+
+Add the following to your project's settings:
+
+::
+
+    DBBACKUP_STORAGE = 'dbbackup.storage.azure_storage'
+    DBBACKUP_STORAGE_OPTIONS = {
+        'container': 'backup',
+        'account_name': 'your account name',
+        'account_key': 'your key',
+    }
+
+.. note::
+
+    The variables you will put in DBBACKUP_STORAGE_OPTIONS will override the default Azure Storage settings
+
+::
+
+
+    AZURE_STORAGE = {
+        'CONTAINER': 'static-files',
+        'ACCOUNT_NAME': 'your account name',
+        'ACCOUNT_KEY': 'your key',
+    }
+
+Available Settings
+~~~~~~~~~~~~~~~~~~
+
+**account_name** - Required
+
+Your Storage Account name as string. It's the first part of the URL (https://`your account name`.blob.core.windows.net).
+
+**secret_key** - Required
+
+Your Storage Account access key. You can find it on settings > Access Keys
+
+**container** - Required
+
+Which container your backups will be uploaded to.
+
+.. note::
+
+    You can configure the container to be private.
+
+**use_ssl** - Default: ``False``
+
+Use a HTTPS connexion to interact with Azure Blob Service
+
+.. note::
+
+    It's highly recommended to use a HTTPS connexion by `Azure Documentation`_.
+.. _`Azure Documentation`: https://msdn.microsoft.com/library/dd179355.aspx
 
 Dropbox
 -------
@@ -275,7 +347,7 @@ your ``settings.py``::
 .. _FileSystemStorage: https://docs.djangoproject.com/en/1.8/ref/files/storage/#the-filesystemstorage-class
 
 ``'dbbackup.storage.builtin_django'`` is a wrapper for use the Django storage
-defined in ``DBBACKUP_DJANGO_STORAGE`` with the options defined in 
+defined in ``DBBACKUP_DJANGO_STORAGE`` with the options defined in
 ``DBBACKUP_STORAGE_OPTIONS``.
 
 Used settings

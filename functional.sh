@@ -24,9 +24,9 @@ test_db_results () {
 }
 
 make_media_test () {
-    touch ${MEDIA_ROOT}foo
+    echo foo > ${MEDIA_ROOT}foo
     mkdir -p ${MEDIA_ROOT}bar
-    touch ${MEDIA_ROOT}bar/ham
+    echo ham > ${MEDIA_ROOT}bar/ham
 
     $PYTHON runtests.py mediabackup --no-compress
 

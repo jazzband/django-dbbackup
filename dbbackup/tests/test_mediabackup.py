@@ -3,6 +3,7 @@ Tests for mediabackup command.
 """
 from mock import patch
 from django.test import TestCase
+from django.core.files.storage import get_storage_class
 from dbbackup.management.commands.mediabackup import Command as DbbackupCommand
 from dbbackup.tests.utils import (FakeStorage, DEV_NULL, HANDLED_FILES,
                                   add_public_gpg)
@@ -17,6 +18,7 @@ class MediabackupBackupMediafilesTest(TestCase):
         self.command.stdout = DEV_NULL
         self.command.compress = False
         self.command.encrypt = False
+        self.command.media_storage = get_storage_class()()
 
     def test_func(self):
         self.command.backup_mediafiles()

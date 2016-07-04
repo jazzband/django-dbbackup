@@ -3,12 +3,12 @@ Save media files.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-import sys
+import os
 import tarfile
 from optparse import make_option
 
 from django.core.management.base import CommandError
-from django.conf import settings as dj_settings
+from django.core.files.storage import get_storage_class
 
 from ._base import BaseDbBackupCommand
 from ... import utils
@@ -39,6 +39,7 @@ class Command(BaseDbBackupCommand):
         self.compress = not options.get('no_compress')
         self.servername = options.get('servername') or settings.HOSTNAME
         try:
+            self.media_storage = get_storage_class()()
             self.storage = BaseStorage.storage_factory()
             self.backup_mediafiles()
             if options.get('clean'):
@@ -67,12 +68,27 @@ class Command(BaseDbBackupCommand):
         self.logger.info("Writing file to %s" % filename)
         self.storage.write_file(outputfile, filename)
 
+    def _explore_storage(self):
+        """Generator of a all files contained in media storage."""
+        path = ''
+        dirs = [path]
+        while dirs:
+            path = dirs.pop()
+            subdirs, files = self.media_storage.listdir(path)
+            for media_filename in files:
+                yield os.path.join(path, media_filename)
+            dirs.extend([os.path.join(path, subdir) for subdir in subdirs])
+
     def _create_tar(self, name):
+        """Create TAR file."""
         fileobj = utils.create_spooled_temporary_file()
         tar_file = tarfile.open(name=name, fileobj=fileobj, mode='w:gz') \
             if self.compress \
             else tarfile.open(name=name, fileobj=fileobj, mode='w')
-        tar_file.add(dj_settings.MEDIA_ROOT)
+        for media_filename in self._explore_storage():
+            tarinfo = tarfile.TarInfo(media_filename)
+            media_file = self.media_storage.open(media_filename)
+            tar_file.addfile(tarinfo, media_file)
         # Close the TAR for writing
         tar_file.close()
         return fileobj

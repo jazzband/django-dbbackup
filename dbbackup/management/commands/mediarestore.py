@@ -7,11 +7,10 @@ from optparse import make_option
 
 from django.core.management.base import CommandError
 from django.utils import six
-from django.conf import settings
+from django.core.files.storage import get_storage_class
 
 from ._base import BaseDbBackupCommand
 from ...storage.base import BaseStorage, StorageError
-from ...storage.filesystem_storage import Storage as FileSystemStorage
 from ... import utils
 
 input = raw_input if six.PY2 else input  # @ReservedAssignment
@@ -39,6 +38,7 @@ class Command(BaseDbBackupCommand):
         self.passphrase = options.get('passphrase')
         self.interactive = options.get('interactive')
         self.storage = BaseStorage.storage_factory()
+        self.media_storage = get_storage_class()()
         self._restore_backup()
 
     def _get_backup_file(self):
@@ -83,5 +83,12 @@ class Command(BaseDbBackupCommand):
         tar_file = tarfile.open(fileobj=input_file, mode='r:gz') \
             if self.uncompress \
             else tarfile.open(fileobj=input_file, mode='r:')
-        # tar_file.extractall(path=settings.MEDIA_ROOT)
-        tar_file.extractall(path='/')
+        # Restore file 1 by 1
+        for media_file_info in tar_file:
+            if media_file_info.path == 'media':
+                continue  # Don't copy root directory
+            media_file = tar_file.extractfile(media_file_info)
+            if media_file is None:
+                continue  # Skip directories
+            name = media_file_info.path.replace('media/', '')
+            self.media_storage.save(name, media_file)

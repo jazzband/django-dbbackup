@@ -29,14 +29,14 @@ class Command(BaseDbBackupCommand):
         make_option("-s", "--servername", help="Specify server name to include in backup filename"),
         make_option("-e", "--encrypt", help="Encrypt the backup files", action="store_true",
                     default=False),
-        make_option("-x", "--no-compress", help="Do not compress the archive", action="store_true",
+        make_option("-z", "--compress", help="Do not compress the archive", action="store_true",
                     default=False),
     )
 
     @utils.email_uncaught_exception
     def handle(self, *args, **options):
-        self.encrypt = options.get('encrypt')
-        self.compress = not options.get('no_compress')
+        self.encrypt = options.get('encrypt', False)
+        self.compress = options.get('compress', False)
         self.servername = options.get('servername') or settings.HOSTNAME
         try:
             self.media_storage = get_storage_class()()

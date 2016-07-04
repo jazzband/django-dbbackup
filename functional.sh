@@ -28,7 +28,7 @@ make_media_test () {
     mkdir -p ${MEDIA_ROOT}bar
     echo ham > ${MEDIA_ROOT}bar/ham
 
-    $PYTHON runtests.py mediabackup --no-compress
+    $PYTHON runtests.py mediabackup
 
     rm -rf ${MEDIA_ROOT}*
     $PYTHON runtests.py mediarestore --noinput

@@ -136,21 +136,21 @@ class MediaBackupCommandTest(TestCase):
         outputfile.seek(0)
         self.assertTrue(outputfile.read().startswith(b'-----BEGIN PGP MESSAGE-----'))
 
-    def test_no_compress(self):
-        argv = ['', 'mediabackup', '--no-compress']
+    def test_compress(self):
+        argv = ['', 'mediabackup', '--compress']
         execute_from_command_line(argv)
         self.assertEqual(1, len(HANDLED_FILES['written_files']))
         filename, outputfile = HANDLED_FILES['written_files'][0]
-        self.assertFalse('.gz' in filename)
+        self.assertTrue('.gz' in filename)
 
     @patch('dbbackup.utils.getpass', return_value=None)
-    def test_no_compress_and_encrypted(self, getpass_mock):
-        argv = ['', 'mediabackup', '--no-compress', '--encrypt']
+    def test_compress_and_encrypted(self, getpass_mock):
+        argv = ['', 'mediabackup', '--compress', '--encrypt']
         execute_from_command_line(argv)
         self.assertEqual(1, len(HANDLED_FILES['written_files']))
         filename, outputfile = HANDLED_FILES['written_files'][0]
         self.assertTrue('.gpg' in filename)
-        self.assertFalse('.gz' in filename)
+        self.assertTrue('.gz' in filename)
         # Test file content
         outputfile = HANDLED_FILES['written_files'][0][1]
         outputfile.seek(0)
@@ -184,7 +184,7 @@ class MediaRestoreCommandTest(TestCase):
     def test_restore(self, *args):
         # Create backup
         self._create_file('foo')
-        execute_from_command_line(['', 'mediabackup', '--no-compress'])
+        execute_from_command_line(['', 'mediabackup'])
         self._emtpy_media()
         # Restore
         execute_from_command_line(['', 'mediarestore'])
@@ -194,7 +194,7 @@ class MediaRestoreCommandTest(TestCase):
     def test_encrypted(self, *args):
         # Create backup
         self._create_file('foo')
-        execute_from_command_line(['', 'mediabackup', '--no-compress', '--encrypt'])
+        execute_from_command_line(['', 'mediabackup', '--encrypt'])
         self._emtpy_media()
         # Restore
         execute_from_command_line(['', 'mediarestore', '--decrypt'])
@@ -203,7 +203,7 @@ class MediaRestoreCommandTest(TestCase):
     def test_compressed(self, *args):
         # Create backup
         self._create_file('foo')
-        execute_from_command_line(['', 'mediabackup'])
+        execute_from_command_line(['', 'mediabackup', '--compress'])
         self._emtpy_media()
         # Restore
         execute_from_command_line(['', 'mediarestore', '--uncompress'])
@@ -223,7 +223,7 @@ class MediaRestoreCommandTest(TestCase):
 
     def test_available_but_not_compressed(self, *args):
         # Create backup
-        execute_from_command_line(['', 'mediabackup', '--no-compress'])
+        execute_from_command_line(['', 'mediabackup'])
         # Restore
         with self.assertRaises(SystemExit):
             execute_from_command_line(['', 'mediarestore', '--uncompress'])

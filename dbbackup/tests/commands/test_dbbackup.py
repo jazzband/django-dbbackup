@@ -5,12 +5,11 @@ import os
 from mock import patch
 
 from django.test import TestCase
-from django.utils import six
 
 from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
 from dbbackup.db.base import get_connector
 from dbbackup.tests.utils import (FakeStorage, TEST_DATABASE,
-                                  add_public_gpg, clean_gpg_keys, DEV_NULL, TEST_MONGODB)
+                                  add_public_gpg, clean_gpg_keys, DEV_NULL)
 
 
 @patch('dbbackup.settings.GPG_RECIPIENT', 'test@test')
@@ -73,21 +72,3 @@ class DbbackupCommandSaveNewMongoBackupTest(TestCase):
     def test_func(self, mock_run_commands, mock_handle_size):
         self.command._save_new_backup(TEST_DATABASE)
         self.assertTrue(mock_run_commands.called)
-
-
-class DbbackupWriteLocallyTest(TestCase):
-    def setUp(self):
-        self.command = DbbackupCommand()
-        self.command.database = TEST_DATABASE['NAME']
-        self.command.storage = FakeStorage()
-        self.command.stdout = DEV_NULL
-        self.command.filename = None
-        self.command.path = None
-        self.command.connector = get_connector('default')
-
-    def test_write(self):
-        fd, path = six.BytesIO(b"foo"), '/tmp/foo.bak'
-        self.command.write_local_file(fd, path)
-        self.assertTrue(os.path.exists(path))
-        # tearDown
-        os.remove(path)

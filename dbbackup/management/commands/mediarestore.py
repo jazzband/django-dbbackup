@@ -1,19 +1,15 @@
 """
 Restore media files.
 """
-import sys
 import tarfile
 from optparse import make_option
 
 from django.core.management.base import CommandError
-from django.utils import six
 from django.core.files.storage import get_storage_class
 
 from ._base import BaseDbBackupCommand
 from ...storage.base import BaseStorage, StorageError
 from ... import utils
-
-input = raw_input if six.PY2 else input  # @ReservedAssignment
 
 
 class Command(BaseDbBackupCommand):
@@ -61,6 +57,9 @@ class Command(BaseDbBackupCommand):
             input_file = self.storage.read_file(input_filename)
         return input_filename, input_file
 
+    def _upload_file(self, name, media_file):
+        self.media_storage.save(name, media_file)
+
     def _restore_backup(self):
         self.logger.info("Restoring backup for media files")
         input_filename, input_file = self._get_backup_file()
@@ -74,10 +73,7 @@ class Command(BaseDbBackupCommand):
 
         self.logger.info("Restore tempfile created: %s", utils.handle_size(input_file))
         if self.interactive:
-            answer = input("Are you sure you want to continue? [Y/n]")
-            if answer.lower().startswith('n'):
-                self.logger.info("Quitting")
-                sys.exit(0)
+            self._ask_confirmation()
 
         input_file.seek(0)
         tar_file = tarfile.open(fileobj=input_file, mode='r:gz') \
@@ -91,4 +87,4 @@ class Command(BaseDbBackupCommand):
             if media_file is None:
                 continue  # Skip directories
             name = media_file_info.path.replace('media/', '')
-            self.media_storage.save(name, media_file)
+            self._upload_file(name, media_file)

@@ -58,7 +58,7 @@ class DbBackupCommandTest(TestCase):
 
 @patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})
 @patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils')
-@patch('dbbackup.management.commands.dbrestore.input', return_value='y')
+@patch('dbbackup.management.commands._base.input', return_value='y')
 class DbRestoreCommandTest(TestCase):
     def setUp(self):
         HANDLED_FILES.clean()
@@ -144,8 +144,7 @@ class MediaBackupCommandTest(TestCase):
         self.assertFalse('.gz' in filename)
 
     @patch('dbbackup.utils.getpass', return_value=None)
-    @patch('dbbackup.management.commands.dbrestore.input', return_value='y')
-    def test_no_compress_and_encrypted(self, getpass_mock, confirm_mock):
+    def test_no_compress_and_encrypted(self, getpass_mock):
         argv = ['', 'mediabackup', '--no-compress', '--encrypt']
         execute_from_command_line(argv)
         self.assertEqual(1, len(HANDLED_FILES['written_files']))
@@ -158,7 +157,7 @@ class MediaBackupCommandTest(TestCase):
         self.assertTrue(outputfile.read().startswith(b'-----BEGIN PGP MESSAGE-----'))
 
 
-@patch('dbbackup.management.commands.mediarestore.input', return_value='y')
+@patch('dbbackup.management.commands._base.input', return_value='y')
 class MediaRestoreCommandTest(TestCase):
     def setUp(self):
         HANDLED_FILES.clean()

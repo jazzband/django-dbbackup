@@ -5,7 +5,6 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
 from optparse import make_option
-from shutil import copyfileobj
 
 from django.core.management.base import CommandError
 
@@ -90,10 +89,3 @@ class Command(BaseDbBackupCommand):
         else:
             self.logger.info("Writing file to %s", self.path)
             self.write_local_file(outputfile, self.path)
-
-    # TODO: Define chunk size
-    def write_local_file(self, outputfile, path):
-        """Write file to the desired path."""
-        outputfile.seek(0)
-        with open(path, 'wb') as fd:
-            copyfileobj(outputfile, fd)

@@ -17,9 +17,10 @@ from ...storage.base import BaseStorage, StorageError
 
 
 class Command(BaseDbBackupCommand):
-    help = """
-    Restore a backup from storage, encrypted and/or compressed.
-    """
+    help = """Restore a database backup from storage, encrypted and/or
+    compressed."""
+    content_type = 'db'
+
     option_list = BaseDbBackupCommand.option_list + (
         make_option("-d", "--database", help="Database to restore"),
         make_option("-i", "--input-filename", help="Specify filename to backup from"),
@@ -28,7 +29,7 @@ class Command(BaseDbBackupCommand):
 
         make_option("-c", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),
         make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
-        make_option("-z", "--uncompress", help="Uncompress gzip data before restoring", action='store_true'),
+        make_option("-z", "--uncompress", help="Uncompress gzip data before restoring", action='store_true', default=False),
     )
 
     def handle(self, *args, **options):
@@ -61,25 +62,6 @@ class Command(BaseDbBackupCommand):
                 raise CommandError(errmsg)
             database_key = list(settings.DATABASES.keys())[0]
         return settings.DATABASES[database_key]
-
-    def _get_backup_file(self):
-        if self.path:
-            input_filename = self.path
-            input_file = self.read_local_file(self.path)
-        else:
-            if self.filename:
-                input_filename = self.filename
-            # Fetch the latest backup if filepath not specified
-            else:
-                self.logger.info("Finding latest backup")
-                try:
-                    input_filename = self.storage.get_latest_backup(encrypted=self.decrypt,
-                                                                    compressed=self.uncompress,
-                                                                    content_type='db')
-                except StorageError as err:
-                    raise CommandError(err.args[0])
-            input_file = self.storage.read_file(input_filename)
-        return input_filename, input_file
 
     def _restore_backup(self):
         """Restore the specified database."""

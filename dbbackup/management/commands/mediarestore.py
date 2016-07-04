@@ -13,13 +13,18 @@ from ... import utils
 
 
 class Command(BaseDbBackupCommand):
+    help = """Restore a media backup from storage, encrypted and/or
+    compressed."""
+    content_type = 'media'
+
     option_list = BaseDbBackupCommand.option_list + (
         make_option("-i", "--input-filename", help="Specify filename to backup from"),
         make_option("-I", "--input-path", help="Specify path on local filesystem to backup from"),
 
-        make_option("-c", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),
+        make_option("-e", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),
         make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
         make_option("-z", "--uncompress", help="Uncompress gzip data before restoring", action='store_true'),
+        make_option("-r", "--replace", help="Replace existing files", action='store_true'),
     )
 
     def handle(self, *args, **options):
@@ -31,39 +36,27 @@ class Command(BaseDbBackupCommand):
         self.servername = options.get('servername')
         self.decrypt = options.get('decrypt')
         self.uncompress = options.get('uncompress')
+        self.replace = options.get('replace')
         self.passphrase = options.get('passphrase')
         self.interactive = options.get('interactive')
         self.storage = BaseStorage.storage_factory()
         self.media_storage = get_storage_class()()
         self._restore_backup()
 
-    def _get_backup_file(self):
-        if self.path:
-            input_filename = self.path
-            input_file = self.read_local_file(self.path)
-        else:
-            if self.filename:
-                input_filename = self.filename
-            # Fetch the latest backup if filepath not specified
-            else:
-                self.logger.info("Finding latest backup")
-                try:
-                    input_filename = self.storage.get_latest_backup(
-                        encrypted=self.decrypt,
-                        compressed=self.uncompress,
-                        content_type='media')
-                except StorageError as err:
-                    raise CommandError(err.args[0])
-            input_file = self.storage.read_file(input_filename)
-        return input_filename, input_file
-
     def _upload_file(self, name, media_file):
+        if self.media_storage.exists(name):
+            if self.replace:
+                self.media_storage.delete(name)
+                self.logger.info("%s deleted", name)
+            else:
+                return
         self.media_storage.save(name, media_file)
+        self.logger.info("%s uploaded", name)
 
     def _restore_backup(self):
         self.logger.info("Restoring backup for media files")
         input_filename, input_file = self._get_backup_file()
-        self.logger.info("Restoring: %s" % input_filename)
+        self.logger.info("Restoring: %s", input_filename)
 
         if self.decrypt:
             unencrypted_file, input_filename = utils.unencrypt_file(input_file, input_filename,
@@ -71,7 +64,7 @@ class Command(BaseDbBackupCommand):
             input_file.close()
             input_file = unencrypted_file
 
-        self.logger.info("Restore tempfile created: %s", utils.handle_size(input_file))
+        self.logger.info("Backup size: %s", utils.handle_size(input_file))
         if self.interactive:
             self._ask_confirmation()
 

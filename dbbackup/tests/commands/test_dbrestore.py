@@ -42,7 +42,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
     def test_no_filename(self, *args):
         # Prepare backup
         HANDLED_FILES['written_files'].append(
-            (utils.filename_generate('foo'), get_dump()))
+            (utils.filename_generate(TEST_DATABASE), get_dump()))
         # Check
         self.command.path = None
         self.command.filename = None

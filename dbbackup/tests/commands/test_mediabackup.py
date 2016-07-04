@@ -1,7 +1,6 @@
 """
 Tests for mediabackup command.
 """
-from mock import patch
 from django.test import TestCase
 from django.core.files.storage import get_storage_class
 from dbbackup.management.commands.mediabackup import Command as DbbackupCommand
@@ -18,6 +17,7 @@ class MediabackupBackupMediafilesTest(TestCase):
         self.command.stdout = DEV_NULL
         self.command.compress = False
         self.command.encrypt = False
+        self.command.path = None
         self.command.media_storage = get_storage_class()()
 
     def test_func(self):
@@ -48,35 +48,3 @@ class MediabackupBackupMediafilesTest(TestCase):
         outputfile = HANDLED_FILES['written_files'][0][1]
         outputfile.seek(0)
         self.assertTrue(outputfile.read().startswith(b'-----BEGIN PGP MESSAGE-----'))
-
-
-class MediabackupGetBackupFileListTest(TestCase):
-    def setUp(self):
-        self.skipTest("Doesn't work!")
-        self.command = DbbackupCommand()
-        self.command.servername = 'foo-server'
-        self.command.storage = FakeStorage()
-
-    def test_func(self):
-        self.command.get_backup_file_list()
-
-
-class MediabackupCleanUpOldBackupsTest(TestCase):
-    def setUp(self):
-        HANDLED_FILES.clean()
-        self.command = DbbackupCommand()
-        self.command.stdout = DEV_NULL
-        self.command.encrypt = False
-        self.command.compress = False
-        self.command.servername = 'foo-server'
-        self.command.storage = FakeStorage()
-        HANDLED_FILES['written_files'] = [(f, None) for f in [
-            '2015-02-06-042810.bak',
-            '2015-02-07-042810.bak',
-            '2015-02-08-042810.bak',
-        ]]
-
-    @patch('dbbackup.settings.CLEANUP_KEEP_MEDIA', 1)
-    def test_func(self):
-        self.command._cleanup_old_backups()
-        self.assertEqual(2, len(HANDLED_FILES['deleted_files']))

@@ -6,6 +6,7 @@ from mock import patch
 from django.test import TestCase
 from django.utils import six
 from dbbackup.management.commands._base import BaseDbBackupCommand
+from dbbackup.tests.utils import (FakeStorage, DEV_NULL, HANDLED_FILES)
 
 
 class BaseDbBackupCommandSetLoggerLevelTest(TestCase):
@@ -26,6 +27,22 @@ class BaseDbBackupCommandSetLoggerLevelTest(TestCase):
         self.command.quiet = True
         self.command._set_logger_level()
         self.assertGreater(self.command.logger.level, 50)
+
+
+class BaseDbBackupCommandMethodsTest(TestCase):
+    def setUp(self):
+        HANDLED_FILES.clean()
+        self.command = BaseDbBackupCommand()
+        self.command.storage = FakeStorage()
+
+    def test_read_from_storage(self):
+        HANDLED_FILES['written_files'].append(['foo', six.BytesIO(b'bar')])
+        file_ = self.command.read_from_storage('foo')
+        self.assertEqual(file_.read(), b'bar')
+
+    def test_write_to_storage(self):
+        self.command.write_to_storage(six.BytesIO(b'foo'), 'bar')
+        self.assertEqual(HANDLED_FILES['written_files'][0][0], 'bar')
 
     def test_read_local_file(self):
         # setUp
@@ -63,3 +80,37 @@ class BaseDbBackupCommandSetLoggerLevelTest(TestCase):
         with patch('dbbackup.management.commands._base.input', return_value='No'):
             with self.assertRaises(SystemExit):
                 self.command._ask_confirmation()
+
+
+class BaseDbBackupCommandCleanupOldBackupsTest(TestCase):
+    def setUp(self):
+        HANDLED_FILES.clean()
+        self.command = BaseDbBackupCommand()
+        self.command.stdout = DEV_NULL
+        self.command.encrypt = False
+        self.command.compress = False
+        self.command.servername = 'foo-server'
+        self.command.storage = FakeStorage()
+        HANDLED_FILES['written_files'] = [(f, None) for f in [
+            '2015-02-06-042810.tar',
+            '2015-02-07-042810.tar',
+            '2015-02-08-042810.tar',
+            'foodb-2015-02-06-042810.dump',
+            'foodb-2015-02-07-042810.dump',
+            'foodb-2015-02-08-042810.dump',
+        ]]
+
+    @patch('dbbackup.settings.CLEANUP_KEEP', 1)
+    def test_clean_db(self):
+        self.command.content_type = 'db'
+        self.command.database = 'foodb'
+        self.command._cleanup_old_backups()
+        self.assertEqual(2, len(HANDLED_FILES['deleted_files']))
+        self.assertNotIn('foodb-2015-02-08-042810.dump', HANDLED_FILES['deleted_files'])
+
+    @patch('dbbackup.settings.CLEANUP_KEEP_MEDIA', 1)
+    def test_clean_media(self):
+        self.command.content_type = 'media'
+        self.command._cleanup_old_backups()
+        self.assertEqual(2, len(HANDLED_FILES['deleted_files']))
+        self.assertNotIn('2015-02-08-042810.tar', HANDLED_FILES['deleted_files'])

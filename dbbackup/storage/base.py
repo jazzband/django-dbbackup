@@ -200,7 +200,7 @@ class BaseStorage(object):
         """
         if keep_number is None:
             keep_number = settings.CLEANUP_KEEP if content_type == 'db' \
-                else settings.MEDIA_FILENAME_TEMPLATE
+                else settings.CLEANUP_KEEP_MEDIA
         files = self.list_backups(encrypted=encrypted, compressed=compressed,
                                   content_type=content_type, database=database)
         files = sorted(files, key=utils.filename_to_date, reverse=True)

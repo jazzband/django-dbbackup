@@ -103,5 +103,6 @@ def get_dump(database=TEST_DATABASE):
     return get_connector().create_dump()
 
 
-def get_dump_name(database=TEST_DATABASE):
+def get_dump_name(database=None):
+    database = database or TEST_DATABASE
     return get_connector().generate_filename()

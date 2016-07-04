@@ -80,7 +80,7 @@ class Command(BaseDbBackupCommand):
             outputfile = encrypted_file
         filename = self.filename if self.filename else filename
         if not self.quiet:
-            self.logger.info("Backup tempfile created: %s", utils.handle_size(outputfile))
+            self.logger.info("Backup size: %s", utils.handle_size(outputfile))
         # Store backup
         if self.path is None:
             self.logger.info("Writing file to %s: %s, filename: %s",

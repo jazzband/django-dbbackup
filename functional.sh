@@ -28,7 +28,7 @@ make_media_test () {
     mkdir -p ${MEDIA_ROOT}bar
     touch ${MEDIA_ROOT}bar/ham
 
-    $PYTHON runtests.py mediabackup
+    $PYTHON runtests.py mediabackup --no-compress
 
     rm -rf ${MEDIA_ROOT}*
     $PYTHON runtests.py mediarestore --noinput

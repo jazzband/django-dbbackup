@@ -1,6 +1,5 @@
 import os
 import tempfile
-from shutil import rmtree
 from mock import patch
 
 from django.test import TransactionTestCase as TestCase
@@ -157,13 +156,6 @@ class MediaBackupCommandTest(TestCase):
         outputfile = HANDLED_FILES['written_files'][0][1]
         outputfile.seek(0)
         self.assertTrue(outputfile.read().startswith(b'-----BEGIN PGP MESSAGE-----'))
-
-    # def test_available_but_not_compressed(self, *args):
-    #     # Create backup
-    #     execute_from_command_line(['', 'dbbackup'])
-    #     # Restore
-    #     with self.assertRaises(Exception):
-    #         execute_from_command_line(['', 'dbrestore', '--uncompress'])
 
 
 @patch('dbbackup.management.commands.mediarestore.input', return_value='y')

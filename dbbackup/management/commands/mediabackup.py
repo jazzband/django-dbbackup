@@ -3,18 +3,17 @@ Save media files.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-import os
 import sys
 import tarfile
-import tempfile
 from optparse import make_option
 
 from django.core.management.base import CommandError
+from django.conf import settings as dj_settings
 
 from ._base import BaseDbBackupCommand
 from ... import utils
 from ...storage.base import BaseStorage, StorageError
-from ... import settings as settings
+from ... import settings
 
 
 class Command(BaseDbBackupCommand):
@@ -41,67 +40,42 @@ class Command(BaseDbBackupCommand):
         self.servername = options.get('servername') or settings.HOSTNAME
         try:
             self.storage = BaseStorage.storage_factory()
-            self.backup_mediafiles(self.encrypt, self.compress)
+            self.backup_mediafiles()
             if options.get('clean'):
                 self._cleanup_old_backups()
 
         except StorageError as err:
             raise CommandError(err)
 
-    def backup_mediafiles(self, encrypt, compress):
+    def backup_mediafiles(self):
         """
         Create backup file and write it to storage.
-
-        :param encrypt: Encrypt file or not
-        :type encrypt: ``bool``
-
-        :param compress: Compress file or not
-        :type compress: ``bool``
         """
-        # TODO: Remove MEDIA_PATH and list Media Storage
-        source_dir = settings.MEDIA_PATH
-        if not source_dir:
-            self.stderr.write("No media source dir configured.")
-            sys.exit(1)
-        self.logger.info("Backing up media files in %s", source_dir)
-        filename = self.get_backup_basename(compress=compress)
-        output_file = self.create_tmp_backup_file(source_dir, filename,
-                                              compress=compress)
-        if encrypt:
-            encrypted_file = utils.encrypt_file(output_file, filename)
-            output_file, filename = encrypted_file
-        self.logger.debug("Backup tempfile created: %s (%s)", filename,
-                          utils.handle_size(output_file))
-        self.logger.info("Writing file to %s: %s", self.storage.name, self.storage.backup_dir)
-        self.storage.write_file(output_file, filename)
+        # Create file name
+        extension = "tar%s" % ('.gz' if self.compress else '')
+        filename = utils.filename_generate(extension,
+                                           servername=self.servername,
+                                           content_type=self.content_type)
 
-    def get_backup_basename(self, **kwargs):
-        extension = "tar%s" % ('.gz' if kwargs.get('compress') else '')
-        return utils.filename_generate(extension,
-                                       servername=self.servername,
-                                       content_type=self.content_type)
+        outputfile = self._create_tar(filename)
 
-    def create_tmp_backup_file(self, source_dir, backup_basename, **kwargs):
-        backup_basename = backup_basename.replace("/", "_")
-        temp_dir = tempfile.mkdtemp(dir=settings.TMP_DIR)
-        try:
-            backup_filename = os.path.join(temp_dir, backup_basename)
-            try:
-                tar_file = tarfile.open(backup_filename, 'w|gz') \
-                    if kwargs.get('compress') \
-                    else tarfile.open(backup_filename, 'w')
+        if self.encrypt:
+            encrypted_file = utils.encrypt_file(outputfile, filename)
+            outputfile, filename = encrypted_file
 
-                try:
-                    tar_file.add(source_dir)
-                finally:
-                    tar_file.close()
+        self.logger.debug("Backup size: %s", utils.handle_size(outputfile))
+        self.logger.info("Writing file to %s" % filename)
+        self.storage.write_file(outputfile, filename)
 
-                return utils.create_spooled_temporary_file(backup_filename)
-            finally:
-                if os.path.exists(backup_filename):
-                    os.remove(backup_filename)
-        finally:
-            os.rmdir(temp_dir)
+    def _create_tar(self, name):
+        fileobj = utils.create_spooled_temporary_file()
+        tar_file = tarfile.open(name=name, fileobj=fileobj, mode='w:gz') \
+            if self.compress \
+            else tarfile.open(name=name, fileobj=fileobj, mode='w')
+        tar_file.add(dj_settings.MEDIA_ROOT)
+        # Close the TAR for writing
+        tar_file.close()
+        return fileobj
 
     def _cleanup_old_backups(self):
         """

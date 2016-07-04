@@ -19,10 +19,8 @@ input = raw_input if six.PY2 else input  # @ReservedAssignment
 
 class Command(BaseDbBackupCommand):
     option_list = BaseDbBackupCommand.option_list + (
-        make_option("-d", "--database", help="Database to restore"),
         make_option("-i", "--input-filename", help="Specify filename to backup from"),
         make_option("-I", "--input-path", help="Specify path on local filesystem to backup from"),
-        make_option("-l", "--list", action='store_true', default=False, help="List backups in the backup directory"),
 
         make_option("-c", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),
         make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
@@ -80,10 +78,10 @@ class Command(BaseDbBackupCommand):
             if answer.lower().startswith('n'):
                 self.logger.info("Quitting")
                 sys.exit(0)
-        input_file.seek(0)
 
-        tar_file = tarfile.open(fileobj=input_file, mode='r|gz') \
+        input_file.seek(0)
+        tar_file = tarfile.open(fileobj=input_file, mode='r:gz') \
             if self.uncompress \
-            else tarfile.open(fileobj=input_file, mode='r')
+            else tarfile.open(fileobj=input_file, mode='r:')
         # tar_file.extractall(path=settings.MEDIA_ROOT)
         tar_file.extractall(path='/')

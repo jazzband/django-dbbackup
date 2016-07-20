@@ -19,27 +19,21 @@ Contents:
    configuration
    databases
    storage
+   commands
    contributing
-
-.. warning::
-   django-dbbackup is currently under heavy refactoring, stay tuned for
-   new versions and a final 2.0 release.
 
 Compatibility
 -------------
 
-Django Database Backup supports PyPy, Python 2.7, 3.2 to 3.4 and Django greater than
-1.6.
+As we want to ensure a lot of platforms will be able to save data before
+upgrading, Django-DBBackup supports PyPy, Python 2.7, 3.2 to 3.4 and Django
+greater than 1.6.
    
 Management Commands
 -------------------
 
 dbbackup
 ~~~~~~~~
-Backup your database to the specified storage. By default this
-will backup all databases specified in your settings.py file and will not
-delete any old backups. You can optionally specify a server name to be included
-in the backup filename.
 
 ::
 

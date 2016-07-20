@@ -1,0 +1,26 @@
+Integration tutorials
+=====================
+
+Django-cron
+-----------
+
+Example of cron job with `django-cron`_ ::
+  from django.core import management
+  from django_cron import CronJobBase
+
+
+  class Backup(CronJobBase):
+      RUN_AT_TIMES = ['6:00', '18:00']
+      schedule = Schedule(run_at_times=RUN_AT_TIMES)
+      code = 'my_app.Backup'
+  
+      def __init__(self):
+      directory = settings.DBBACKUP_STORAGE_OPTIONS['location']
+      if not os.path.exists(directory):
+          os.makedirs(directory)
+  
+      def do(self):
+      management.call_command('dbbackup')
+      management.call_command('mediabackup')
+
+.. _`django-cron`: https://github.com/Tivix/django-cron

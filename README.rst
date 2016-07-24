@@ -102,7 +102,7 @@ can use Tox.  First install Tox:
 To run the tests just use the command ``tox`` in the command line.  If you
 want to run the tests against just one specific test environment you can run
 ``tox -e <testenv>``.  For example, to run the tests with Python3.3 and
-Django1.7 you would run:
+Django1.9 you would run:
 
 ::
 

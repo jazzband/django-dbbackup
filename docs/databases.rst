@@ -155,6 +155,12 @@ Path to ``psql`` command used for administration tasks like enable PostGIS
 for example, default is ``psql``.
 
 
+PASSWORD
+~~~~~~~~
+
+If you fill this settings ``PGPASSWORD`` environment variable will be used
+with every commands. For security reason, we advise to use ``.pgpass`` file.
+
 ADMIN_USER
 ~~~~~~~~~~
 

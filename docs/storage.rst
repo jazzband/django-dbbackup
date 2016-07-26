@@ -192,10 +192,17 @@ Setup Your Django Project
 ::
 
     DBBACKUP_STORAGE = 'dbbackup.storage.dropbox_storage'
+
+
+    Then this:
+
     DBBACKUP_TOKENS_FILEPATH = '<local_tokens_filepath>'
     DBBACKUP_DROPBOX_APP_KEY = '<dropbox_app_key>'
     DBBACKUP_DROPBOX_APP_SECRET = '<dropbox_app_secret>'
 
+
+    Or:
+    DROPBOX_ACCESS_TOKEN = **************
 
 FTP
 ---

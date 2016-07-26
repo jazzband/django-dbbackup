@@ -25,6 +25,7 @@ RETRY_COUNT = 2
 class Storage(BaseStorage):
     """ Dropbox API Storage. """
     name = 'Dropbox'
+    DROPBOX_ACCESS_TOKEN = getattr(settings, 'DROPBOX_ACCESS_TOKEN', None)
     TOKENS_FILEPATH = getattr(settings, 'DBBACKUP_TOKENS_FILEPATH', None)
     DROPBOX_DIRECTORY = getattr(settings, 'DBBACKUP_DROPBOX_DIRECTORY', '').strip('/')
     DBBACKUP_DROPBOX_APP_KEY = getattr(settings, 'DBBACKUP_DROPBOX_APP_KEY', None)
@@ -39,12 +40,16 @@ class Storage(BaseStorage):
 
     def _check_settings(self):
         """ Check we have all the required settings defined. """
-        if not self.TOKENS_FILEPATH:
-            raise StorageError('Dropbox storage requires DBBACKUP_TOKENS_FILEPATH to be defined in settings.')
-        if not self.DBBACKUP_DROPBOX_APP_KEY:
-            raise StorageError('%s storage requires DBBACKUP_DROPBOX_APP_KEY to be defined in settings.' % self.name)
-        if not self.DBBACKUP_DROPBOX_APP_SECRET:
-            raise StorageError('%s storage requires DBBACKUP_DROPBOX_APP_SECRET to be specified.' % self.name)
+        if not self.DROPBOX_ACCESS_TOKEN:
+            if not self.TOKENS_FILEPATH:
+                raise StorageError('Dropbox storage requires DBBACKUP_TOKENS_FILEPATH to be defined in settings.')
+            if not self.DBBACKUP_DROPBOX_APP_KEY:
+                raise StorageError('%s storage requires DBBACKUP_DROPBOX_APP_KEY to be defined in settings.' % self.name)
+            if not self.DBBACKUP_DROPBOX_APP_SECRET:
+                raise StorageError('%s storage requires DBBACKUP_DROPBOX_APP_SECRET to be specified.' % self.name)
+        else:
+            if not self.DROPBOX_ACCESS_TOKEN:
+                raise StorageError('%s storage requires DROPBOX_ACCESS_TOKEN to be defined in settings.' % self.name)
 
     ###################################
     #  DBBackup Storage Attributes
@@ -158,10 +163,13 @@ class Storage(BaseStorage):
 
     def get_dropbox_client(self):
         """ Connect and return a Dropbox client object. """
-        self.read_token_file()
-        flow = dropbox.client.DropboxOAuth2FlowNoRedirect(self.DBBACKUP_DROPBOX_APP_KEY,
+        if not self.DROPBOX_ACCESS_TOKEN:
+            self.read_token_file()
+            flow = dropbox.client.DropboxOAuth2FlowNoRedirect(self.DBBACKUP_DROPBOX_APP_KEY,
             self.DBBACKUP_DROPBOX_APP_SECRET)
-        access_token = self.get_access_token(flow)
+            access_token = self.get_access_token(flow)
+        else:
+            access_token = self.DROPBOX_ACCESS_TOKEN
         client = dropbox.client.DropboxClient(access_token)
         return client
 

@@ -225,6 +225,7 @@ use the below project settings:
     DBBACKUP_FTP_USER = 'user, blank if anonymous'
     DBBACKUP_FTP_PASSWORD = 'password, can be blank'
     DBBACKUP_FTP_PATH = 'path, blank for default'
+    DBBACKUP_FTP_PASSIVE_MODE = True
 
 Available Settings
 ~~~~~~~~~~~~~~~~~~
@@ -244,6 +245,10 @@ Authentication password, do not use if there's no password.
 **DBBACKUP\_FTP\_PATH** - Default: ``'.'``
 
 The directory on remote FTP server you wish to save your backups.
+
+**DBBACKUP\_FTP\_PASSIVE\_MODE** - Default: ``False``
+
+FTP client connection mode.
 
 .. note::
 

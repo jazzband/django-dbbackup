@@ -3,13 +3,14 @@ from django.test import TestCase
 from django.core.management import execute_from_command_line
 from django.utils.six import StringIO
 from dbbackup.management.commands.listbackups import Command as ListbackupsCommand
-from dbbackup.tests.utils import HANDLED_FILES, FakeStorage, TEST_DATABASE
+from dbbackup.storage import get_storage
+from dbbackup.tests.utils import HANDLED_FILES
 
 
 class ListbackupsCommandTest(TestCase):
     def setUp(self):
         self.command = ListbackupsCommand()
-        self.command.storage = FakeStorage()
+        self.command.storage = get_storage()
         HANDLED_FILES['written_files'] = [(f, None) for f in [
             '2015-02-06-042810.bak',
             '2015-02-07-042810.bak',
@@ -22,19 +23,17 @@ class ListbackupsCommandTest(TestCase):
         self.assertEqual(len(HANDLED_FILES['written_files']), len(attrs))
 
 
-@patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})
-@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils')
 class ListbackupsCommandArgComputingTest(TestCase):
     def setUp(self):
         HANDLED_FILES['written_files'] = [(f, None) for f in [
             '2015-02-06-042810_foo.db', '2015-02-06-042810_foo.db.gz',
             '2015-02-06-042810_foo.db.gpg', '2015-02-06-042810_foo.db.gz.gpg',
-            '2015-02-06-042810_foo.media.tar', '2015-02-06-042810_foo.media.tar.gz',
-            '2015-02-06-042810_foo.media.tar.gpg', '2015-02-06-042810_foo.media.tar.gz.gpg',
+            '2015-02-06-042810_foo.tar', '2015-02-06-042810_foo.tar.gz',
+            '2015-02-06-042810_foo.tar.gpg', '2015-02-06-042810_foo.tar.gz.gpg',
             '2015-02-06-042810_bar.db', '2015-02-06-042810_bar.db.gz',
             '2015-02-06-042810_bar.db.gpg', '2015-02-06-042810_bar.db.gz.gpg',
-            '2015-02-06-042810_bar.media.tar', '2015-02-06-042810_bar.media.tar.gz',
-            '2015-02-06-042810_bar.media.tar.gpg', '2015-02-06-042810_bar.media.tar.tar.gz.gpg',
+            '2015-02-06-042810_bar.tar', '2015-02-06-042810_bar.tar.gz',
+            '2015-02-06-042810_bar.tar.gpg', '2015-02-06-042810_bar.tar.gz.gpg',
         ]]
 
     def test_list(self):
@@ -92,4 +91,4 @@ class ListbackupsCommandArgComputingTest(TestCase):
         stdout.seek(0)
         stdout.readline()
         for line in stdout.readlines():
-            self.assertIn('.media', line)
+            self.assertIn('.tar', line)

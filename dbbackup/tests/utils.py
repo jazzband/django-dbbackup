@@ -1,9 +1,8 @@
 import os
 import subprocess
-import logging
 from django.conf import settings
-from django.utils import six
-from dbbackup.storage.base import BaseStorage
+from django.utils import six, timezone
+from django.core.files.storage import Storage
 from dbbackup.db.base import get_connector
 
 BASE_FILE = os.path.join(settings.BLOB_DIR, 'test.txt')
@@ -37,29 +36,37 @@ class handled_files(dict):
 HANDLED_FILES = handled_files()
 
 
-class FakeStorage(BaseStorage):
+class FakeStorage(Storage):
     name = 'FakeStorage'
-    logger = logging.getLogger('dbbackup.storage')
 
-    def __init__(self, *args, **kwargs):
-        super(FakeStorage, self).__init__(*args, **kwargs)
-        self.deleted_files = []
-        self.written_files = []
+    def exists(self, name):
+        return name in HANDLED_FILES['written_files']
 
-    def delete_file(self, filepath):
-        self.logger.debug("Delete %s", filepath)
-        HANDLED_FILES['deleted_files'].append(filepath)
-        self.deleted_files.append(filepath)
+    def get_available_name(self, name, max_length=None):
+        return name[:max_length]
 
-    def list_directory(self, raw=False):
-        return [f[0] for f in HANDLED_FILES['written_files']]
+    def get_valid_name(self, name):
+        return name
 
-    def write_file(self, filehandle, filename):
-        self.logger.debug("Write %s", filename)
-        HANDLED_FILES['written_files'].append((filename, filehandle))
+    def listdir(self, path):
+        return ([], [f[0] for f in HANDLED_FILES['written_files']])
 
-    def read_file(self, filepath):
-        return [f[1] for f in HANDLED_FILES['written_files'] if f[0] == filepath][0]
+    def accessed_time(self, name):
+        return timezone.now()
+    created_time = modified_time = accessed_time
+
+    def _open(self, name, mode='rb'):
+        file_ = [f[1] for f in HANDLED_FILES['written_files']
+                 if f[0] == name][0]
+        file_.seek(0)
+        return file_
+
+    def _save(self, name, content):
+        HANDLED_FILES['written_files'].append((name, content))
+        return name
+
+    def delete(self, name):
+        HANDLED_FILES['deleted_files'].append(name)
 
 Storage = FakeStorage
 

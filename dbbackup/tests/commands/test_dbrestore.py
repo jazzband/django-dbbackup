@@ -13,13 +13,12 @@ from dbbackup import utils
 from dbbackup.db.base import get_connector
 from dbbackup.db.mongodb import MongoDumpConnector
 from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
-from dbbackup.tests.utils import (FakeStorage, TEST_DATABASE,
-                                  add_private_gpg, DEV_NULL,
+from dbbackup.storage import get_storage
+from dbbackup.tests.utils import (TEST_DATABASE, add_private_gpg, DEV_NULL,
                                   clean_gpg_keys, HANDLED_FILES, TEST_MONGODB, TARED_FILE,
                                   get_dump, get_dump_name)
 
 
-@patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})
 @patch('dbbackup.management.commands._base.input', return_value='y')
 class DbrestoreCommandRestoreBackupTest(TestCase):
     def setUp(self):
@@ -32,7 +31,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.database = TEST_DATABASE
         self.command.passphrase = None
         self.command.interactive = True
-        self.command.storage = FakeStorage()
+        self.command.storage = get_storage()
         self.command.connector = get_connector()
         HANDLED_FILES.clean()
 
@@ -120,7 +119,7 @@ class DbMongoRestoreCommandRestoreBackupTest(TestCase):
         self.command.database = TEST_MONGODB
         self.command.passphrase = None
         self.command.interactive = True
-        self.command.storage = FakeStorage()
+        self.command.storage = get_storage()
         self.command.connector = MongoDumpConnector()
         HANDLED_FILES.clean()
         add_private_gpg()

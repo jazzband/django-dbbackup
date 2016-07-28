@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division,
 from optparse import make_option
 from ... import utils
 from ._base import BaseDbBackupCommand
-from ...storage.base import BaseStorage, StorageError
+from ...storage import get_storage
 
 ROW_TEMPLATE = '{name:40} {datetime:20}'
 FILTER_KEYS = ('encrypted', 'compressed', 'content_type', 'database')
@@ -28,7 +28,7 @@ class Command(BaseDbBackupCommand):
 
     def handle(self, **options):
         self.quiet = options.get('quiet')
-        self.storage = BaseStorage.storage_factory()
+        self.storage = get_storage()
         files_attr = self.get_backup_attrs(options)
         if not self.quiet:
             title = ROW_TEMPLATE.format(name='Name', datetime='Datetime')

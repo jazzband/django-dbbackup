@@ -13,7 +13,7 @@ from django.db import connection
 from ._base import BaseDbBackupCommand
 from ... import utils
 from ...db.base import get_connector
-from ...storage.base import BaseStorage, StorageError
+from ...storage import get_storage, StorageError
 
 
 class Command(BaseDbBackupCommand):
@@ -47,7 +47,7 @@ class Command(BaseDbBackupCommand):
             self.passphrase = options.get('passphrase')
             self.interactive = options.get('interactive')
             self.database = self._get_database(options)
-            self.storage = BaseStorage.storage_factory()
+            self.storage = get_storage()
             self._restore_backup()
         except StorageError as err:
             raise CommandError(err)

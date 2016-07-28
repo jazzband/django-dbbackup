@@ -12,7 +12,8 @@ from django.core.files.storage import get_storage_class
 
 from ._base import BaseDbBackupCommand
 from ... import utils
-from ...storage.base import BaseStorage, StorageError
+from ...storage import get_storage, StorageError
+from ... import settings
 
 
 class Command(BaseDbBackupCommand):
@@ -43,7 +44,7 @@ class Command(BaseDbBackupCommand):
         self.path = options.get('output_path')
         try:
             self.media_storage = get_storage_class()()
-            self.storage = BaseStorage.storage_factory()
+            self.storage = get_storage()
             self.backup_mediafiles()
             if options.get('clean'):
                 self._cleanup_old_backups()

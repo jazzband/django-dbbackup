@@ -14,8 +14,6 @@ from dbbackup.tests.utils import (TEST_DATABASE, HANDLED_FILES,
 from dbbackup.tests.testapp import models
 
 
-@patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})
-@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils')
 class DbBackupCommandTest(TestCase):
     def setUp(self):
         HANDLED_FILES.clean()
@@ -56,8 +54,6 @@ class DbBackupCommandTest(TestCase):
         self.assertTrue(outputfile.read().startswith(b'-----BEGIN PGP MESSAGE-----'))
 
 
-@patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})
-@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils')
 @patch('dbbackup.management.commands._base.input', return_value='y')
 class DbRestoreCommandTest(TestCase):
     def setUp(self):
@@ -116,7 +112,6 @@ class DbRestoreCommandTest(TestCase):
             execute_from_command_line(['', 'dbrestore', '--uncompress'])
 
 
-@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils')
 class MediaBackupCommandTest(TestCase):
     def setUp(self):
         HANDLED_FILES.clean()

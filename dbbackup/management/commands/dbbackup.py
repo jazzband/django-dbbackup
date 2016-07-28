@@ -10,7 +10,7 @@ from django.core.management.base import CommandError
 
 from ._base import BaseDbBackupCommand
 from ...db.base import get_connector
-from ...storage.base import BaseStorage, StorageError
+from ...storage import get_storage, StorageError
 from ... import utils, settings as dbbackup_settings
 
 
@@ -48,7 +48,7 @@ class Command(BaseDbBackupCommand):
         self.encrypt = options.get('encrypt')
         self.filename = options.get('output_filename')
         self.path = options.get('output_path')
-        self.storage = BaseStorage.storage_factory()
+        self.storage = get_storage()
         database_keys = (self.database,) if self.database else dbbackup_settings.DATABASES
         for database_key in database_keys:
             self.connector = get_connector(database_key)
@@ -78,6 +78,7 @@ class Command(BaseDbBackupCommand):
         if not self.quiet:
             self.logger.info("Backup size: %s", utils.handle_size(outputfile))
         # Store backup
+        outputfile.seek(0)
         if self.path is None:
             self.write_to_storage(outputfile, filename)
         else:

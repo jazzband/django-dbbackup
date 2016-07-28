@@ -49,9 +49,9 @@ main () {
         export DATABASE_URL="sqlite:///$DATABASE_FILE"
     fi
     export PYTHON=${PYTHON:-python}
-    export STORAGE="dbbackup.storage.filesystem_storage"
+    export STORAGE="${STORAGE:-django.core.files.storage.FileSystemStorage}"
     export STORAGE_LOCATION="/tmp/backups/"
-    export STORAGE_OPTIONS="location=${STORAGE_LOCATION}"
+    export STORAGE_OPTIONS="${STORAGE_OPTIONS:-location=$STORAGE_LOCATION}"
     export MEDIA_ROOT="/tmp/media/"
 
     make_db_test 

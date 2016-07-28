@@ -18,34 +18,32 @@ is a dictionary of keywords representing how to configure it.
     Do not configure backup storage with the same configuration than your media
     files, you'll risk to share backups inside public directories.
 
-FileSystemStorage
------------------
+DBBackup uses by default the `built-in file system storage`_ to manage files on
+a local directory. Feel free to use any Django storage, you can find a variety
+of them at `Django Packages`_.
 
-Django has a built-in filesystem storage helping to deal with local file.
-Dbbackup uses `built-in file system storage`_ to manage files on a local
-directory.
-
-.. _`built-in file system storage`: https://docs.djangoproject.com/en/stable/ref/files/storage/#the-filesystemstorage-class
+.. _`built-in file system storage`: https://docs.djangoproject.com/en/1.8/ref/files/storage/#the-filesystemstorage-class
+.. _`Django Packages`: https://djangopackages.org/grids/g/storage-backends/
 
 .. note::
 
     Storing backups to local disk may also be useful for Dropbox if you
     already have the offical Dropbox client installed on your system.
 
+File system storage
+-------------------
+
 Setup
 ~~~~~
 
-To store your backups on the local file system, simply setup the
-required settings below.
-
-::
+To store your backups on the local file system, simply setup the required
+settings below. ::
 
     DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
     DBBACKUP_STORAGE_OPTIONS = {'location': '/my/backup/dir/'}
 
 
-
-Available Settings
+Available settings
 ~~~~~~~~~~~~~~~~~~
 
 **location** 
@@ -64,11 +62,14 @@ The file system permissions that the file will receive when it is saved.
 
 The file system permissions that the directory will receive when it is saved.
 
+See `FileSystemStorage's documentation`_ for a full list of available settings.
+
+.. _`FileSystemStorage's documentation`: https://docs.djangoproject.com/en/1.9/ref/files/storage/#the-filesystemstorage-class
 
 Amazon S3
 ---------
 
-We advise to use Django-Storages S3 storage which uses `boto`_.
+Our S3 backend uses Django Storages which uses `boto`_.
 
 .. _`boto`: http://docs.pythonboto.org/en/latest/#
 
@@ -77,17 +78,13 @@ Setup
 
 In order to backup to Amazon S3, you'll first need to create an Amazon
 Webservices Account and setup your Amazon S3 bucket. Once that is
-complete, you can follow the required setup below.
-
-::
+complete, you can follow the required setup below. ::
 
     pip install boto django-storages
 
-Add the following to your project's settings:
+Add the following to your project's settings: ::
 
-::
-
-    DBBACKUP_STORAGE = 'storages.storages.backends.s3boto.S3BotoStorageFile'
+    DBBACKUP_STORAGE = 'storages.backends.s3boto.S3BotoStorageFile'
     DBBACKUP_STORAGE_OPTIONS = {
         'access_key': 'my_id',
         'secret_key': 'my_secret',
@@ -129,21 +126,20 @@ For example, this can be set to ``'s3-eu-west-1.amazonaws.com'``.
 
 **default_acl** - Required
 
-If bucket doesn't exist, it will be created with the given ACL.
+See `Django Storage S3 storage official documentation`_ for more informations
+about available settings.
 
-.. warning::
+.. _`Django Storage S3 storage official documentation`: http://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
 
-    The default ACL is `'public-read'`, please take care of this possible
-    security issue.
 
 Dropbox
 -------
 
-In order to backup to Dropbox, you'll first need to create a Dropbox
-Account and set it up to communicate with the Django-DBBackup
-application. Don't worry, all instructions are below.
+In order to backup to Dropbox, you'll first need to create a Dropbox account
+and set it up to communicate with the Django-DBBackup application. Don't
+worry, all instructions are below.
 
-Setup Your Dropbox Account
+Setup your Dropbox account
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Login to Dropbox and navigate to Developers » MyApps.
@@ -156,16 +152,15 @@ Setup Your Dropbox Account
    importantly the 'App Key' and 'App Secret' values inside. You'll need
    those later.
 
-Setup
-~~~~~
+Setup your Django project
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
     pip install dropbox django-storages
 
-...And make sure you have the following required project settings:
+...And make sure you have the following required project settings: ::
 
-::
 
     DBBACKUP_STORAGE = 'storages.backends.dropbox.DropBoxStorage
     DBBACKUP_STORAGE_OPTIONS = {
@@ -188,7 +183,6 @@ Your OAuth access token
 **root_path**
 
 Jail storage to this directory
-
 
 FTP
 ---
@@ -226,6 +220,18 @@ A FTP URI with optional user, password and port. example: ``'ftp://anonymous@myf
 
 URL that serves with HTTP(S) the files stored at this location.
 
+Setup
+~~~~~
+
+We use FTP backend from Django-Storages (again). ::
+
+    pip install django-storages
+
+Here a simple configuration: ::
+
+    DBBACKUP_STORAGE = 'storages.backends.ftp.FTPStorage'
+    DBBACKUP_STORAGE_OPTIONS = {'location': ftp://myftpserver>/}
+
 SFTP
 ----
 
@@ -234,6 +240,23 @@ setup the required settings below.
 
 Setup
 ~~~~~
+
+This backend is from Django-Storages with `paramiko`_ under. ::
+
+    pip install paramiko django-storages
+
+.. _`paramiko`: http://www.paramiko.org/ 
+
+The next configuration admit SSH server grant a the local user: ::
+
+    DBBACKUP_STORAGE = 'storages.backends.sftpstorage.SFTPStorage'
+    DBBACKUP_STORAGE_OPTIONS = {'host': 'myserver'}
+
+
+.. _`paramiko SSHClient.connect() documentation`: http://docs.paramiko.org/en/latest/api/client.html#paramiko.client.SSHClient.connect
+
+Available settings
+~~~~~~~~~~~~~~~~~~
 
 **host** - Required
 
@@ -247,8 +270,6 @@ Jail storage to this directory
 
 Arugment used by meth:`paramikor.SSHClient.connect()`.
 See `paramiko SSHClient.connect() documentation`_ for details.
-
-.. _`paramiko SSHClient.connect() documentation`: http://docs.paramiko.org/en/latest/api/client.html#paramiko.client.SSHClient.connect
 
 **interactive** - Default ``False``
 

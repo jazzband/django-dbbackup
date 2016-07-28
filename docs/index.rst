@@ -4,11 +4,22 @@ Django Database Backup
 ======================
 
 This Django application provides management commands to help backup and
-restore your project database to AmazonS3, Dropbox or Local Disk.
+restore your project database and media files with various storages such as
+Amazon S3, DropBox or local file system.
 
--  Keep your important data secure and offsite.
+It is made for:
+
+-  Ensure yours backup with GPG signature and encryption
+-  Archive with compression
 -  Use Crontab or Celery to setup automated backups.
 -  Great to keep your development database up to date.
+
+.. warning::
+
+    Django DBBackup version 3 make great changements see
+    `Upgrade documentation` to help to up to date.
+
+.. _`Upgrade documentation`: upgrade 
 
 Contents:
 
@@ -21,6 +32,7 @@ Contents:
    storage
    commands
    contributing
+   upgrade
 
 Compatibility
 -------------

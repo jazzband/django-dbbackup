@@ -8,10 +8,34 @@ The following settings are now useless, you can remove them:
 - ``DBBACKUP_FORCE_ENGINE``
 - ``DBBACKUP_READ_FILE``
 - ``DBBACKUP_WRITE_FILE``
-- ``DBBACKUP_BACKUP_DIRECTORY``
+- ``DBBACKUP_BACKUP_DIRECTORY``: Was used by Filesystem storage, use
+  ``location`` parameter
+- ``DBBACKUP_SQLITE_BACKUP_COMMANDS``: Was used by SQLite database, use
+  ``CONNECTORS``'s parameters.
+- ``DBBACKUP_SQLITE_RESTORE_COMMANDS``: Same than ``SQLITE_BACKUP_COMMANDS``
+- ``DBBACKUP_MYSQL_BACKUP_COMMANDS``: Same than ``SQLITE_BACKUP_COMMANDS`` but
+  for MySQL
+- ``DBBACKUP_MYSQL_RESTORE_COMMANDS``: Same than ``MYSQL_BACKUP_COMMANDS``
+- ``DBBACKUP_POSTGRESQL_BACKUP_COMMANDS`` Same than ``MYSQL_BACKUP_COMMANDS``
+  but for PostgreSQL
+- ``DBBACKUP_POSTGRESQL_RESTORE_COMMANDS``: Same than
+  ``DBBACKUP_POSTGRESQL_BACKUP_COMMANDS``: Was used for activate PostGIS, use
+  ``PgDumpGisConnector`` connector for enable this option
+- ``DBBACKUP_POSTGRESQL_RESTORE_SINGLE_TRANSACTION``: Must be set in
+  ``CONNTECTORS['dbname']['single_transaction']``
+- ``DBBACKUP_BUILTIN_STORAGE``
 
 Commands
 ========
+
+dbrestore
+---------
+
+``--backup-extension`` has been removed, DBBackup should automaticaly
+know your the appropriate file.
+
+Listing from this command, ``--list``, has been removed in favor of
+``listbackups`` command.
 
 mediabackup
 -----------
@@ -44,6 +68,9 @@ SQLite
 Previously backup was made by copy the database file, now you have the choice
 between make a raw snaphot or make a real SQL dump. It can be useful.
 
+If you want to restore your old backups choose
+``dbbackup.db.sqlite.SqliteCPConnector``.
+
 Media backup and restore
 ========================
 
@@ -53,4 +80,13 @@ be able to restore old backup files.
 Storage engine
 ==============
 
+All storage engines has been removed from DBBackup except the basic. Now this
+object will use Django storages as driver.
 
+``settings.DBBACKUP_STORAGE`` must now be a full path to a Django storage, for
+example ``'django.core.files.storage.FileSystemStorage'``.
+``settings.DBBACKUP_STORAGE_OPTIONS`` hold its function of gather storage's
+options.
+
+If you was using the removed storage backend, don't worry, we ensure you'll
+have a solution, test and write tests for equivalent in Django-Storages.

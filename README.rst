@@ -11,17 +11,22 @@ Django Database Backup
 .. image:: https://coveralls.io/repos/django-dbbackup/django-dbbackup/badge.svg?branch=master&service=github
         :target: https://coveralls.io/github/django-dbbackup/django-dbbackup?branch=master
 
+.. image:: https://landscape.io/github/django-dbbackup/django-dbbackup/master/landscape.svg?style=flat
+        :target: https://landscape.io/github/django-dbbackup/django-dbbackup/master
+        :alt: Code Health
+
 
 This Django application provides management commands to help backup and
 restore your project database and media files with various storages such as
-Amazon S3, DropBox or local file storage.
+Amazon S3, DropBox, local file storage or any Django storage.
 
 It is made for:
 
--  Ensure yours backup with GPG signature and encryption
--  Archive with compression
--  Use Crontab or Celery to setup automated backups.
--  Great to keep your development database up to date.
+- Ensure yours backup with GPG signature and encryption
+- Archive with compression
+- Deal easily with remote archiving
+- Great to keep your development database up to date.
+- Use Crontab or Celery to setup automated backups.
 
 Docs
 ====
@@ -34,22 +39,100 @@ Management Commands
 
 dbbackup
 --------
-Backup your database to the specified storage. By default this will backup all databases specified in your settings.py file and will not delete any old backups. You can optionally specify a server name to be included in the backup filename.
 
-    dbbackup [-s <servername>] [-d <database>] [--clean] [--compress] [--encrypt] [--backup-extension <file-extension>]
+Backup your database to the specified storage. By default this will backup all
+databases specified in your settings.py file and will not delete any old
+backups. You can optionally specify a server name to be included in the backup
+filename. ::
+
+  Usage: ./manage.py dbbackup [options]
+  
+  Options:
+    --noinput             Tells Django to NOT prompt the user for input of any
+                          kind.
+    -q, --quiet           Tells Django to NOT output other text than errors.
+    -c, --clean           Clean up old backup files
+    -d DATABASE, --database=DATABASE
+                          Database to backup (default: everything)
+    -s SERVERNAME, --servername=SERVERNAME
+                          Specify server name to include in backup filename
+    -z, --compress        Compress the backup files
+    -e, --encrypt         Encrypt the backup files
+    -o OUTPUT_FILENAME, --output-filename=OUTPUT_FILENAME
+                          Specify filename on storage
+    -O OUTPUT_PATH, --output-path=OUTPUT_PATH
+                          Specify where to store on local filesystem
 
 dbrestore
 ---------
-Restore your database from the specified storage. By default this will lookup the latest backup and restore from that. You may optionally specify a servername if you you want to backup a database image that was created from a different server. You may also specify an explicit local file to backup from.
 
-    dbrestore [-d <database>] [-s <servername>] [-f <localfile>] [--uncompress] [--backup-extension <file-extension>]
+Restore your database from the specified storage. By default this will lookup
+the latest backup and restore from that. You may optionally specify a
+servername if you you want to backup a database image that was created from a
+different server. You may also specify an explicit local file to backup from.
+
+::
+
+  Usage: ./manage.py dbrestore [options]
+  
+  Options:
+    --noinput             Tells Django to NOT prompt the user for input of any
+                          kind.
+    -d DATABASE, --database=DATABASE
+                          Database to restore
+    -i INPUT_FILENAME, --input-filename=INPUT_FILENAME
+                          Specify filename to backup from
+    -I INPUT_PATH, --input-path=INPUT_PATH
+                          Specify path on local filesystem to backup from
+    -s SERVERNAME, --servername=SERVERNAME
+                          Use a different servername backup
+    -c, --decrypt         Decrypt data before restoring
+    -p PASSPHRASE, --passphrase=PASSPHRASE
+                          Passphrase for decrypt file
+    -z, --uncompress      Uncompress gzip data before restoring
+
 
 mediabackup
 -----------
-Backup media files. Default this will backup the files in the MEDIA_ROOT. Optionally you can set the DBBACKUP_MEDIA_PATH setting.
 
-   mediabackup [--encrypt] [--clean] [--servername <servername>]
+Backup media files by get them one by one, include in a TAR file. ::
 
+  Usage: ./manage.py mediabackup [options]
+  
+  Options:
+    --noinput             Tells Django to NOT prompt the user for input of any
+                          kind.
+    -q, --quiet           Tells Django to NOT output other text than errors.
+    -c, --clean           Clean up old backup files
+    -s SERVERNAME, --servername=SERVERNAME
+                          Specify server name to include in backup filename
+    -z, --compress        Do not compress the archive
+    -e, --encrypt         Encrypt the backup files
+    -o OUTPUT_FILENAME, --output-filename=OUTPUT_FILENAME
+                          Specify filename on storage
+    -O OUTPUT_PATH, --output-path=OUTPUT_PATH
+                          Specify where to store on local filesystem
+
+mediarestore
+------------
+
+Restore media files ftom storage backup to your media storage. ::
+
+  Usage: ./manage.py mediarestore [options]
+  
+  Options:
+    --noinput             Tells Django to NOT prompt the user for input of any
+                          kind.
+    -q, --quiet           Tells Django to NOT output other text than errors.
+    -i INPUT_FILENAME, --input-filename=INPUT_FILENAME
+                          Specify filename to backup from
+    -I INPUT_PATH, --input-path=INPUT_PATH
+                          Specify path on local filesystem to backup from
+    -e, --decrypt         Decrypt data before restoring
+    -p PASSPHRASE, --passphrase=PASSPHRASE
+                          Passphrase for decrypt file
+    -z, --uncompress      Uncompress gzip data before restoring
+    -r, --replace         Replace existing files
 
 Contributing
 ============
@@ -73,7 +156,7 @@ We use `Travis`_ coupled with `Coveralls`_ as continious integration tools.
 Tests
 =====
 
-Tests are stored in :mod:`dbbackup.tests` and for run them you must launch:
+Tests are stored in `dbbackup.tests` and for run them you must launch:
 
 ::
 
@@ -92,8 +175,14 @@ See `Django test command documentation`_ for more informations about it.
 
 .. _`Django test command documentation`: https://docs.djangoproject.com/en/stable/topics/testing/overview/#running-tests
 
+There are even functional tests: ::
+
+    ./functional.sh
+
+See documentation for details about
+
 To run the tests across all supported versions of Django and Python, you
-can use Tox.  First install Tox:
+can use Tox. Firstly install Tox:
 
 ::
 

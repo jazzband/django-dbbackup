@@ -7,6 +7,7 @@ from shutil import copyfileobj
 
 from django.test import TestCase
 from django.core.management.base import CommandError
+from django.core.files import File
 from django.conf import settings
 
 from dbbackup import utils
@@ -41,7 +42,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
     def test_no_filename(self, *args):
         # Prepare backup
         HANDLED_FILES['written_files'].append(
-            (utils.filename_generate(TEST_DATABASE), get_dump()))
+            (utils.filename_generate(TEST_DATABASE), File(get_dump())))
         # Check
         self.command.path = None
         self.command.filename = None
@@ -57,7 +58,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.path = None
         compressed_file, self.command.filename = utils.compress_file(get_dump(), get_dump_name())
         HANDLED_FILES['written_files'].append(
-            (self.command.filename, compressed_file)
+            (self.command.filename, File(compressed_file))
         )
         self.command.uncompress = True
         self.command._restore_backup()
@@ -68,7 +69,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.decrypt = True
         encrypted_file, self.command.filename = utils.encrypt_file(get_dump(), get_dump_name())
         HANDLED_FILES['written_files'].append(
-            (self.command.filename, encrypted_file)
+            (self.command.filename, File(encrypted_file))
         )
         self.command._restore_backup()
 

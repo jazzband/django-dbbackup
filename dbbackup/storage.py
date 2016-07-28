@@ -79,7 +79,10 @@ class Storage(object):
 
     def read_file(self, filepath):
         self.logger.debug('Reading file %s', filepath)
-        return self.storage.open(name=filepath, mode='rb')
+        file_ = self.storage.open(name=filepath, mode='rb')
+        if file_.name is None:
+            file_.name = filepath
+        return file_
 
     def list_backups(self, encrypted=None, compressed=None, content_type=None,
                      database=None):

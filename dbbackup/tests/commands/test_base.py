@@ -5,8 +5,10 @@ import os
 from mock import patch
 from django.test import TestCase
 from django.utils import six
+from django.core.files import File
 from dbbackup.management.commands._base import BaseDbBackupCommand
-from dbbackup.tests.utils import (FakeStorage, DEV_NULL, HANDLED_FILES)
+from dbbackup.storage import get_storage
+from dbbackup.tests.utils import DEV_NULL, HANDLED_FILES
 
 
 class BaseDbBackupCommandSetLoggerLevelTest(TestCase):
@@ -33,10 +35,10 @@ class BaseDbBackupCommandMethodsTest(TestCase):
     def setUp(self):
         HANDLED_FILES.clean()
         self.command = BaseDbBackupCommand()
-        self.command.storage = FakeStorage()
+        self.command.storage = get_storage()
 
     def test_read_from_storage(self):
-        HANDLED_FILES['written_files'].append(['foo', six.BytesIO(b'bar')])
+        HANDLED_FILES['written_files'].append(['foo', File(six.BytesIO(b'bar'))])
         file_ = self.command.read_from_storage('foo')
         self.assertEqual(file_.read(), b'bar')
 
@@ -54,7 +56,7 @@ class BaseDbBackupCommandMethodsTest(TestCase):
         os.remove(self.command.path)
 
     def test_write_local_file(self):
-        fd, path = six.BytesIO(b"foo"), '/tmp/foo.bak'
+        fd, path = File(six.BytesIO(b"foo")), '/tmp/foo.bak'
         self.command.write_local_file(fd, path)
         self.assertTrue(os.path.exists(path))
         # tearDown
@@ -90,7 +92,7 @@ class BaseDbBackupCommandCleanupOldBackupsTest(TestCase):
         self.command.encrypt = False
         self.command.compress = False
         self.command.servername = 'foo-server'
-        self.command.storage = FakeStorage()
+        self.command.storage = get_storage()
         HANDLED_FILES['written_files'] = [(f, None) for f in [
             '2015-02-06-042810.tar',
             '2015-02-07-042810.tar',

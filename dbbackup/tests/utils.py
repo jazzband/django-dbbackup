@@ -2,6 +2,7 @@ import os
 import subprocess
 from django.conf import settings
 from django.utils import six, timezone
+from django.core.files import File
 from django.core.files.storage import Storage
 from dbbackup.db.base import get_connector
 
@@ -62,13 +63,11 @@ class FakeStorage(Storage):
         return file_
 
     def _save(self, name, content):
-        HANDLED_FILES['written_files'].append((name, content))
+        HANDLED_FILES['written_files'].append((name, File(content)))
         return name
 
     def delete(self, name):
         HANDLED_FILES['deleted_files'].append(name)
-
-Storage = FakeStorage
 
 
 def clean_gpg_keys():

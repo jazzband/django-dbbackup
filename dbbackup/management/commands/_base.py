@@ -9,7 +9,7 @@ from shutil import copyfileobj
 from django.core.management.base import BaseCommand, LabelCommand, CommandError
 from django.utils import six
 
-from ...storage.base import StorageError
+from ...storage import StorageError
 
 input = raw_input if six.PY2 else input  # @ReservedAssignment
 
@@ -43,9 +43,7 @@ class BaseDbBackupCommand(LabelCommand):
         return self.storage.read_file(path)
 
     def write_to_storage(self, file, path):
-        self.logger.info("Writing file to %s: %s, filename: %s",
-                         self.storage.name, self.storage.backup_dir,
-                         path)
+        self.logger.info("Writing file to %s", path)
         self.storage.write_file(file, path)
 
     def read_local_file(self, path):
@@ -88,8 +86,8 @@ class BaseDbBackupCommand(LabelCommand):
         DBBACKUP_CLEANUP_KEEP and any backups that occur on first of the month.
         """
         # database = self.database if self.content_type == 'db' else None
-        file_list = self.storage.clean_old_backups(encrypted=self.encrypt,
-                                                   compressed=self.compress,
-                                                   content_type=self.content_type)
-                                                   # TODO: Make better filter
-                                                   # database=database)
+        self.storage.clean_old_backups(encrypted=self.encrypt,
+                                       compressed=self.compress,
+                                       content_type=self.content_type)
+                                       # TODO: Make better filter
+                                       # database=database)

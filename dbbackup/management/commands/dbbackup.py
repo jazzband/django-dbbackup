@@ -4,11 +4,9 @@ Command for backup database.
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
-from optparse import make_option
-
 from django.core.management.base import CommandError
 
-from ._base import BaseDbBackupCommand
+from ._base import BaseDbBackupCommand, make_option
 from ...db.base import get_connector
 from ...storage import get_storage, StorageError
 from ... import utils, settings as dbbackup_settings

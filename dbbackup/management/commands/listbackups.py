@@ -3,9 +3,8 @@ List backups.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-from optparse import make_option
 from ... import utils
-from ._base import BaseDbBackupCommand
+from ._base import BaseDbBackupCommand, make_option
 from ...storage import get_storage
 
 ROW_TEMPLATE = '{name:40} {datetime:20}'
@@ -13,7 +12,7 @@ FILTER_KEYS = ('encrypted', 'compressed', 'content_type', 'database')
 
 
 class Command(BaseDbBackupCommand):
-    option_list = BaseDbBackupCommand.option_list + (
+    option_list = (
         make_option("-d", "--database", help="Filter by database name"),
         make_option("-z", "--compressed", help="Exclude non-compressed", action="store_true",
                     default=None, dest="compressed"),

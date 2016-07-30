@@ -18,7 +18,8 @@ build:
 	python setup.py build
 
 docs:
-	cd docs && make html
+	cd docs/ && make clean
+	cd docs/ && make html
 
 upload:
 	make clean

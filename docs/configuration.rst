@@ -88,11 +88,6 @@ django-dbbackup can not send email to the ``SERVER_EMAIL``.
 
 Default: ``socket.gethostname()``
 
-.. note::
-
-    Previously ``DBBACKUP_FAKE_HOST`` was used for this setting.
-
-
 Encrypting your backups
 =======================
 

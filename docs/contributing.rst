@@ -30,19 +30,79 @@ of requests we advise you to:
 #. If succeed, open a pull request
 #. Upset us until we give you an answer
 
+.. note::
+
+    We advise you to launch it with Python 2 & 3 before push and try it in
+    Travis. DBBackup uses a lot of file operations, so breaks between Python
+    versions are easy.
+
 .. _`GitHub pull requests`: https://github.com/django-dbbackup/django-dbbackup/pulls
 
-Test code
-~~~~~~~~~
+Test environment
+----------------
 
-You can test your code in local machine with the ``runtests.py`` script:
+We provides tools for helps developers to quickly test and dev on DBBackup.
+There are 2 majors scripts:
 
-::
+* ``runtests.py``: Unit tests launcher and equivalent of ``manage.py`` in
+  the test project.
+* ``functional.sh``: Shell script that use ``runtests.py`` to create a
+  database backup and restore it, the same with media, and test if they are
+  restored.
 
-    cd tests
+
+``runtests.py``
+~~~~~~~~~~~~~~~
+
+You can test code in local machine with the ``runtests.py`` script: ::
+
     python runtests.py
 
-We advise you to launch it with Python 2 & 3 before push and try it in Travis.
+But if argument are provided, it acts as ``manage.py`` so you can simply
+launch other command to test deeply, example: ::
+
+    # Enter in Python shell
+    python runtests.py shell
+
+    # Launch a particular test module
+    python runtests.py test dbbackup.tests.test_utils
+
+All tests are stored in ``dbbackup.tests``.
+
+
+``functional.sh``
+~~~~~~~~~~~~~~~~~
+
+It tests at the higher level if backup/restore mechanism is alright. It
+becomes powerful because of the configuration you can give to it. See the next
+chapter for explanation about it.
+
+Configuration
+~~~~~~~~~~~~~
+
+DBBackup contains a test Django project at ``dbbackup.tests`` and its
+``settings`` module. This configuration takes care of the following
+environment variables:
+
+**DATABASE_URL** - Default: ``'sqlite:///%s' % tempfile.mktemp()``
+
+A URL representing the used database, see `DJ-Database-URL`_ for all the
+available format.
+
+.. _`DJ-Database-URL`: https://github.com/kennethreitz/dj-database-url
+
+**MEDIA_ROOT** - Default= ``tempfile.mkdtemp()``
+
+Django's ``MEDIA_ROOT``, useful if you want test media backup from filesystem
+
+**STORAGE** - Default: ``dbbackup.tests.utils.FakeStorage``
+
+Storage used for backups
+
+**STORAGE_OPTIONS**
+
+Options for instanciate the chosen storage. It must be in format
+``"key1=foo,key2=bar"`` and will be convert into a ``dict``.
 
 Online CI
 ---------
@@ -57,5 +117,12 @@ Code coverage is ensured with `Coveralls`_ and has not yet minimum coverage limi
 .. image:: https://coveralls.io/repos/django-dbbackup/django-dbbackup/badge.svg?branch=master&service=github
         :target: https://coveralls.io/github/django-dbbackup/django-dbbackup?branch=master
 
+Code health is checked with `Landscape`_
+
+.. image:: https://landscape.io/github/django-dbbackup/django-dbbackup/master/landscape.svg?style=flat
+        :target: https://landscape.io/github/django-dbbackup/django-dbbackup/master
+        :alt: Code Health
+
 .. _Travis: https://travis-ci.org/django-dbbackup/django-dbbackup
 .. _Coveralls: https://coveralls.io/github/django-dbbackup/django-dbbackup
+.. _`Landscape`: https://landscape.io/github/django-dbbackup/django-dbbackup/

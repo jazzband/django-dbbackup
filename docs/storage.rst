@@ -116,7 +116,8 @@ Your Amazon Web Services secret access key, as a string.
 Your Amazon Web Services storage bucket name, as a string. This directory must
 exist before attempting to create your first backup.
 
-**host** - Default: ``'s3.amazonaws.com'`` (``boto.s3.connection.S3Connection.DefaultHost``)
+**host** - Default: ``'s3.amazonaws.com'``
+(``boto.s3.connection.S3Connection.DefaultHost``)
 
 Specify the Amazon domain to use when transferring the generated backup files.
 For example, this can be set to ``'s3-eu-west-1.amazonaws.com'``.
@@ -230,7 +231,7 @@ We use FTP backend from Django-Storages (again). ::
 Here a simple configuration: ::
 
     DBBACKUP_STORAGE = 'storages.backends.ftp.FTPStorage'
-    DBBACKUP_STORAGE_OPTIONS = {'location': ftp://myftpserver>/}
+    DBBACKUP_STORAGE_OPTIONS = {'location': ftp://myftpserver/}
 
 SFTP
 ----

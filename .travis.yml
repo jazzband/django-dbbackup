@@ -59,6 +59,18 @@ matrix:
         - DATABASE_URL=sqlite:////tmp/db.sqlite tox -e functional
         - DATABASE_URL=mysql://travis:@localhost/test tox -e functional
         - DATABASE_URL=postgres://postgres:@localhost/test tox -e functional
+    - python: "3.4"
+      env: TOX_ENV=upgrade
+      install:
+        - pip install tox
+        - export PYTHON='coverage run -a'
+      before_install: 
+        - mysql -e 'CREATE DATABASE test;'
+        - psql -c 'CREATE DATABASE test;' -U postgres
+      script:
+        - DATABASE_URL=sqlite:////tmp/db.sqlite tox -e upgrade
+        - DATABASE_URL=mysql://travis:@localhost/test tox -e upgrade
+        - DATABASE_URL=postgres://postgres:@localhost/test tox -e upgrade
   exclude:
     - python: "3.5"
       env: DJANGO=1.6

@@ -2,6 +2,7 @@
 Utility functions for dbbackup.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import sys
 import os
 import tempfile
@@ -11,11 +12,13 @@ from getpass import getpass
 from shutil import copyfileobj
 from functools import wraps
 from datetime import datetime
+
 from django.core.mail import EmailMessage
 from django.db import connection
 from django.http import HttpRequest
 from django.views.debug import ExceptionReporter
 from django.utils import six, timezone
+
 from . import settings
 
 input = raw_input if six.PY2 else input  # noqa
@@ -112,6 +115,31 @@ def email_uncaught_exception(func):
     return wrapper
 
 
+def create_spooled_temporary_file(filepath=None, fileobj=None):
+    """
+    Create a spooled temporary file. if ``filepath`` or ``fileobj`` is
+    defined its content will be copied into temporary file.
+
+    :param filepath: Path of input file
+    :type filepath: str
+
+    :param fileobj: Input file object
+    :type fileobj: file
+
+    :returns: Spooled temporary file
+    :rtype: :class:`tempfile.SpooledTemporaryFile`
+    """
+    spooled_file = tempfile.SpooledTemporaryFile(
+        max_size=settings.TMP_FILE_MAX_SIZE,
+        dir=settings.TMP_DIR)
+    if filepath:
+        fileobj = open(filepath, 'r+b')
+    if fileobj is not None:
+        fileobj.seek(0)
+        copyfileobj(fileobj, spooled_file, settings.TMP_FILE_READ_SIZE)
+    return spooled_file
+
+
 def encrypt_file(inputfile, filename):
     """
     Encrypt input file using GPG and remove .gpg extension to its name.
@@ -183,13 +211,7 @@ def unencrypt_file(inputfile, filename, passphrase=None):
                                     output=temp_filename)
             if not result:
                 raise DecryptionError('Decryption failed; status: %s' % result.status)
-            outputfile = tempfile.SpooledTemporaryFile(
-                max_size=settings.TMP_FILE_MAX_SIZE, dir=settings.TMP_DIR)
-            f = open(temp_filename, 'r+b')
-            try:
-                outputfile.write(f.read())
-            finally:
-                f.close()
+            outputfile = create_spooled_temporary_file(temp_filename)
         finally:
             if os.path.exists(temp_filename):
                 os.remove(temp_filename)
@@ -211,11 +233,9 @@ def compress_file(inputfile, filename):
     :returns: Tuple with compressed file and new file's name
     :rtype: :class:`tempfile.SpooledTemporaryFile`, ``str``
     """
-    outputfile = tempfile.SpooledTemporaryFile(
-        max_size=settings.TMP_FILE_MAX_SIZE, dir=settings.TMP_DIR)
+    outputfile = create_spooled_temporary_file()
     new_filename = filename + '.gz'
     zipfile = gzip.GzipFile(filename=filename, fileobj=outputfile, mode="wb")
-    # TODO: Why do we have an exception block without handling exceptions?
     try:
         inputfile.seek(0)
         copyfileobj(inputfile, zipfile, settings.TMP_FILE_READ_SIZE)
@@ -237,40 +257,13 @@ def uncompress_file(inputfile, filename):
     :returns: Tuple with file and new file's name
     :rtype: :class:`tempfile.SpooledTemporaryFile`, ``str``
     """
-    outputfile = tempfile.SpooledTemporaryFile(
-        max_size=settings.TMP_FILE_MAX_SIZE, dir=settings.TMP_DIR)
     zipfile = gzip.GzipFile(fileobj=inputfile, mode="rb")
     try:
-        inputfile.seek(0)
-        outputfile.write(zipfile.read())
+        outputfile = create_spooled_temporary_file(fileobj=zipfile)
     finally:
         zipfile.close()
     new_basename = os.path.basename(filename).replace('.gz', '')
     return outputfile, new_basename
-
-
-def create_spooled_temporary_file(filepath=None, fileobj=None):
-    """
-    Create a spooled temporary file. if ``filepath`` or ``fileobj`` is
-    defined its content will be copied into temporary file.
-
-    :param filepath: Path of input file
-    :type filepath: str
-
-    :param fileobj: Input file object
-    :type fileobj: file
-
-    :returns: Spooled temporary file
-    :rtype: :class:`tempfile.SpooledTemporaryFile`
-    """
-    spooled_file = tempfile.SpooledTemporaryFile(
-        max_size=settings.TMP_FILE_MAX_SIZE,
-        dir=settings.TMP_DIR)
-    if filepath:
-        fileobj = open(filepath, 'r+b')
-    if fileobj is not None:
-        copyfileobj(fileobj, spooled_file, settings.TMP_FILE_READ_SIZE)
-    return spooled_file
 
 
 def timestamp(value):

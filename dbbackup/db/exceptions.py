@@ -1,3 +1,4 @@
+"""Exceptions for database connectors."""
 class ConnectorError(Exception):
     """Base connector error"""
 

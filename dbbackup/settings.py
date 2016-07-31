@@ -1,9 +1,7 @@
 # DO NOT IMPORT THIS BEFORE django.configure() has been run!
 
-import os
 import tempfile
 import socket
-import warnings
 from django.conf import settings
 
 DATABASES = getattr(settings, 'DBBACKUP_DATABASES', list(settings.DATABASES.keys()))
@@ -44,14 +42,3 @@ import dbbackup.log
 LOGGING = getattr(settings, 'DBBACKUP_LOGGING', dbbackup.log.DEFAULT_LOGGING)
 LOG_CONFIGURATOR = log_config.DictConfigurator(LOGGING)
 LOG_CONFIGURATOR.configure()
-
-
-# Deprecation
-if hasattr(settings, 'DBBACKUP_BACKUP_DIRECTORY'):  # pragma: no cover
-    BACKUP_DIRECTORY = STORAGE_OPTIONS['location'] = \
-        getattr(settings, 'DBBACKUP_BACKUP_DIRECTORY', os.getcwd())
-    warnings.warn("DBBACKUP_BACKUP_DIRECTORY is deprecated, use DBBACKUP_STORAGE_OPTIONS['location']", DeprecationWarning)
-
-if hasattr(settings, 'DBBACKUP_FAKE_HOST'):  # pragma: no cover
-    warnings.warn("DBBACKUP_FAKE_HOST is deprecated, use DBBACKUP_HOSTNAME", DeprecationWarning)
-    HOSTNAME = settings.DBBACKUP_FAKE_HOST

@@ -1,5 +1,5 @@
 """
-Backup Storage class.
+Utils for handle files.
 """
 import logging
 from django.core.exceptions import ImproperlyConfigured
@@ -39,7 +39,11 @@ class FileNotFound(StorageError):
 
 
 class Storage(object):
-    """Abstract storage class."""
+    """
+    This object make high-level storage operations for upload/download or
+    list and filter files. It uses a Django storage object for low-level
+    operations.
+    """
     @property
     def logger(self):
         if not hasattr(self, '_logger'):
@@ -51,8 +55,8 @@ class Storage(object):
         Initialize a Django Storage instance with given options.
 
         :param storage_path: Path to a Django Storage class with dot style
-                             If ``None``, ``settings.DBBACKUP_BUILTIN_STORAGE``
-                             will be used.
+                             If ``None``, ``settings.DBBACKUP_STORAGE`` will
+                             be used.
         :type storage_path: str
         """
         self._storage_path = storage_path or settings.STORAGE
@@ -64,14 +68,14 @@ class Storage(object):
         self.name = self.storageCls.__name__
 
     def __str__(self):
-        return self.name
+        return 'dbbackup-%s' % self.storage.__str__()
 
     def delete_file(self, filepath):
         self.logger.debug('Deleting file %s', filepath)
         self.storage.delete(name=filepath)
 
-    def list_directory(self):
-        return self.storage.listdir('')[1]
+    def list_directory(self, path=''):
+        return self.storage.listdir(path)[1]
 
     def write_file(self, filehandle, filename):
         self.logger.debug('Writing file %s', filename)
@@ -109,7 +113,6 @@ class Storage(object):
         :rtype: ``list`` of ``str``
         """
         if content_type not in ('db', 'media', None):
-            import ipdb; ipdb.set_trace()
             msg = "Bad content_type %s, must be 'db', 'media', or None" % (
                 content_type)
             raise TypeError(msg)
@@ -158,7 +161,7 @@ class Storage(object):
         return max(files, key=utils.filename_to_date)
 
     def get_older_backup(self, encrypted=None, compressed=None,
-                          content_type=None, database=None):
+                         content_type=None, database=None):
         """
         Return the older backup's file name.
 
@@ -188,8 +191,7 @@ class Storage(object):
         return min(files, key=utils.filename_to_date)
 
     def clean_old_backups(self, encrypted=None, compressed=None,
-                          content_type=None, database=None,
-                          keep_number=None):
+                          content_type=None, database=None, keep_number=None):
         """
         Delete olders backups and hold the number defined.
 

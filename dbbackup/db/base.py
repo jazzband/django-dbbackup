@@ -1,3 +1,6 @@
+"""
+Base database connectors
+"""
 import shlex
 from tempfile import SpooledTemporaryFile
 from subprocess import Popen

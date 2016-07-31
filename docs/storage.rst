@@ -1,5 +1,5 @@
-Storage
-=======
+Storage settings
+================
 
 One of the most helpful feature of django-dbbackup is the avaibility to store
 and retrieve backups from a local or remote storage. This functionality is

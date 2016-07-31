@@ -1,7 +1,6 @@
 """
 Tests for dbrestore command.
 """
-import os
 from mock import patch
 from tempfile import mktemp
 from shutil import copyfileobj
@@ -21,8 +20,7 @@ from dbbackup.tests.utils import (FakeStorage, TEST_DATABASE,
 
 
 @patch('django.conf.settings.DATABASES', {'default': TEST_DATABASE})
-@patch('dbbackup.management.commands.dbrestore.input', return_value='y')
-@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils.FakeStorage')
+@patch('dbbackup.management.commands._base.input', return_value='y')
 class DbrestoreCommandRestoreBackupTest(TestCase):
     def setUp(self):
         self.command = DbrestoreCommand()
@@ -44,7 +42,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
     def test_no_filename(self, *args):
         # Prepare backup
         HANDLED_FILES['written_files'].append(
-            (utils.filename_generate('foo'), get_dump()))
+            (utils.filename_generate(TEST_DATABASE), get_dump()))
         # Check
         self.command.path = None
         self.command.filename = None
@@ -108,8 +106,7 @@ class DbrestoreCommandGetDatabaseTest(TestCase):
             self.command._get_database({})
 
 
-@patch('dbbackup.management.commands.dbrestore.input', return_value='y')
-@patch('dbbackup.settings.STORAGE', 'dbbackup.tests.utils.FakeStorage')
+@patch('dbbackup.management.commands._base.input', return_value='y')
 @patch('dbbackup.db.mongodb.MongoDumpConnector.restore_dump')
 class DbMongoRestoreCommandRestoreBackupTest(TestCase):
     def setUp(self):
@@ -134,17 +131,3 @@ class DbMongoRestoreCommandRestoreBackupTest(TestCase):
         HANDLED_FILES['written_files'].append((TARED_FILE, open(TARED_FILE, 'rb')))
         self.command._restore_backup()
         self.assertTrue(mock_runcommands.called)
-
-
-class DbbackupReadLocalFileTest(TestCase):
-    def setUp(self):
-        self.command = DbrestoreCommand()
-        self.command.path = '/tmp/foo.bak'
-
-    def test_read(self):
-        # setUp
-        open(self.command.path, 'w').close()
-        # Test
-        output_file = self.command.read_local_file(self.command.path)
-        # tearDown
-        os.remove(self.command.path)

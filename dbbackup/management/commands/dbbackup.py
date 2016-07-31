@@ -5,7 +5,6 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
 from optparse import make_option
-from shutil import copyfileobj
 
 from django.core.management.base import CommandError
 
@@ -16,9 +15,10 @@ from ... import utils, settings as dbbackup_settings
 
 
 class Command(BaseDbBackupCommand):
-    help = """
-    Backup a database, encrypt and/or compress and write to storage.
-    """
+    help = """Backup a database, encrypt and/or compress and write to
+    storage."""
+    content_type = 'db'
+
     option_list = BaseDbBackupCommand.option_list + (
         make_option("-c", "--clean", dest='clean', action="store_true",
                     default=False, help="Clean up old backup files"),
@@ -42,7 +42,6 @@ class Command(BaseDbBackupCommand):
         self.verbosity = int(options.get('verbosity'))
         self.quiet = options.get('quiet')
         self.clean = options.get('clean')
-        self.clean_keep = dbbackup_settings.CLEANUP_KEEP
         self.database = options.get('database')
         self.servername = options.get('servername')
         self.compress = options.get('compress')
@@ -57,10 +56,7 @@ class Command(BaseDbBackupCommand):
             try:
                 self._save_new_backup(database)
                 if self.clean:
-                    self.storage.clean_old_backups(self.encrypt,
-                                                   self.compress,
-                                                   content_type='db',
-                                                   database=self.database)
+                    self._cleanup_old_backups()
             except StorageError as err:
                 raise CommandError(err)
 
@@ -80,20 +76,9 @@ class Command(BaseDbBackupCommand):
             outputfile = encrypted_file
         filename = self.filename if self.filename else filename
         if not self.quiet:
-            self.logger.info("Backup tempfile created: %s", utils.handle_size(outputfile))
+            self.logger.info("Backup size: %s", utils.handle_size(outputfile))
         # Store backup
         if self.path is None:
-            self.logger.info("Writing file to %s: %s, filename: %s",
-                             self.storage.name, self.storage.backup_dir,
-                             filename)
-            self.storage.write_file(outputfile, filename)
+            self.write_to_storage(outputfile, filename)
         else:
-            self.logger.info("Writing file to %s", self.path)
             self.write_local_file(outputfile, self.path)
-
-    # TODO: Define chunk size
-    def write_local_file(self, outputfile, path):
-        """Write file to the desired path."""
-        outputfile.seek(0)
-        with open(path, 'wb') as fd:
-            copyfileobj(outputfile, fd)

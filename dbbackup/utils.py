@@ -249,28 +249,27 @@ def uncompress_file(inputfile, filename):
     return outputfile, new_basename
 
 
-def create_spooled_temporary_file(filepath):
+def create_spooled_temporary_file(filepath=None, fileobj=None):
     """
-    Create a spooled temporary file.
+    Create a spooled temporary file. if ``filepath`` or ``fileobj`` is
+    defined its content will be copied into temporary file.
 
     :param filepath: Path of input file
     :type filepath: str
 
-    :returns: file of the spooled temporary file
+    :param fileobj: Input file object
+    :type fileobj: file
+
+    :returns: Spooled temporary file
     :rtype: :class:`tempfile.SpooledTemporaryFile`
     """
     spooled_file = tempfile.SpooledTemporaryFile(
         max_size=settings.TMP_FILE_MAX_SIZE,
         dir=settings.TMP_DIR)
-    tmpfile = open(filepath, 'r+b')
-    try:
-        while True:
-            data = tmpfile.read(1024 * 1000)
-            if not data:
-                break
-            spooled_file.write(data)
-    finally:
-        tmpfile.close()
+    if filepath:
+        fileobj = open(filepath, 'r+b')
+    if fileobj is not None:
+        copyfileobj(fileobj, spooled_file, settings.TMP_FILE_READ_SIZE)
     return spooled_file
 
 

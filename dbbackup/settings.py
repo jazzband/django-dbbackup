@@ -1,12 +1,10 @@
 # DO NOT IMPORT THIS BEFORE django.configure() has been run!
 
 import os
-import re
 import tempfile
 import socket
 import warnings
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 
 DATABASES = getattr(settings, 'DBBACKUP_DATABASES', list(settings.DATABASES.keys()))
 
@@ -87,18 +85,3 @@ if hasattr(settings, 'DBBACKUP_S3_BUCKET'):
             msg = "DBBACKUP_S3_%s is now useless" % old_suffix
             warnings.warn(msg, DeprecationWarning)
     del old_suffix, new_key
-
-# TODO: Make a module ?
-# Checks
-for sett in [sett for sett in locals().copy() if sett.endswith('FILENAME_TEMPLATE')]:
-    if callable(locals()[sett]):
-        continue
-    for param in ('datetime',):
-        if '{%s}' % param not in locals()[sett]:
-            msg = "You must provide '{%s}' in DBBACKUP_%s" % (param, 'FILENAME_TEMPLATE')
-            raise ImproperlyConfigured(msg)
-del sett
-
-if re.search(r'[^A-Za-z0-9%_-]', DATE_FORMAT):  # pragma: no cover
-    msg = "Bad DBBACKUP_DATE_FORMAT: %s, it must match with [A-Za-z0-9%_-]" % DATE_FORMAT
-    raise ImproperlyConfigured(msg)

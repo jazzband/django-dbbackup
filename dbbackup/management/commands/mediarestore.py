@@ -8,7 +8,7 @@ from django.core.management.base import CommandError
 from django.core.files.storage import get_storage_class
 
 from ._base import BaseDbBackupCommand
-from ...storage.base import BaseStorage, StorageError
+from ...storage import get_storage, StorageError
 from ... import utils
 
 
@@ -39,7 +39,7 @@ class Command(BaseDbBackupCommand):
         self.replace = options.get('replace')
         self.passphrase = options.get('passphrase')
         self.interactive = options.get('interactive')
-        self.storage = BaseStorage.storage_factory()
+        self.storage = get_storage()
         self.media_storage = get_storage_class()()
         self._restore_backup()
 

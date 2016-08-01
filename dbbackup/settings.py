@@ -42,7 +42,6 @@ GPG_ALWAYS_TRUST = getattr(settings, 'DBBACKUP_GPG_ALWAYS_TRUST', False)
 GPG_RECIPIENT = GPG_ALWAYS_TRUST = getattr(settings, 'DBBACKUP_GPG_RECIPIENT', None)
 
 STORAGE = getattr(settings, 'DBBACKUP_STORAGE', 'dbbackup.storage.filesystem_storage')
-BUILTIN_STORAGE = getattr(settings, 'DBBACKUP_BUILTIN_STORAGE', None)
 STORAGE_OPTIONS = getattr(settings, 'DBBACKUP_STORAGE_OPTIONS', {})
 
 CONNECTORS = getattr(settings, 'DBBACKUP_CONNECTORS', {})
@@ -63,25 +62,3 @@ if hasattr(settings, 'DBBACKUP_BACKUP_DIRECTORY'):  # pragma: no cover
 if hasattr(settings, 'DBBACKUP_FAKE_HOST'):  # pragma: no cover
     warnings.warn("DBBACKUP_FAKE_HOST is deprecated, use DBBACKUP_HOSTNAME", DeprecationWarning)
     HOSTNAME = settings.DBBACKUP_FAKE_HOST
-
-UNSED_AWS_SETTINGS = ('DIRECTORY',)
-DEPRECATED_AWS_SETTINGS = (
-    ('BUCKET', 'bucket_name'),
-    ('ACCESS_KEY', 'access_key'),
-    ('SECRET_KEY', 'secret_key'),
-    ('DOMAIN', 'host'),
-    ('IS_SECURE', 'use_ssl'),
-    ('SERVER_SIDE_ENCRYPTION', 'encryption'),
-)
-if hasattr(settings, 'DBBACKUP_S3_BUCKET'):
-    for old_suffix, new_key in DEPRECATED_AWS_SETTINGS:
-        old_key = 'DBBACKUP_S3_%s' % old_suffix
-        if hasattr(settings, old_key):
-            STORAGE_OPTIONS[new_key] = getattr(settings, old_key)
-            msg = "%s is deprecated, use DBBACKUP_STORAGE_OPTIONS['%s']" % (old_key, new_key)
-            warnings.warn(msg, DeprecationWarning)
-    for old_suffix in UNSED_AWS_SETTINGS:
-        if hasattr(settings, 'DBBACKUP_S3_%s' % old_suffix):
-            msg = "DBBACKUP_S3_%s is now useless" % old_suffix
-            warnings.warn(msg, DeprecationWarning)
-    del old_suffix, new_key

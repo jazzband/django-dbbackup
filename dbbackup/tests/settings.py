@@ -35,7 +35,7 @@ CACHES = {
 DBBACKUP_GPG_RECIPIENT = "test@test"
 DBBACKUP_GPG_ALWAYS_TRUST = True,
 
-DBBACKUP_STORAGE = os.environ.get('STORAGE', 'dbbackup.tests.utils')
+DBBACKUP_STORAGE = os.environ.get('STORAGE', 'dbbackup.tests.utils.FakeStorage')
 DBBACKUP_STORAGE_OPTIONS = dict([keyvalue.split('=') for keyvalue in
                                  os.environ.get('STORAGE_OPTIONS', '').split(',')
                                  if keyvalue])

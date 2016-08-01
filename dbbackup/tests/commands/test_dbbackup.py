@@ -8,8 +8,9 @@ from django.test import TestCase
 
 from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
 from dbbackup.db.base import get_connector
-from dbbackup.tests.utils import (FakeStorage, TEST_DATABASE,
-                                  add_public_gpg, clean_gpg_keys, DEV_NULL)
+from dbbackup.storage import get_storage
+from dbbackup.tests.utils import (TEST_DATABASE, add_public_gpg, clean_gpg_keys,
+                                  DEV_NULL)
 
 
 @patch('dbbackup.settings.GPG_RECIPIENT', 'test@test')
@@ -21,7 +22,7 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         self.command.encrypt = False
         self.command.compress = False
         self.command.database = TEST_DATABASE['NAME']
-        self.command.storage = FakeStorage()
+        self.command.storage = get_storage()
         self.command.connector = get_connector()
         self.command.stdout = DEV_NULL
         self.command.filename = None
@@ -60,7 +61,7 @@ class DbbackupCommandSaveNewMongoBackupTest(TestCase):
         self.command.servername = 'foo-server'
         self.command.encrypt = False
         self.command.compress = False
-        self.command.storage = FakeStorage()
+        self.command.storage = get_storage()
         self.command.stdout = DEV_NULL
         self.command.filename = None
         self.command.path = None

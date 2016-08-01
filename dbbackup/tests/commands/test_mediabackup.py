@@ -4,8 +4,8 @@ Tests for mediabackup command.
 from django.test import TestCase
 from django.core.files.storage import get_storage_class
 from dbbackup.management.commands.mediabackup import Command as DbbackupCommand
-from dbbackup.tests.utils import (FakeStorage, DEV_NULL, HANDLED_FILES,
-                                  add_public_gpg)
+from dbbackup.storage import get_storage
+from dbbackup.tests.utils import DEV_NULL, HANDLED_FILES, add_public_gpg
 
 
 class MediabackupBackupMediafilesTest(TestCase):
@@ -13,7 +13,7 @@ class MediabackupBackupMediafilesTest(TestCase):
         HANDLED_FILES.clean()
         self.command = DbbackupCommand()
         self.command.servername = 'foo-server'
-        self.command.storage = FakeStorage()
+        self.command.storage = get_storage()
         self.command.stdout = DEV_NULL
         self.command.compress = False
         self.command.encrypt = False

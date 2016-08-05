@@ -2,12 +2,11 @@
 Restore media files.
 """
 import tarfile
-from optparse import make_option
 
 from django.core.management.base import CommandError
 from django.core.files.storage import get_storage_class
 
-from ._base import BaseDbBackupCommand
+from ._base import BaseDbBackupCommand, make_option
 from ...storage import get_storage, StorageError
 from ... import utils
 
@@ -17,8 +16,8 @@ class Command(BaseDbBackupCommand):
     compressed."""
     content_type = 'media'
 
-    option_list = BaseDbBackupCommand.option_list + (
-        make_option("-i", "--input-filename", help="Specify filename to backup from"),
+    option_list = (
+        make_option("-i", "--input-filename", action='store', help="Specify filename to backup from"),
         make_option("-I", "--input-path", help="Specify path on local filesystem to backup from"),
 
         make_option("-e", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),

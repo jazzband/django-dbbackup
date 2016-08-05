@@ -3,31 +3,67 @@ Abstract Command.
 """
 import sys
 from logging import getLogger
-from optparse import make_option
+from optparse import make_option as optparse_make_option
 from shutil import copyfileobj
+import inspect
 
+import django
 from django.core.management.base import BaseCommand, LabelCommand, CommandError
 from django.utils import six
 
 from ...storage import StorageError
 
-input = raw_input if six.PY2 else input  # @ReservedAssignment
+if six.PY2:
+    input = raw_input
+else:
+    long = int
+
+USELESS_ARGS = ('callback', 'callback_args', 'callback_kwargs', 'metavar')
+TYPES = {
+    'string': str,
+    'int': int,
+    'long': long,
+    'float': float,
+    'complex': complex,
+    'choice': list
+}
 
 
-class BaseDbBackupCommand(LabelCommand):
+def make_option(*args, **kwargs):
+    return args, kwargs
+
+
+class BaseDbBackupCommand(BaseCommand):
     """
     Base command class used for create all dbbackup command.
     """
-    option_list = BaseCommand.option_list + (
+    base_option_list = (
         make_option("--noinput", action='store_false', dest='interactive', default=True,
                     help='Tells Django to NOT prompt the user for input of any kind.'),
         make_option('-q', "--quiet", action='store_true', default=False,
                     help='Tells Django to NOT output other text than errors.')
     )
+    option_list = ()
 
     verbosity = 1
     quiet = False
     logger = getLogger('dbbackup.command')
+
+    def __init__(self, *args, **kwargs):
+        self.option_list = self.base_option_list + self.option_list
+        if django.VERSION < (1, 10):
+            options = tuple([optparse_make_option(*_args, **_kwargs)
+                             for _args, _kwargs in self.option_list])
+            self.option_list = options + BaseCommand.option_list
+        super(BaseDbBackupCommand, self).__init__(*args, **kwargs)
+
+    def add_arguments(self, parser):
+        for args, kwargs in self.option_list:
+            kwargs = dict([
+                (k, v) for k, v in kwargs.items()
+                if not k.startswith('_') and
+                k not in USELESS_ARGS])
+            parser.add_argument(*args, **kwargs)
 
     def _set_logger_level(self):
         level = 60 if self.quiet else (self.verbosity + 1) * 10

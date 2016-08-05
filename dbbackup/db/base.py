@@ -123,8 +123,10 @@ class BaseCommandDBConnector(BaseDBConnector):
         :rtype: file
         """
         cmd = shlex.split(command)
-        stdout = SpooledTemporaryFile(max_size=10 * 1024 * 1024)
-        stderr = SpooledTemporaryFile(max_size=10 * 1024 * 1024)
+        stdout = SpooledTemporaryFile(max_size=settings.TMP_FILE_MAX_SIZE,
+                                      dir=settings.TMP_DIR)
+        stderr = SpooledTemporaryFile(max_size=settings.TMP_FILE_MAX_SIZE,
+                                      dir=settings.TMP_DIR)
         full_env = self.env.copy()
         full_env.update(env or {})
         try:

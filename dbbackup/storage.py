@@ -109,6 +109,7 @@ class Storage(object):
         :rtype: ``list`` of ``str``
         """
         if content_type not in ('db', 'media', None):
+            import ipdb; ipdb.set_trace()
             msg = "Bad content_type %s, must be 'db', 'media', or None" % (
                 content_type)
             raise TypeError(msg)

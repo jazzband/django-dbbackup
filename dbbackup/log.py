@@ -1,5 +1,6 @@
 DEFAULT_LOGGING = {
     'version': 1,
+    'disable_existing_loggers': False,
     'handlers': {
         'console': {
             'formatter': 'base',

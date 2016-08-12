@@ -12,14 +12,6 @@ connect and create database backups.
 
 Default: ``list(settings.DATABASES.keys())`` (keys of all entries listed)
 
-DBBACKUP_BACKUP_DIRECTORY
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Where to store backups. String pointing to django-dbbackup
-location module to use when performing a backup.
-
-Default: ``os.getcwd()`` (Current working directory)
-
 DBBACKUP_TMP_DIR
 ~~~~~~~~~~~~~~~~
 
@@ -42,12 +34,7 @@ DBBACKUP_CLEANUP_KEEP and DBBACKUP_CLEANUP_KEEP_MEDIA
 When issueing ``dbbackup`` and ``mediabackup``, old backup files are
 looked for and removed.
 
-Default: ``10`` (days)
-
-DBBACKUP_MEDIA_PATH
-~~~~~~~~~~~~~~~~~~~
-
-Default: settings.MEDIA_ROOT
+Default: ``10`` (backups)
 
 DBBACKUP_DATE_FORMAT
 ~~~~~~~~~~~~~~~~~~~~
@@ -101,14 +88,6 @@ django-dbbackup can not send email to the ``SERVER_EMAIL``.
 
 Default: ``socket.gethostname()``
 
-.. note::
-
-    Previously ``DBBACKUP_FAKE_HOST`` was used for this setting.
-
-**DBBACKUP\_CLEANUP\_KEEP (optional)** - The number of backups to keep
-when specifying the --clean flag. Defaults to keeping 10 + the first
-backup of each month.
-
 Encrypting your backups
 =======================
 
@@ -141,8 +120,7 @@ Requirements:
 -  Install the python package python-gnupg:
    ``pip install python-gnupg``.
 -  You need gpg key.
--  Set the setting 'DBBACKUP\_GPG\_RECIPIENT' to the name of the gpg
-   key.
+-  Set the setting ``DBBACKUP_GPG_RECIPIENT`` to the name of the gpg key.
 
 DBBACKUP_GPG_ALWAYS_TRUST
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -168,5 +146,5 @@ Storage configuration
 
 You have to use a storage for your backups, see `Storage settings`_ for more.
 
-.. _`Database settings`: /databases.html
-.. _`Storage settings`: /storage.html
+.. _`Database settings`: ../databases.html
+.. _`Storage settings`: ../storage.html

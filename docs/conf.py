@@ -25,7 +25,9 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = []
+extensions = [
+    'djcommanddoc',
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -41,7 +43,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'django-dbbackup'
-copyright = u'2014, Michael Shepanski'
+copyright = u'2016, Michael Shepanski'
 
 path = os.path.join(
     os.path.split(
@@ -54,9 +56,9 @@ path = os.path.join(
 sys.path = [path] + sys.path
 sys.path = [os.path.join(path, 'dbbackup')] + sys.path
 
-import dbbackup
+os.environ['DJANGO_SETTINGS_MODULE'] = 'dbbackup.tests.settings'
 
-print(dbbackup.__file__)
+import dbbackup
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -103,11 +105,6 @@ pygments_style = 'sphinx'
 
 
 # -- Options for HTML output ---------------------------------------------------
-
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-html_theme = 'default'
-
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:

@@ -30,9 +30,7 @@ that are at least present when using PyPi repositories.
 Add it in your project
 ----------------------
 
-In your ``settings.py``, make sure you have the following things:
-
-::
+In your ``settings.py``, make sure you have the following things: ::
 
     INSTALLED_APPS = (
         ...
@@ -42,16 +40,20 @@ In your ``settings.py``, make sure you have the following things:
     DBBACKUP_STORAGE = 'dbbackup.storage.filesystem_storage'
     DBBACKUP_STORAGE_OPTIONS = {'location': '/var/backups'}
 
-This configuration uses filesystem storage, but you can use any storage
-supported by Django API. See `storage` for more information about it.
+Create the backup directory: ::
+
+    mkdir /var/backups
+
+.. note::
+
+    This configuration uses filesystem storage, but you can use any storage
+    supported by Django API. See `storage` for more information about it.
 
 
 Testing that everything worked
 ------------------------------
 
-Now, you should be able to create your first backup by running:
-
-::
+Now, you should be able to create your first backup by running: ::
 
     $ python manage.py dbbackup
 

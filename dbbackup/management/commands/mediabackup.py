@@ -65,12 +65,12 @@ class Command(BaseDbBackupCommand):
     def _create_tar(self, name):
         """Create TAR file."""
         fileobj = utils.create_spooled_temporary_file()
-        tar_file = tarfile.open(name=name, fileobj=fileobj, mode='w:gz') \
-            if self.compress \
-            else tarfile.open(name=name, fileobj=fileobj, mode='w')
+        mode = 'w:gz' if self.compress else 'w'
+        tar_file = tarfile.open(name=name, fileobj=fileobj, mode=mode)
         for media_filename in self._explore_storage():
             tarinfo = tarfile.TarInfo(media_filename)
             media_file = self.media_storage.open(media_filename)
+            tarinfo.size = len(media_file)
             tar_file.addfile(tarinfo, media_file)
         # Close the TAR for writing
         tar_file.close()
@@ -86,14 +86,14 @@ class Command(BaseDbBackupCommand):
                                            servername=self.servername,
                                            content_type=self.content_type)
 
-        outputfile = self._create_tar(filename)
+        tarball = self._create_tar(filename)
 
         if self.encrypt:
-            encrypted_file = utils.encrypt_file(outputfile, filename)
-            outputfile, filename = encrypted_file
+            encrypted_file = utils.encrypt_file(tarball, filename)
+            tarball, filename = encrypted_file
 
-        self.logger.debug("Backup size: %s", utils.handle_size(outputfile))
+        self.logger.debug("Backup size: %s", utils.handle_size(tarball))
         if self.path is None:
-            self.write_to_storage(outputfile, filename)
+            self.write_to_storage(tarball, filename)
         else:
-            self.storage.write_file(outputfile, filename)
+            self.storage.write_file(tarball, filename)

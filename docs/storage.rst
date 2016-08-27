@@ -84,7 +84,7 @@ complete, you can follow the required setup below. ::
 
 Add the following to your project's settings: ::
 
-    DBBACKUP_STORAGE = 'storages.backends.s3boto.S3BotoStorageFile'
+    DBBACKUP_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
     DBBACKUP_STORAGE_OPTIONS = {
         'access_key': 'my_id',
         'secret_key': 'my_secret',

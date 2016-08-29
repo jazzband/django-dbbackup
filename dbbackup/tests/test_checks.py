@@ -45,22 +45,8 @@ class ChecksTest(TestCase):
         errors = checks.check_settings(DbbackupConfig)
         self.assertEqual(expected_errors, errors)
 
-    @patch('dbbackup.checks.settings.MEDIA_FILENAME_TEMPLATE', test_func)
-    def test_media_filename_template_is_callable(self):
-        self.assertFalse(checks.check_settings(DbbackupConfig))
-
-    @patch('dbbackup.checks.settings.MEDIA_FILENAME_TEMPLATE', '{datetime}.bak')
-    def test_media_filename_template_is_string(self):
-        self.assertFalse(checks.check_settings(DbbackupConfig))
-
-    @patch('dbbackup.checks.settings.MEDIA_FILENAME_TEMPLATE', 'foo.bak')
-    def test_media_filename_template_no_date(self):
-        expected_errors = [checks.W004]
-        errors = checks.check_settings(DbbackupConfig)
-        self.assertEqual(expected_errors, errors)
-
     @patch('dbbackup.checks.settings.DATE_FORMAT', 'foo@net.pt')
     def test_date_format_warning(self):
-        expected_errors = [checks.W005]
+        expected_errors = [checks.W004]
         errors = checks.check_settings(DbbackupConfig)
         self.assertEqual(expected_errors, errors)

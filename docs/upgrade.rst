@@ -9,6 +9,7 @@ The following settings are now useless, you can remove them:
 - ``DBBACKUP_BACKUP_ENVIRONMENT``: Must be set in ``CONNECTORS['dbname']['env']``
 - ``DBBACKUP_RESTORE_ENVIRONMENT``: Same than ``BACKUP_ENVIRONMENT``
 - ``DBBACKUP_FORCE_ENGINE``
+- ``DBBACKUP_MEDIA_FILENAME_TEMPLATE``
 - ``DBBACKUP_READ_FILE``
 - ``DBBACKUP_WRITE_FILE``
 - ``DBBACKUP_BACKUP_DIRECTORY``: Was used by Filesystem storage, use

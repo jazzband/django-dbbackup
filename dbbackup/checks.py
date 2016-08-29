@@ -12,12 +12,9 @@ W002 = Warning('Invalid STORAGE parameter',
 W003 = Warning('Invalid FILENAME_TEMPLATE parameter',
                hint='Include {datetime} to settings.DBBACKUP_FILENAME_TEMPLATE',
                id='dbbackup.W003')
-W004 = Warning('Invalid MEDIA_FILENAME_TEMPLATE parameter',
-               hint='Include {datetime} to settings.DBBACKUP_MEDIA_FILENAME_TEMPLATE',
-               id='dbbackup.W004')
-W005 = Warning('Invalid DATE_FORMAT parameter',
+W004 = Warning('Invalid DATE_FORMAT parameter',
                hint='settings.DBBACKUP_DATE_FORMAT can contain only [A-Za-z0-9%_-]',
-               id='dbbackup.W005')
+               id='dbbackup.W004')
 
 
 @register(Tags.compatibility)
@@ -33,11 +30,7 @@ def check_settings(app_configs, **kwargs):
         if '{datetime}' not in settings.FILENAME_TEMPLATE:
             errors.append(W003)
 
-    if not callable(settings.MEDIA_FILENAME_TEMPLATE):
-        if '{datetime}' not in settings.MEDIA_FILENAME_TEMPLATE:
-            errors.append(W004)
-
     if re.search(r'[^A-Za-z0-9%_-]', settings.DATE_FORMAT):
-        errors.append(W005)
+        errors.append(W004)
 
     return errors

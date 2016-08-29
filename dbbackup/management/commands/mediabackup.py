@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division,
 import os
 import tarfile
 
+from django.core.files import File
 from django.core.management.base import CommandError
 from django.core.files.storage import get_storage_class
 
@@ -87,6 +88,14 @@ class Command(BaseDbBackupCommand):
                                            content_type=self.content_type)
 
         tarball = self._create_tar(filename)
+
+        # ``django.core.files.storage.Storage.save`` method waiting for
+        # an instance (or a subclass) of django.core.files.File
+        # File-like objects also works, but with empty name we have a bug
+        # in boto3.S3Boto3Storage, which leads to botocore internals.
+        # See https://github.com/boto/botocore/issues/1022
+        # TODO: remove, when problem will be solved
+        tarball = File(tarball, name=filename)
 
         if self.encrypt:
             encrypted_file = utils.encrypt_file(tarball, filename)

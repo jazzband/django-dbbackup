@@ -21,12 +21,7 @@ Example of cron job with `django-cron`_  with file system storage: ::
       RUN_AT_TIMES = ['6:00', '18:00']
       schedule = Schedule(run_at_times=RUN_AT_TIMES)
       code = 'my_app.Backup'
-  
-      def __init__(self):
-          directory = settings.DBBACKUP_STORAGE_OPTIONS['location']
-          if not os.path.exists(directory):
-              os.makedirs(directory)
-  
+ 
       def do(self):
           management.call_command('dbbackup')
 

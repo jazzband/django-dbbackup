@@ -37,7 +37,9 @@ make_media_test () {
 test_media_results () {
     media_success=0
     [[ -f ${MEDIA_ROOT}foo ]] || media_success=1
+    [[ $(cat ${MEDIA_ROOT}foo) -eq foo ]] || media_success=1
     [[ -d ${MEDIA_ROOT}bar ]] || media_success=1
+    [[ $(cat ${MEDIA_ROOT}bar/ham) -eq ham ]] || media_success=1
     [[ -f ${MEDIA_ROOT}bar/ham ]] || media_success=1
     [[ "$media_success" -eq 0 ]] && echo "Media test succeed!" || echo "Media test failed!"
 }

@@ -1,8 +1,10 @@
 # DO NOT IMPORT THIS BEFORE django.configure() has been run!
 
+import logging.config
 import tempfile
 import socket
 from django.conf import settings
+import dbbackup.log
 
 DATABASES = getattr(settings, 'DBBACKUP_DATABASES', list(settings.DATABASES.keys()))
 
@@ -37,8 +39,6 @@ STORAGE_OPTIONS = getattr(settings, 'DBBACKUP_STORAGE_OPTIONS', {})
 CONNECTORS = getattr(settings, 'DBBACKUP_CONNECTORS', {})
 
 # Logging
-from logging import config as log_config
-import dbbackup.log
 LOGGING = getattr(settings, 'DBBACKUP_LOGGING', dbbackup.log.DEFAULT_LOGGING)
-LOG_CONFIGURATOR = log_config.DictConfigurator(LOGGING)
+LOG_CONFIGURATOR = logging.config.DictConfigurator(LOGGING)
 LOG_CONFIGURATOR.configure()

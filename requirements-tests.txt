@@ -7,3 +7,4 @@ python-gnupg
 django-storages-redux
 pytz
 dj-database-url
+testfixtures

@@ -24,6 +24,15 @@ class DbBackupCommandTest(TestCase):
     def tearDown(self):
         clean_gpg_keys()
 
+    def test_database(self):
+        argv = ['', 'dbbackup', '--database=default']
+        execute_from_command_line(argv)
+        self.assertEqual(1, len(HANDLED_FILES['written_files']))
+        filename, outputfile = HANDLED_FILES['written_files'][0]
+        # Test file content
+        outputfile.seek(0)
+        self.assertTrue(outputfile.read())
+
     def test_encrypt(self):
         argv = ['', 'dbbackup', '--encrypt']
         execute_from_command_line(argv)

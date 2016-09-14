@@ -126,8 +126,8 @@ class Storage(object):
             files = [f for f in files if '.tar' in f]
         elif content_type == 'db':
             files = [f for f in files if '.tar' not in f]
-        if database is not None:
-            files = [f for f in files if '%s' % database in f]
+        if database:
+            files = [f for f in files if database in f]
         return files
 
     def get_latest_backup(self, encrypted=None, compressed=None,

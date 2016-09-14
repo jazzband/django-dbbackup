@@ -33,7 +33,8 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.passphrase = None
         self.command.interactive = True
         self.command.storage = get_storage()
-        self.command.connector = get_connector()
+        self.command.database_name = 'default'
+        self.command.connector = get_connector('default')
         HANDLED_FILES.clean()
 
     def tearDown(self):
@@ -42,7 +43,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
     def test_no_filename(self, *args):
         # Prepare backup
         HANDLED_FILES['written_files'].append(
-            (utils.filename_generate(TEST_DATABASE), File(get_dump())))
+            (utils.filename_generate('default'), File(get_dump())))
         # Check
         self.command.path = None
         self.command.filename = None
@@ -93,11 +94,13 @@ class DbrestoreCommandGetDatabaseTest(TestCase):
         self.command = DbrestoreCommand()
 
     def test_give_db_name(self):
-        db = self.command._get_database({'database': 'default'})
+        name, db = self.command._get_database({'database': 'default'})
+        self.assertEqual(name, 'default')
         self.assertEqual(db, settings.DATABASES['default'])
 
     def test_no_given_db(self):
-        db = self.command._get_database({})
+        name, db = self.command._get_database({})
+        self.assertEqual(name, 'default')
         self.assertEqual(db, settings.DATABASES['default'])
 
     @patch('django.conf.settings.DATABASES', {'db1': {}, 'db2': {}})
@@ -122,6 +125,7 @@ class DbMongoRestoreCommandRestoreBackupTest(TestCase):
         self.command.interactive = True
         self.command.storage = get_storage()
         self.command.connector = MongoDumpConnector()
+        self.command.database_name = 'mongo'
         HANDLED_FILES.clean()
         add_private_gpg()
 

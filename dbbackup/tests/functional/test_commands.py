@@ -111,6 +111,15 @@ class DbRestoreCommandTest(TestCase):
         with self.assertRaises(SystemExit):
             execute_from_command_line(['', 'dbrestore', '--uncompress'])
 
+    def test_specify_db(self, *args):
+        # Create backup
+        execute_from_command_line(['', 'dbbackup', '--database', 'default'])
+        # Test wrong name
+        with self.assertRaises(SystemExit):
+            execute_from_command_line(['', 'dbrestore', '--database', 'foo'])
+        # Restore
+        execute_from_command_line(['', 'dbrestore', '--database', 'default'])
+
 
 class MediaBackupCommandTest(TestCase):
     def setUp(self):

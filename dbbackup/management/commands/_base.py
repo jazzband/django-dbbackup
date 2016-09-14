@@ -93,7 +93,7 @@ class BaseDbBackupCommand(BaseCommand):
         with open(path, 'wb') as fd:
             copyfileobj(outputfile, fd)
 
-    def _get_backup_file(self):
+    def _get_backup_file(self, database=None):
         if self.path:
             input_filename = self.path
             input_file = self.read_local_file(self.path)
@@ -103,14 +103,12 @@ class BaseDbBackupCommand(BaseCommand):
             # Fetch the latest backup if filepath not specified
             else:
                 self.logger.info("Finding latest backup")
-                # database = self.database['NAME'] if self.content_type == 'db' else None
                 try:
                     input_filename = self.storage.get_latest_backup(
                         encrypted=self.decrypt,
                         compressed=self.uncompress,
-                        content_type=self.content_type)
-                        # TODO: Make better filter
-                        # database=database)
+                        content_type=self.content_type,
+                        database=database)
                 except StorageError as err:
                     raise CommandError(err.args[0])
             input_file = self.read_from_storage(input_filename)

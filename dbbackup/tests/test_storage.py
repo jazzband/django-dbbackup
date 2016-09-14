@@ -36,53 +36,59 @@ class StorageListBackupsTest(TestCase):
     def setUp(self):
         HANDLED_FILES.clean()
         self.storage = get_storage()
+        # foodb files
         HANDLED_FILES['written_files'] += [
-            (utils.filename_generate(ext, 'foo'), None) for ext in
+            (utils.filename_generate(ext, 'foodb'), None) for ext in
             ('db', 'db.gz', 'db.gpg', 'db.gz.gpg')
         ]
+        # Media file
         HANDLED_FILES['written_files'] += [
-            (utils.filename_generate(ext, 'foo', None, 'media'), None) for ext in
+            (utils.filename_generate(ext, None, None, 'media'), None) for ext in
             ('tar', 'tar.gz', 'tar.gpg', 'tar.gz.gpg')
         ]
+        HANDLED_FILES['written_files'] += [
+            (utils.filename_generate(ext, 'bardb', 'barserver'), None) for ext in
+            ('db', 'db.gz', 'db.gpg', 'db.gz.gpg')
+        ]
+        # barserver files
         HANDLED_FILES['written_files'] += [
             ('file_without_date', None)
         ]
 
     def test_nofilter(self):
         files = self.storage.list_backups()
-        # self.assertEqual(len(HANDLED_FILES['written_files']), len(files))
         for file in files:
             self.assertNotEqual('file_without_date', file)
 
     def test_encrypted(self):
         files = self.storage.list_backups(encrypted=True)
-        # self.assertEqual(8, len(files))
         for file in files:
             self.assertIn('.gpg', file)
 
     def test_compressed(self):
         files = self.storage.list_backups(compressed=True)
-        # self.assertEqual(8, len(files))
         for file in files:
             self.assertIn('.gz', file)
 
     def test_dbbackup(self):
         files = self.storage.list_backups(content_type='db')
-        # self.assertEqual(8, len(files))
         for file in files:
             self.assertIn('.db', file)
 
     def test_database(self):
-        files = self.storage.list_backups(database='foo')
-        # self.assertEqual(9, len(files))
+        files = self.storage.list_backups(database='foodb')
         for file in files:
-            self.assertIn('foo', file)
+            self.assertIn('foodb', file)
 
     def test_mediabackup(self):
         files = self.storage.list_backups(content_type='media')
-        # self.assertEqual(8, len(files))
         for file in files:
             self.assertIn('.tar', file)
+
+    # def test_servername(self):
+    #     files = self.storage.list_backups(servername='barserver')
+    #     for file in files:
+    #         self.assertIn('barserver', file)
 
 
 class StorageGetLatestTest(TestCase):

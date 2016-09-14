@@ -44,7 +44,7 @@ class Command(BaseDbBackupCommand):
             self.uncompress = options.get('uncompress')
             self.passphrase = options.get('passphrase')
             self.interactive = options.get('interactive')
-            self.database = self._get_database(options)
+            self.database_name, self.database = self._get_database(options)
             self.storage = get_storage()
             self._restore_backup()
         except StorageError as err:
@@ -52,20 +52,21 @@ class Command(BaseDbBackupCommand):
 
     def _get_database(self, options):
         """Get the database to restore."""
-        database_key = options.get('database')
-        if not database_key:
-            if len(settings.DATABASES) >= 2:
+        database_name = options.get('database')
+        if not database_name:
+            if len(settings.DATABASES) > 1:
                 errmsg = "Because this project contains more than one database, you"\
                     " must specify the --database option."
                 raise CommandError(errmsg)
-            database_key = list(settings.DATABASES.keys())[0]
-        return settings.DATABASES[database_key]
+            database_name = list(settings.DATABASES.keys())[0]
+        if database_name not in settings.DATABASES:
+            raise CommandError("Database %s does not exist." % database_name)
+        return database_name, settings.DATABASES[database_name]
 
     def _restore_backup(self):
         """Restore the specified database."""
+        input_filename, input_file = self._get_backup_file(database=self.database_name)
         self.logger.info("Restoring backup for database: %s", self.database['NAME'])
-
-        input_filename, input_file = self._get_backup_file()
         self.logger.info("Restoring: %s" % input_filename)
 
         if self.decrypt:

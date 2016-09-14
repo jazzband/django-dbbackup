@@ -114,14 +114,12 @@ class BaseDbBackupCommand(BaseCommand):
             input_file = self.read_from_storage(input_filename)
         return input_filename, input_file
 
-    def _cleanup_old_backups(self):
+    def _cleanup_old_backups(self, database=None):
         """
         Cleanup old backups, keeping the number of backups specified by
         DBBACKUP_CLEANUP_KEEP and any backups that occur on first of the month.
         """
-        # database = self.database if self.content_type == 'db' else None
         self.storage.clean_old_backups(encrypted=self.encrypt,
                                        compressed=self.compress,
-                                       content_type=self.content_type)
-                                       # TODO: Make better filter
-                                       # database=database)
+                                       content_type=self.content_type,
+                                       database=database)

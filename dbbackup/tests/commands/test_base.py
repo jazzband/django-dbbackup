@@ -100,15 +100,25 @@ class BaseDbBackupCommandCleanupOldBackupsTest(TestCase):
             'foodb-2015-02-06-042810.dump',
             'foodb-2015-02-07-042810.dump',
             'foodb-2015-02-08-042810.dump',
+            'bardb-2015-02-06-042810.dump',
+            'bardb-2015-02-07-042810.dump',
+            'bardb-2015-02-08-042810.dump',
         ]]
 
     @patch('dbbackup.settings.CLEANUP_KEEP', 1)
     def test_clean_db(self):
         self.command.content_type = 'db'
         self.command.database = 'foodb'
-        self.command._cleanup_old_backups()
+        self.command._cleanup_old_backups(database='foodb')
         self.assertEqual(2, len(HANDLED_FILES['deleted_files']))
         self.assertNotIn('foodb-2015-02-08-042810.dump', HANDLED_FILES['deleted_files'])
+
+    @patch('dbbackup.settings.CLEANUP_KEEP', 1)
+    def test_clean_other_db(self):
+        self.command.content_type = 'db'
+        self.command._cleanup_old_backups(database='bardb')
+        self.assertEqual(2, len(HANDLED_FILES['deleted_files']))
+        self.assertNotIn('bardb-2015-02-08-042810.dump', HANDLED_FILES['deleted_files'])
 
     @patch('dbbackup.settings.CLEANUP_KEEP_MEDIA', 1)
     def test_clean_media(self):

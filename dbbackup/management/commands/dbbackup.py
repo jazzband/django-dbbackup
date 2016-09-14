@@ -54,7 +54,7 @@ class Command(BaseDbBackupCommand):
             try:
                 self._save_new_backup(database)
                 if self.clean:
-                    self._cleanup_old_backups()
+                    self._cleanup_old_backups(database=database_key)
             except StorageError as err:
                 raise CommandError(err)
 

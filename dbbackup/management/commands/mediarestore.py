@@ -19,6 +19,7 @@ class Command(BaseDbBackupCommand):
     option_list = (
         make_option("-i", "--input-filename", action='store', help="Specify filename to backup from"),
         make_option("-I", "--input-path", help="Specify path on local filesystem to backup from"),
+        make_option("-s", "--servername", help="If backup file is not specified, filter the existing ones with the given servername"),
 
         make_option("-e", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),
         make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
@@ -54,7 +55,7 @@ class Command(BaseDbBackupCommand):
 
     def _restore_backup(self):
         self.logger.info("Restoring backup for media files")
-        input_filename, input_file = self._get_backup_file()
+        input_filename, input_file = self._get_backup_file(servername=self.servername)
         self.logger.info("Restoring: %s", input_filename)
 
         if self.decrypt:

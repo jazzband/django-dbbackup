@@ -5,10 +5,9 @@ import sys
 from logging import getLogger
 from optparse import make_option as optparse_make_option
 from shutil import copyfileobj
-import inspect
 
 import django
-from django.core.management.base import BaseCommand, LabelCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError
 from django.utils import six
 
 from ...storage import StorageError

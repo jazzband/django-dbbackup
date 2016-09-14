@@ -23,7 +23,7 @@ class Command(BaseDbBackupCommand):
         make_option("-d", "--database", help="Database to restore"),
         make_option("-i", "--input-filename", help="Specify filename to backup from"),
         make_option("-I", "--input-path", help="Specify path on local filesystem to backup from"),
-        make_option("-s", "--servername", help="Use a different servername backup"),
+        make_option("-s", "--servername", help="If backup file is not specified, filter the existing ones with the given servername"),
 
         make_option("-c", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),
         make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),

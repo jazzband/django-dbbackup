@@ -41,6 +41,10 @@ class StorageListBackupsTest(TestCase):
             (utils.filename_generate(ext, 'foodb'), None) for ext in
             ('db', 'db.gz', 'db.gpg', 'db.gz.gpg')
         ]
+        HANDLED_FILES['written_files'] += [
+            (utils.filename_generate(ext, 'foodb', 'fooserver'), None) for ext in
+            ('db', 'db.gz', 'db.gpg', 'db.gz.gpg')
+        ]
         # Media file
         HANDLED_FILES['written_files'] += [
             (utils.filename_generate(ext, None, None, 'media'), None) for ext in
@@ -79,6 +83,14 @@ class StorageListBackupsTest(TestCase):
         files = self.storage.list_backups(database='foodb')
         for file in files:
             self.assertIn('foodb', file)
+
+    def test_servername(self):
+        files = self.storage.list_backups(servername='fooserver')
+        for file in files:
+            self.assertIn('fooserver', file)
+        files = self.storage.list_backups(servername='barserver')
+        for file in files:
+            self.assertIn('barserver', file)
 
     def test_mediabackup(self):
         files = self.storage.list_backups(content_type='media')

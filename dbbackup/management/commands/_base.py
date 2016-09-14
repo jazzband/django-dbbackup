@@ -93,7 +93,7 @@ class BaseDbBackupCommand(BaseCommand):
         with open(path, 'wb') as fd:
             copyfileobj(outputfile, fd)
 
-    def _get_backup_file(self, database=None):
+    def _get_backup_file(self, database=None, servername=None):
         if self.path:
             input_filename = self.path
             input_file = self.read_local_file(self.path)
@@ -108,13 +108,14 @@ class BaseDbBackupCommand(BaseCommand):
                         encrypted=self.decrypt,
                         compressed=self.uncompress,
                         content_type=self.content_type,
-                        database=database)
+                        database=database,
+                        servername=servername)
                 except StorageError as err:
                     raise CommandError(err.args[0])
             input_file = self.read_from_storage(input_filename)
         return input_filename, input_file
 
-    def _cleanup_old_backups(self, database=None):
+    def _cleanup_old_backups(self, database=None, servername=None):
         """
         Cleanup old backups, keeping the number of backups specified by
         DBBACKUP_CLEANUP_KEEP and any backups that occur on first of the month.
@@ -122,4 +123,5 @@ class BaseDbBackupCommand(BaseCommand):
         self.storage.clean_old_backups(encrypted=self.encrypt,
                                        compressed=self.compress,
                                        content_type=self.content_type,
-                                       database=database)
+                                       database=database,
+                                       servername=servername)

@@ -9,6 +9,7 @@ from django.core.files import File
 from dbbackup.management.commands._base import BaseDbBackupCommand
 from dbbackup.storage import get_storage
 from dbbackup.tests.utils import DEV_NULL, HANDLED_FILES
+from dbbackup.settings import HOSTNAME
 
 
 class BaseDbBackupCommandSetLoggerLevelTest(TestCase):
@@ -94,15 +95,18 @@ class BaseDbBackupCommandCleanupOldBackupsTest(TestCase):
         self.command.servername = 'foo-server'
         self.command.storage = get_storage()
         HANDLED_FILES['written_files'] = [(f, None) for f in [
-            '2015-02-06-042810.tar',
-            '2015-02-07-042810.tar',
-            '2015-02-08-042810.tar',
-            'foodb-2015-02-06-042810.dump',
-            'foodb-2015-02-07-042810.dump',
-            'foodb-2015-02-08-042810.dump',
-            'bardb-2015-02-06-042810.dump',
-            'bardb-2015-02-07-042810.dump',
-            'bardb-2015-02-08-042810.dump',
+            'fooserver-2015-02-06-042810.tar',
+            'fooserver-2015-02-07-042810.tar',
+            'fooserver-2015-02-08-042810.tar',
+            'foodb-fooserver-2015-02-06-042810.dump',
+            'foodb-fooserver-2015-02-07-042810.dump',
+            'foodb-fooserver-2015-02-08-042810.dump',
+            'bardb-fooserver-2015-02-06-042810.dump',
+            'bardb-fooserver-2015-02-07-042810.dump',
+            'bardb-fooserver-2015-02-08-042810.dump',
+            'hamdb-hamserver-2015-02-06-042810.dump',
+            'hamdb-hamserver-2015-02-07-042810.dump',
+            'hamdb-hamserver-2015-02-08-042810.dump',
         ]]
 
     @patch('dbbackup.settings.CLEANUP_KEEP', 1)
@@ -111,18 +115,29 @@ class BaseDbBackupCommandCleanupOldBackupsTest(TestCase):
         self.command.database = 'foodb'
         self.command._cleanup_old_backups(database='foodb')
         self.assertEqual(2, len(HANDLED_FILES['deleted_files']))
-        self.assertNotIn('foodb-2015-02-08-042810.dump', HANDLED_FILES['deleted_files'])
+        self.assertNotIn('foodb-fooserver-2015-02-08-042810.dump',
+                         HANDLED_FILES['deleted_files'])
 
     @patch('dbbackup.settings.CLEANUP_KEEP', 1)
     def test_clean_other_db(self):
         self.command.content_type = 'db'
         self.command._cleanup_old_backups(database='bardb')
         self.assertEqual(2, len(HANDLED_FILES['deleted_files']))
-        self.assertNotIn('bardb-2015-02-08-042810.dump', HANDLED_FILES['deleted_files'])
+        self.assertNotIn('bardb-fooserver-2015-02-08-042810.dump',
+                         HANDLED_FILES['deleted_files'])
+
+    @patch('dbbackup.settings.CLEANUP_KEEP', 1)
+    def test_clean_other_server_db(self):
+        self.command.content_type = 'db'
+        self.command._cleanup_old_backups(database='bardb')
+        self.assertEqual(2, len(HANDLED_FILES['deleted_files']))
+        self.assertNotIn('bardb-fooserver-2015-02-08-042810.dump',
+                         HANDLED_FILES['deleted_files'])
 
     @patch('dbbackup.settings.CLEANUP_KEEP_MEDIA', 1)
     def test_clean_media(self):
         self.command.content_type = 'media'
         self.command._cleanup_old_backups()
         self.assertEqual(2, len(HANDLED_FILES['deleted_files']))
-        self.assertNotIn('2015-02-08-042810.tar', HANDLED_FILES['deleted_files'])
+        self.assertNotIn('foo-server-2015-02-08-042810.tar',
+                         HANDLED_FILES['deleted_files'])

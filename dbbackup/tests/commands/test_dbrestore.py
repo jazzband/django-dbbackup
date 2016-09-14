@@ -15,6 +15,7 @@ from dbbackup.db.base import get_connector
 from dbbackup.db.mongodb import MongoDumpConnector
 from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
 from dbbackup.storage import get_storage
+from dbbackup.settings import HOSTNAME
 from dbbackup.tests.utils import (TEST_DATABASE, add_private_gpg, DEV_NULL,
                                   clean_gpg_keys, HANDLED_FILES, TEST_MONGODB, TARED_FILE,
                                   get_dump, get_dump_name)
@@ -33,6 +34,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.passphrase = None
         self.command.interactive = True
         self.command.storage = get_storage()
+        self.command.servername = HOSTNAME
         self.command.database_name = 'default'
         self.command.connector = get_connector('default')
         HANDLED_FILES.clean()
@@ -126,6 +128,7 @@ class DbMongoRestoreCommandRestoreBackupTest(TestCase):
         self.command.storage = get_storage()
         self.command.connector = MongoDumpConnector()
         self.command.database_name = 'mongo'
+        self.command.servername = HOSTNAME
         HANDLED_FILES.clean()
         add_private_gpg()
 

@@ -33,6 +33,16 @@ Docs
 
 See our offical documentation at `Read The Docs`_.
 
+Why use DBBackup
+================
+
+This software doesn't reinvent the wheel, in few words it is a pipe between
+your Django project and your backup storage. It tries to use tradionnal dump &
+restore mechanisms, applies compression and/or encryption and stores it to a
+storage.
+
+It gives a simple interface to backup and restore your database or media
+files.
 
 Management Commands
 ===================

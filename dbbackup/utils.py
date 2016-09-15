@@ -391,6 +391,12 @@ def filename_generate(extension, database_name='', servername=None, content_type
             database_name = os.path.basename(database_name)
         if '.' in database_name:
             database_name = database_name.split('.')[0]
+        template = settings.FILENAME_TEMPLATE
+    elif content_type == 'media':
+        template = settings.MEDIA_FILENAME_TEMPLATE
+    else:
+        template = settings.FILENAME_TEMPLATE
+
     params = {
         'servername': servername or settings.HOSTNAME,
         'datetime': wildcard or timezone.now().strftime(settings.DATE_FORMAT),
@@ -398,10 +404,10 @@ def filename_generate(extension, database_name='', servername=None, content_type
         'extension': extension,
         'content_type': content_type
     }
-    if callable(settings.FILENAME_TEMPLATE):
-        filename = settings.FILENAME_TEMPLATE(**params)
+    if callable(template):
+        filename = template(**params)
     else:
-        filename = settings.FILENAME_TEMPLATE.format(**params)
+        filename = template.format(**params)
         filename = REG_FILENAME_CLEAN.sub('-', filename)
         filename = filename[1:] if filename.startswith('-') else filename
     return filename

@@ -163,7 +163,8 @@ class Storage(object):
         :raises: FileNotFound: If no backup file is found
         """
         files = self.list_backups(encrypted=encrypted, compressed=compressed,
-                                  content_type=content_type, database=database)
+                                  content_type=content_type, database=database,
+                                  servername=servername)
         if not files:
             raise FileNotFound("There's no backup file available.")
         return max(files, key=utils.filename_to_date)
@@ -196,7 +197,8 @@ class Storage(object):
         :raises: FileNotFound: If no backup file is found
         """
         files = self.list_backups(encrypted=encrypted, compressed=compressed,
-                                  content_type=content_type, database=database)
+                                  content_type=content_type, database=database,
+                                  servername=servername)
         if not files:
             raise FileNotFound("There's no backup file available.")
         return min(files, key=utils.filename_to_date)

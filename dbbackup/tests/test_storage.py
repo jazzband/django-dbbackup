@@ -42,7 +42,7 @@ class StorageListBackupsTest(TestCase):
             ('db', 'db.gz', 'db.gpg', 'db.gz.gpg')
         ]
         HANDLED_FILES['written_files'] += [
-            (utils.filename_generate(ext, 'foodb', 'fooserver'), None) for ext in
+            (utils.filename_generate(ext, 'hamdb', 'fooserver'), None) for ext in
             ('db', 'db.gz', 'db.gpg', 'db.gz.gpg')
         ]
         # Media file
@@ -61,6 +61,7 @@ class StorageListBackupsTest(TestCase):
 
     def test_nofilter(self):
         files = self.storage.list_backups()
+        self.assertEqual(len(HANDLED_FILES['written_files'])-1, len(files))
         for file in files:
             self.assertNotEqual('file_without_date', file)
 
@@ -74,7 +75,17 @@ class StorageListBackupsTest(TestCase):
         for file in files:
             self.assertIn('.gz', file)
 
-    def test_dbbackup(self):
+    def test_not_encrypted(self):
+        files = self.storage.list_backups(encrypted=False)
+        for file in files:
+            self.assertNotIn('.gpg', file)
+
+    def test_not_compressed(self):
+        files = self.storage.list_backups(compressed=False)
+        for file in files:
+            self.assertNotIn('.gz', file)
+
+    def test_content_type_db(self):
         files = self.storage.list_backups(content_type='db')
         for file in files:
             self.assertIn('.db', file)
@@ -83,16 +94,20 @@ class StorageListBackupsTest(TestCase):
         files = self.storage.list_backups(database='foodb')
         for file in files:
             self.assertIn('foodb', file)
+            self.assertNotIn('bardb', file)
+            self.assertNotIn('hamdb', file)
 
     def test_servername(self):
         files = self.storage.list_backups(servername='fooserver')
         for file in files:
             self.assertIn('fooserver', file)
+            self.assertNotIn('barserver', file)
         files = self.storage.list_backups(servername='barserver')
         for file in files:
             self.assertIn('barserver', file)
+            self.assertNotIn('fooserver', file)
 
-    def test_mediabackup(self):
+    def test_content_type_media(self):
         files = self.storage.list_backups(content_type='media')
         for file in files:
             self.assertIn('.tar', file)

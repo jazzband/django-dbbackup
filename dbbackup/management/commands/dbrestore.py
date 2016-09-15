@@ -67,7 +67,8 @@ class Command(BaseDbBackupCommand):
         """Restore the specified database."""
         input_filename, input_file = self._get_backup_file(database=self.database_name,
                                                            servername=self.servername)
-        self.logger.info("Restoring backup for database: %s", self.database['NAME'])
+        self.logger.info("Restoring backup for database '%s' and server '%s'",
+                         self.database_name, self.servername)
         self.logger.info("Restoring: %s" % input_filename)
 
         if self.decrypt:

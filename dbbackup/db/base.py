@@ -13,7 +13,7 @@ CONNECTOR_MAPPING = {
     'django.db.backends.sqlite3': 'dbbackup.db.sqlite.SqliteConnector',
     'django.db.backends.mysql': 'dbbackup.db.mysql.MysqlDumpConnector',
     'django.db.backends.postgresql': 'dbbackup.db.postgresql.PgDumpConnector',
-    'django.db.backends.postgresql_psycopg2': 'dbbackup.db.postgresql.PgDumpConnector',
+    'django.db.backends.postgresql_psycopg2': 'dbbackup.db.postgresql.PgDumpBinaryConnector',
     'django.db.backends.oracle': None,
     'django_mongodb_engine': 'dbbackup.db.mongo.MongoDumpConnector',
     'django.contrib.gis.db.backends.postgis': 'dbbackup.db.postgresql.PgDumpGisConnector',
@@ -73,18 +73,12 @@ class BaseDBConnector(object):
                                        server_name)
 
     def create_dump(self):
-        """
-        :return: File object
-        :rtype: file
-        """
         dump = self._create_dump()
         return dump
 
     def _create_dump(self):
         """
         Override this method to define dump creation.
-        :return: File object
-        :rtype: file
         """
         raise NotImplementedError("_create_dump not implemented")
 

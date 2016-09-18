@@ -12,7 +12,6 @@ from django.core.files.storage import get_storage_class
 from ._base import BaseDbBackupCommand, make_option
 from ... import utils
 from ...storage import get_storage, StorageError
-from ... import settings
 
 
 class Command(BaseDbBackupCommand):
@@ -46,7 +45,7 @@ class Command(BaseDbBackupCommand):
             self.storage = get_storage()
             self.backup_mediafiles()
             if options.get('clean'):
-                self._cleanup_old_backups()
+                self._cleanup_old_backups(servername=self.servername)
 
         except StorageError as err:
             raise CommandError(err)

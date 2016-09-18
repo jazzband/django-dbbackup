@@ -89,7 +89,7 @@ class Storage(object):
         return file_
 
     def list_backups(self, encrypted=None, compressed=None, content_type=None,
-                     database=None):
+                     database=None, servername=None):
         """
         List stored files except given filter. If filter is None, it won't be
         used. ``content_type`` must be ``'db'`` for database backups or
@@ -109,6 +109,9 @@ class Storage(object):
         :param database: Filter by source database's name
         :type: ``str`` or ``None``
 
+        :param servername: Filter by source server's name
+        :type: ``str`` or ``None``
+
         :returns: List of files
         :rtype: ``list`` of ``str``
         """
@@ -126,12 +129,14 @@ class Storage(object):
             files = [f for f in files if '.tar' in f]
         elif content_type == 'db':
             files = [f for f in files if '.tar' not in f]
-        if database is not None:
-            files = [f for f in files if '%s' % database in f]
+        if database:
+            files = [f for f in files if database in f]
+        if servername:
+            files = [f for f in files if servername in f]
         return files
 
     def get_latest_backup(self, encrypted=None, compressed=None,
-                          content_type=None, database=None):
+                          content_type=None, database=None, servername=None):
         """
         Return the latest backup file name.
 
@@ -149,19 +154,23 @@ class Storage(object):
         :param database: Filter by source database's name
         :type: ``str`` or ``None``
 
+        :param servername: Filter by source server's name
+        :type: ``str`` or ``None``
+
         :returns: Most recent file
         :rtype: ``str``
 
         :raises: FileNotFound: If no backup file is found
         """
         files = self.list_backups(encrypted=encrypted, compressed=compressed,
-                                  content_type=content_type, database=database)
+                                  content_type=content_type, database=database,
+                                  servername=servername)
         if not files:
             raise FileNotFound("There's no backup file available.")
         return max(files, key=utils.filename_to_date)
 
     def get_older_backup(self, encrypted=None, compressed=None,
-                         content_type=None, database=None):
+                         content_type=None, database=None, servername=None):
         """
         Return the older backup's file name.
 
@@ -179,19 +188,24 @@ class Storage(object):
         :param database: Filter by source database's name
         :type: ``str`` or ``None``
 
+        :param servername: Filter by source server's name
+        :type: ``str`` or ``None``
+
         :returns: Older file
         :rtype: ``str``
 
         :raises: FileNotFound: If no backup file is found
         """
         files = self.list_backups(encrypted=encrypted, compressed=compressed,
-                                  content_type=content_type, database=database)
+                                  content_type=content_type, database=database,
+                                  servername=servername)
         if not files:
             raise FileNotFound("There's no backup file available.")
         return min(files, key=utils.filename_to_date)
 
     def clean_old_backups(self, encrypted=None, compressed=None,
-                          content_type=None, database=None, keep_number=None):
+                          content_type=None, database=None, servername=None,
+                          keep_number=None):
         """
         Delete olders backups and hold the number defined.
 
@@ -209,6 +223,9 @@ class Storage(object):
         :param database: Filter by source database's name
         :type: ``str`` or ``None``
 
+        :param servername: Filter by source server's name
+        :type: ``str`` or ``None``
+
         :param keep_number: Number of files to keep, other will be deleted
         :type keep_number: ``int`` or ``None``
         """
@@ -216,7 +233,8 @@ class Storage(object):
             keep_number = settings.CLEANUP_KEEP if content_type == 'db' \
                 else settings.CLEANUP_KEEP_MEDIA
         files = self.list_backups(encrypted=encrypted, compressed=compressed,
-                                  content_type=content_type, database=database)
+                                  content_type=content_type, database=database,
+                                  servername=servername)
         files = sorted(files, key=utils.filename_to_date, reverse=True)
         files_to_delete = [fi for i, fi in enumerate(files) if i >= keep_number]
         for filename in files_to_delete:

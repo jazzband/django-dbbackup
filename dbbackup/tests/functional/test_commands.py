@@ -24,6 +24,15 @@ class DbBackupCommandTest(TestCase):
     def tearDown(self):
         clean_gpg_keys()
 
+    def test_database(self):
+        argv = ['', 'dbbackup', '--database=default']
+        execute_from_command_line(argv)
+        self.assertEqual(1, len(HANDLED_FILES['written_files']))
+        filename, outputfile = HANDLED_FILES['written_files'][0]
+        # Test file content
+        outputfile.seek(0)
+        self.assertTrue(outputfile.read())
+
     def test_encrypt(self):
         argv = ['', 'dbbackup', '--encrypt']
         execute_from_command_line(argv)
@@ -110,6 +119,15 @@ class DbRestoreCommandTest(TestCase):
         # Restore
         with self.assertRaises(SystemExit):
             execute_from_command_line(['', 'dbrestore', '--uncompress'])
+
+    def test_specify_db(self, *args):
+        # Create backup
+        execute_from_command_line(['', 'dbbackup', '--database', 'default'])
+        # Test wrong name
+        with self.assertRaises(SystemExit):
+            execute_from_command_line(['', 'dbrestore', '--database', 'foo'])
+        # Restore
+        execute_from_command_line(['', 'dbrestore', '--database', 'default'])
 
 
 class MediaBackupCommandTest(TestCase):

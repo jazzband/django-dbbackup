@@ -102,8 +102,6 @@ class PgDumpBinaryConnector(PgDumpConnector):
         cmd += ' --format=custom'
         for table in self.exclude:
             cmd += ' --exclude-table={}'.format(table)
-        if self.drop:
-            cmd += ' --clean'
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
         stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
@@ -119,6 +117,8 @@ class PgDumpBinaryConnector(PgDumpConnector):
         cmd += ' --no-password'
         if self.single_transaction:
             cmd += ' --single-transaction'
+        if self.drop:
+            cmd += ' --clean'
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr

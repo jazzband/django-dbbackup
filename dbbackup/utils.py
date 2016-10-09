@@ -399,7 +399,7 @@ def filename_generate(extension, database_name='', servername=None, content_type
 
     params = {
         'servername': servername or settings.HOSTNAME,
-        'datetime': wildcard or timezone.now().strftime(settings.DATE_FORMAT),
+        'datetime': wildcard or datetime.now().strftime(settings.DATE_FORMAT),
         'databasename': database_name,
         'extension': extension,
         'content_type': content_type

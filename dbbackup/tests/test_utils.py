@@ -215,6 +215,12 @@ class Filename_GenerateTest(TestCase):
         self.assertTrue(generated_name.startswith(dbbackup_settings.HOSTNAME))
         self.assertTrue(generated_name.endswith(extension))
 
+    @patch('django.utils.timezone.settings.USE_TZ', True)
+    def test_tz_true(self):
+        filename = utils.filename_generate('bak', 'default')
+        datestring = utils.filename_to_datestring(filename)
+        self.assertIn(datestring, filename)
+
     @patch('dbbackup.settings.FILENAME_TEMPLATE', callable_for_filename_template)
     def test_template_is_callable(self, *args):
         extension = 'foo'

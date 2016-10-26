@@ -21,6 +21,9 @@ CONNECTOR_MAPPING = {
     'django.contrib.gis.db.backends.spatialite': 'dbbackup.db.sqlite.SqliteConnector',
 }
 
+if settings.CUSTOM_CONNECTOR_MAPPING:
+    CONNECTOR_MAPPING.update(settings.CUSTOM_CONNECTOR_MAPPING)
+
 
 def get_connector(database_name=None):
     """

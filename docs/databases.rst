@@ -196,3 +196,16 @@ Create your connector is easy, create a children class from
 :class:`dbbackup.db.base.BaseDBConnector` and create ``create_dump`` and
 ``restore_dump``.  If your connector uses a command line tool heritate from
 :class:`dbbackup.db.base.BaseCommandDBConnector`
+
+Connecting a Custom connector
+-----------------------------
+
+Here is an example, on how to easily connect a custom connector that you have created or even that you simply want to reuse: ::
+
+    DBBACKUP_CONNECTOR_MAPPING = {
+        'transaction_hooks.backends.postgis': 'dbbackup.db.postgresql.PgDumpGisConnector',
+    }
+
+Obviously instead of :class:`dbbackup.db.postgresql.PgDumpGisConnector` you can
+use the custom connector you have created yourself and ``transaction_hooks.backends.postgis``
+is simply the database engine name you are using.

@@ -38,6 +38,8 @@ STORAGE_OPTIONS = getattr(settings, 'DBBACKUP_STORAGE_OPTIONS', {})
 
 CONNECTORS = getattr(settings, 'DBBACKUP_CONNECTORS', {})
 
+CUSTOM_CONNECTOR_MAPPING = getattr(settings, 'DBBACKUP_CONNECTOR_MAPPING', {})
+
 # Logging
 LOGGING = getattr(settings, 'DBBACKUP_LOGGING', dbbackup.log.DEFAULT_LOGGING)
 LOG_CONFIGURATOR = logging.config.DictConfigurator(LOGGING)

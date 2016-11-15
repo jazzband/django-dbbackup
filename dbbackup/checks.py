@@ -18,6 +18,10 @@ W004 = Warning('Invalid MEDIA_FILENAME_TEMPLATE parameter',
 W005 = Warning('Invalid DATE_FORMAT parameter',
                hint='settings.DBBACKUP_DATE_FORMAT can contain only [A-Za-z0-9%_-]',
                id='dbbackup.W005')
+W006 = Warning('FAILURE_RECIPIENTS has been deprecated',
+               hint='settings.DBBACKUP_FAILURE_RECIPIENTS is replaced by '
+                    'settings.DBBACKUP_ADMINS',
+               id='dbbackup.W006')
 
 
 @register(Tags.compatibility)
@@ -39,5 +43,8 @@ def check_settings(app_configs, **kwargs):
 
     if re.search(r'[^A-Za-z0-9%_-]', settings.DATE_FORMAT):
         errors.append(W005)
+
+    if getattr(settings, 'FAILURE_RECIPIENTS', None) is not None:
+        errors.append(W006)
 
     return errors

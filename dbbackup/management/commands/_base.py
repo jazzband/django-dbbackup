@@ -71,7 +71,7 @@ class BaseDbBackupCommand(BaseCommand):
             parser.add_argument(*args, **kwargs)
 
     def _set_logger_level(self):
-        level = 60 if self.quiet else LOGGING_VERBOSITY[self.verbosity]
+        level = 60 if self.quiet else LOGGING_VERBOSITY[int(self.verbosity)]
         self.logger.setLevel(level)
 
     def _ask_confirmation(self):

@@ -26,10 +26,6 @@ DATE_FORMAT = getattr(settings, 'DBBACKUP_DATE_FORMAT', '%Y-%m-%d-%H%M%S')
 FILENAME_TEMPLATE = getattr(settings, 'DBBACKUP_FILENAME_TEMPLATE', '{databasename}-{servername}-{datetime}.{extension}')
 MEDIA_FILENAME_TEMPLATE = getattr(settings, 'DBBACKUP_MEDIA_FILENAME_TEMPLATE', '{servername}-{datetime}.{extension}')
 
-FAILURE_RECIPIENTS = getattr(settings, 'DBBACKUP_FAILURE_RECIPIENTS', settings.ADMINS)
-SEND_EMAIL = getattr(settings, 'DBBACKUP_SEND_EMAIL', True)
-SERVER_EMAIL = getattr(settings, 'DBBACKUP_SERVER_EMAIL', settings.SERVER_EMAIL)
-
 GPG_ALWAYS_TRUST = getattr(settings, 'DBBACKUP_GPG_ALWAYS_TRUST', False)
 GPG_RECIPIENT = GPG_ALWAYS_TRUST = getattr(settings, 'DBBACKUP_GPG_RECIPIENT', None)
 
@@ -44,3 +40,13 @@ CUSTOM_CONNECTOR_MAPPING = getattr(settings, 'DBBACKUP_CONNECTOR_MAPPING', {})
 LOGGING = getattr(settings, 'DBBACKUP_LOGGING', dbbackup.log.DEFAULT_LOGGING)
 LOG_CONFIGURATOR = logging.config.DictConfigurator(LOGGING)
 LOG_CONFIGURATOR.configure()
+
+# Mail
+SEND_EMAIL = getattr(settings, 'DBBACKUP_SEND_EMAIL', True)
+SERVER_EMAIL = getattr(settings, 'DBBACKUP_SERVER_EMAIL', settings.SERVER_EMAIL)
+FAILURE_RECIPIENTS = getattr(settings, 'DBBACKUP_FAILURE_RECIPIENTS', None)
+if FAILURE_RECIPIENTS is None:
+    ADMINS = getattr(settings, 'DBBACKUP_ADMIN', settings.ADMINS)
+else:
+    ADMINS = FAILURE_RECIPIENTS
+EMAIL_SUBJECT_PREFIX = getattr(settings, 'DBBACKUP_EMAIL_SUBJECT_PREFIX', '[dbbackup] ')

@@ -1,6 +1,9 @@
 import logging
+from mock import patch
 import django
 from django.test import TestCase
+from django.core import mail
+from dbbackup import log
 from testfixtures import log_capture
 
 
@@ -90,3 +93,47 @@ class LoggerDefaultTestCase(TestCase):
             ('os.path', 'ERROR', 'an error'),
             ('os.path', 'CRITICAL', 'a critical error'),
         )
+
+
+class DBbackupAdminEmailHandlerTest(TestCase):
+    logger = logging.getLogger('dbbackup')
+
+    def get_admin_email_handler(self, logger):
+        admin_email_handler = [
+            h for h in logger.handlers
+            if h.__class__.__name__ == "DbbackupAdminEmailHandler"
+        ][0]
+        return admin_email_handler
+
+    def test_send_mail(self):
+        msg = "Super msg"
+        admin_email_handler = self.get_admin_email_handler(self.logger)
+        orig_filters = admin_email_handler.filters  # Backup filters
+        try:
+            admin_email_handler.filters = []
+            # Test mail error
+            self.logger.error(msg)
+            self.assertEqual(mail.outbox[0].subject, '[dbbackup] ERROR: Super msg')
+            # Test don't mail below
+            self.logger.warning(msg)
+            self.assertEqual(len(mail.outbox), 1)
+        finally:
+            admin_email_handler.filters = orig_filters
+
+    @patch('dbbackup.settings.SEND_EMAIL', False)
+    def test_send_mail_is_false(self):
+        msg = "Super msg"
+        self.logger.error(msg)
+        self.assertEqual(len(mail.outbox), 0)
+
+
+class MailEnabledFilterTest(TestCase):
+    @patch('dbbackup.settings.SEND_EMAIL', True)
+    def test_filter_is_true(self):
+        filter_ = log.MailEnabledFilter()
+        self.assertTrue(filter_.filter('foo'))
+
+    @patch('dbbackup.settings.SEND_EMAIL', False)
+    def test_filter_is_false(self):
+        filter_ = log.MailEnabledFilter()
+        self.assertFalse(filter_.filter('foo'))

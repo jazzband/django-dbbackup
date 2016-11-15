@@ -1,6 +1,8 @@
 """
 Tests for mediabackup command.
 """
+import os
+import tempfile
 from django.test import TestCase
 from django.core.files.storage import get_storage_class
 from dbbackup.management.commands.mediabackup import Command as DbbackupCommand
@@ -19,6 +21,13 @@ class MediabackupBackupMediafilesTest(TestCase):
         self.command.encrypt = False
         self.command.path = None
         self.command.media_storage = get_storage_class()()
+
+    def tearDown(self):
+        if self.command.path is not None:
+            try:
+                os.remove(self.command.path)
+            except OSError:
+                pass
 
     def test_func(self):
         self.command.backup_mediafiles()
@@ -48,3 +57,9 @@ class MediabackupBackupMediafilesTest(TestCase):
         outputfile = HANDLED_FILES['written_files'][0][1]
         outputfile.seek(0)
         self.assertTrue(outputfile.read().startswith(b'-----BEGIN PGP MESSAGE-----'))
+
+    def test_write_local_file(self):
+        self.command.path = tempfile.mktemp()
+        self.command.backup_mediafiles()
+        self.assertTrue(os.path.exists(self.command.path))
+        self.assertEqual(0, len(HANDLED_FILES['written_files']))

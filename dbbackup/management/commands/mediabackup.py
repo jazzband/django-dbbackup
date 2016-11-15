@@ -91,8 +91,11 @@ class Command(BaseDbBackupCommand):
             encrypted_file = utils.encrypt_file(tarball, filename)
             tarball, filename = encrypted_file
 
-        self.logger.debug("Backup size: %s", utils.handle_size(tarball))
+        if not self.quiet:
+            self.logger.debug("Backup size: %s", utils.handle_size(tarball))
+        # Store backup
+        tarball.seek(0)
         if self.path is None:
             self.write_to_storage(tarball, filename)
         else:
-            self.storage.write_file(tarball, filename)
+            self.write_local_file(tarball, self.path)

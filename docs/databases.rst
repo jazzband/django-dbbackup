@@ -58,7 +58,7 @@ EXTENSION
 Extension of backup file name, default ``'dump'``.
 
 Command connectors
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Some connectors use command line tools as dump engine, ``mysqldump`` for
 example. This kind of tools has common attributes:
@@ -95,6 +95,12 @@ ENV, DUMP_ENV and RESTORE_ENV
 Environment variables used during command running, default are ``{}``. ``ENV``
 is used for every command, ``DUMP_ENV`` and ``RESTORE_ENV``  override the
 values defined in ``ENV`` during the dedicated commands.
+
+USE_PARENT_ENV
+~~~~~~~~~~~~~~
+
+Specify if the connector will use its parent's environment variables. By
+default it is ``True`` to keep ``PATH``.
 
 SQLite
 ------

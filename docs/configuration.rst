@@ -15,7 +15,7 @@ Default: ``list(settings.DATABASES.keys())`` (keys of all entries listed)
 DBBACKUP_TMP_DIR
 ~~~~~~~~~~~~~~~~
 
-Directory to be used for temporary files.
+Directory to be used in local filesystem for temporary files.
 
 Default: ``tempfile.gettempdir()``
 
@@ -23,7 +23,7 @@ DBBACKUP_TMP_FILE_MAX_SIZE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Maximum size in bytes for file handling in memory before write a temporary
-file on ``DBBACKUP_TMP_DIR``.
+file in ``DBBACKUP_TMP_DIR``.
 
 Default: ``10*1024*1024``
 
@@ -31,8 +31,8 @@ Default: ``10*1024*1024``
 DBBACKUP_CLEANUP_KEEP and DBBACKUP_CLEANUP_KEEP_MEDIA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When issueing ``dbbackup`` and ``mediabackup``, old backup files are
-looked for and removed.
+When issueing ``dbbackup`` and ``mediabackup`` with ``--clean`` option, the
+number of old backup files are looked for and removed.
 
 Default: ``10`` (backups)
 
@@ -43,6 +43,13 @@ Date format to use for naming files. It must contain only alphanumerical
 characters, ``'_'``, ``'-'`` or ``'%'``.
 
 Default: ``'%Y-%m-%d-%H%M%S'``
+
+DBBACKUP_HOSTNAME
+~~~~~~~~~~~~~~~~~
+
+Used to identify backup by server name in their file name..
+
+Default: ``socket.gethostname()``
 
 DBBACKUP_FILENAME_TEMPLATE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,25 +75,6 @@ DBBACKUP_MEDIA_FILENAME_TEMPLATE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Same as ``DBBACKUP_FILENAME_TEMPLATE`` but for media files backups.
-
-
-DBBACKUP_SEND_EMAIL
-~~~~~~~~~~~~~~~~~~~
-
-Controls whether or not django-dbbackup sends an error email when an uncaught
-exception is received.
-
-Default: ``True``
-
-DBBACKUP_HOSTNAME
-~~~~~~~~~~~~~~~~~
-
-Hostname needed by django-dbbackup's uncaught exception email sender for
-well described error reporting. If you are using ``ALLOWED_HOSTS`` you should
-set ``DBBACKUP_HOSTNAME`` to any host from ``ALLOWED_HOSTS`` setting. Otherwise
-django-dbbackup can not send email to the ``SERVER_EMAIL``.
-
-Default: ``socket.gethostname()``
 
 Encrypting your backups
 -----------------------
@@ -133,6 +121,46 @@ DBBACKUP_GPG_RECIPIENT
 The name of the key that is used for encryption. This setting is only used
 when making a backup with the ``--encrypt`` or ``--decrypt`` option.
 
+Email configuration
+-------------------
+
+DBBACKUP_SEND_EMAIL
+~~~~~~~~~~~~~~~~~~~
+
+Controls whether or not django-dbbackup sends an error email when an uncaught
+exception is received.
+
+Default: ``True``
+
+DBBACKUP_SERVER_EMAIL
+~~~~~~~~~~~~~~~~~~~~~
+
+The email address that error messages come from, such as those sent to
+``DBBACKUP_ADMINS``.
+
+Default: ``django.conf.settings.SERVER_EMAIL``
+
+DBBACKUP_ADMINS
+~~~~~~~~~~~~~~~
+
+A list of all the people who get code error notifications. When ``DEBUG=False``
+and an operation raises an exception, DBBackup will email these people with the
+full exception information. This should be a tuple of (Full name,
+email address).
+
+Default: ``django.conf.settings.ADMINS``
+
+.. warning::
+    ``DBBACKUP_FAILURE_RECIPIENTS`` was used before and is deprecated
+
+DBBACKUP_EMAIL_SUBJECT_PREFIX
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Subject-line prefix for email messages sent by DBBackup.
+
+Default: ``'[dbbackup] '``
+
+
 Database configuration
 ----------------------
 
@@ -146,3 +174,5 @@ You have to use a storage for your backups, see `Storage settings`_ for more.
 
 .. _`Database settings`: ../databases.html
 .. _`Storage settings`: ../storage.html
+
+

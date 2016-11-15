@@ -160,10 +160,10 @@ Setup your Django project
 
     pip install dropbox django-storages
 
-...And make sure you have the following required project settings: ::
+...And make sure you have the following required settings: ::
 
 
-    DBBACKUP_STORAGE = 'storages.backends.dropbox.DropBoxStorage
+    DBBACKUP_STORAGE = 'storages.backends.dropbox.DropBoxStorage'
     DBBACKUP_STORAGE_OPTIONS = {
         'oauth2_access_token': 'my_token',
     }

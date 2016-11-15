@@ -46,7 +46,22 @@ class LoggerDefaultTestCase(TestCase):
             )
 
     @log_capture()
-    def test_dbbackup(self, captures):
+    def test_dbbackup_command(self, captures):
+        logger = logging.getLogger('dbbackup.command')
+        logger.debug('a noise')
+        logger.info('a message')
+        logger.warning('a warning')
+        logger.error('an error')
+        logger.critical('a critical error')
+        captures.check(
+            ('dbbackup.command', 'INFO', 'a message'),
+            ('dbbackup.command', 'WARNING', 'a warning'),
+            ('dbbackup.command', 'ERROR', 'an error'),
+            ('dbbackup.command', 'CRITICAL', 'a critical error'),
+        )
+
+    @log_capture()
+    def test_dbbackup_storage(self, captures):
         logger = logging.getLogger('dbbackup.storage')
         logger.debug('a noise')
         logger.info('a message')
@@ -54,7 +69,6 @@ class LoggerDefaultTestCase(TestCase):
         logger.error('an error')
         logger.critical('a critical error')
         captures.check(
-            ('dbbackup.storage', 'DEBUG', 'a noise'),
             ('dbbackup.storage', 'INFO', 'a message'),
             ('dbbackup.storage', 'WARNING', 'a warning'),
             ('dbbackup.storage', 'ERROR', 'an error'),

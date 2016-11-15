@@ -22,7 +22,8 @@ class Command(BaseDbBackupCommand):
     option_list = BaseDbBackupCommand.option_list + (
         make_option("-c", "--clean", help="Clean up old backup files", action="store_true",
                     default=False),
-        make_option("-s", "--servername", help="Specify server name to include in backup filename"),
+        make_option("-s", "--servername",
+                    help="Specify server name to include in backup filename"),
         make_option("-z", "--compress", help="Do not compress the archive", action="store_true",
                     default=False),
         make_option("-e", "--encrypt", help="Encrypt the backup files", action="store_true",
@@ -34,10 +35,15 @@ class Command(BaseDbBackupCommand):
     )
 
     @utils.email_uncaught_exception
-    def handle(self, *args, **options):
+    def handle(self, **options):
+        self.verbosity = options.get('verbosity')
+        self.quiet = options.get('quiet')
+        self._set_logger_level()
+
         self.encrypt = options.get('encrypt', False)
         self.compress = options.get('compress', False)
         self.servername = options.get('servername')
+
         self.filename = options.get('output_filename')
         self.path = options.get('output_path')
         try:
@@ -84,15 +90,13 @@ class Command(BaseDbBackupCommand):
         filename = utils.filename_generate(extension,
                                            servername=self.servername,
                                            content_type=self.content_type)
-
         tarball = self._create_tar(filename)
-
+        # Apply trans
         if self.encrypt:
             encrypted_file = utils.encrypt_file(tarball, filename)
             tarball, filename = encrypted_file
 
-        if not self.quiet:
-            self.logger.debug("Backup size: %s", utils.handle_size(tarball))
+        self.logger.debug("Backup size: %s", utils.handle_size(tarball))
         # Store backup
         tarball.seek(0)
         if self.path is None:

@@ -2,6 +2,7 @@
 Tests for base command class.
 """
 import os
+import logging
 from mock import patch
 from django.test import TestCase
 from django.utils import six
@@ -9,27 +10,36 @@ from django.core.files import File
 from dbbackup.management.commands._base import BaseDbBackupCommand
 from dbbackup.storage import get_storage
 from dbbackup.tests.utils import DEV_NULL, HANDLED_FILES
-from dbbackup.settings import HOSTNAME
 
 
 class BaseDbBackupCommandSetLoggerLevelTest(TestCase):
     def setUp(self):
         self.command = BaseDbBackupCommand()
 
-    def test_debug_level(self):
+    def test_0_level(self):
         self.command.verbosity = 0
         self.command._set_logger_level()
-        self.assertEqual(self.command.logger.level, 10)
+        self.assertEqual(self.command.logger.level, logging.WARNING)
 
-    def test_info_level(self):
+    def test_1_level(self):
         self.command.verbosity = 1
         self.command._set_logger_level()
-        self.assertEqual(self.command.logger.level, 20)
+        self.assertEqual(self.command.logger.level, logging.INFO)
+
+    def test_2_level(self):
+        self.command.verbosity = 2
+        self.command._set_logger_level()
+        self.assertEqual(self.command.logger.level, logging.DEBUG)
+
+    def test_3_level(self):
+        self.command.verbosity = 3
+        self.command._set_logger_level()
+        self.assertEqual(self.command.logger.level, logging.DEBUG)
 
     def test_quiet(self):
         self.command.quiet = True
         self.command._set_logger_level()
-        self.assertGreater(self.command.logger.level, 50)
+        self.assertGreater(self.command.logger.level, logging.ERROR)
 
 
 class BaseDbBackupCommandMethodsTest(TestCase):

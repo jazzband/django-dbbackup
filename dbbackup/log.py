@@ -2,7 +2,7 @@ DEFAULT_LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'console': {
+        'dbbackup.console': {
             'formatter': 'base',
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -14,13 +14,13 @@ DEFAULT_LOGGING = {
         'simple': {'format': '%(levelname)s %(message)s'}
     },
     'loggers': {
-        'dbbackup': {
-            'handlers': ['console'],
-            'level': 'DEBUG'
-        },
         'dbbackup.storage': {
-            'handlers': ['console'],
-            'level': 'DEBUG'
+            'handlers': ['dbbackup.console'],
+            'level': 'INFO'
+        },
+        'dbbackup.command': {
+            'handlers': ['dbbackup.console'],
+            'level': 'INFO'
         }
     }
 }

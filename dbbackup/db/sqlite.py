@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import warnings
 from tempfile import SpooledTemporaryFile
 from shutil import copyfileobj

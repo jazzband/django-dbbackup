@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 from mock import patch, mock_open
 from tempfile import SpooledTemporaryFile
@@ -11,6 +13,7 @@ from dbbackup.db.sqlite import SqliteConnector, SqliteCPConnector
 from dbbackup.db.mysql import MysqlDumpConnector
 from dbbackup.db.postgresql import PgDumpConnector, PgDumpGisConnector
 from dbbackup.db.mongodb import MongoDumpConnector
+from dbbackup.tests.testapp.models import CharModel
 
 
 class GetConnectorTest(TestCase):
@@ -98,7 +101,6 @@ class BaseCommandDBConnectorTest(TestCase):
 
 class SqliteConnectorTest(TestCase):
     def test_write_dump(self):
-
         dump_file = BytesIO()
         connector = SqliteConnector()
         connector._write_dump(dump_file)
@@ -107,6 +109,12 @@ class SqliteConnectorTest(TestCase):
             self.assertTrue(line.strip().endswith(b';'))
 
     def test_create_dump(self):
+        connector = SqliteConnector()
+        dump = connector.create_dump()
+        self.assertTrue(dump.read())
+
+    def test_create_dump_with_unicode(self):
+        CharModel.objects.create(field='\xe9')
         connector = SqliteConnector()
         dump = connector.create_dump()
         self.assertTrue(dump.read())

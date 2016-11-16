@@ -37,9 +37,10 @@ class Command(BaseDbBackupCommand):
 
     @utils.email_uncaught_exception
     def handle(self, **options):
-        """Django command handler."""
-        self.verbosity = int(options.get('verbosity'))
+        self.verbosity = options.get('verbosity')
         self.quiet = options.get('quiet')
+        self._set_logger_level()
+
         self.clean = options.get('clean')
 
         self.servername = options.get('servername')
@@ -67,19 +68,20 @@ class Command(BaseDbBackupCommand):
         """
         Save a new backup file.
         """
-        if not self.quiet:
-            self.logger.info("Backing Up Database: %s", database['NAME'])
+        self.logger.info("Backing Up Database: %s", database['NAME'])
+        # Get backup and name
         filename = self.connector.generate_filename(self.servername)
         outputfile = self.connector.create_dump()
+        # Apply trans
         if self.compress:
             compressed_file, filename = utils.compress_file(outputfile, filename)
             outputfile = compressed_file
         if self.encrypt:
             encrypted_file, filename = utils.encrypt_file(outputfile, filename)
             outputfile = encrypted_file
+        # Set file name
         filename = self.filename if self.filename else filename
-        if not self.quiet:
-            self.logger.info("Backup size: %s", utils.handle_size(outputfile))
+        self.logger.debug("Backup size: %s", utils.handle_size(outputfile))
         # Store backup
         outputfile.seek(0)
         if self.path is None:

@@ -5,18 +5,19 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import sys
 import os
+import traceback
 import tempfile
 import gzip
 import re
+import logging
 from getpass import getpass
 from shutil import copyfileobj
 from functools import wraps
 from datetime import datetime
 
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
 from django.db import connection
 from django.http import HttpRequest
-from django.views.debug import ExceptionReporter
 from django.utils import six, timezone
 
 from . import settings
@@ -84,6 +85,19 @@ def handle_size(filehandle):
     return bytes_to_str(filehandle.tell())
 
 
+def mail_admins(subject, message, fail_silently=False, connection=None,
+                html_message=None):
+    """Sends a message to the admins, as defined by the DBBACKUP_ADMINS setting."""
+    if not settings.ADMINS:
+        return
+    mail = EmailMultiAlternatives('%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
+                                  message, settings.SERVER_EMAIL, [a[1] for a in settings.ADMINS],
+                                  connection=connection)
+    if html_message:
+        mail.attach_alternative(html_message, 'text/html')
+    mail.send(fail_silently=fail_silently)
+
+
 def email_uncaught_exception(func):
     """
     Function decorator for send email with uncaught exceptions to admins.
@@ -91,24 +105,16 @@ def email_uncaught_exception(func):
     (``settings.ADMINS`` if not defined). The message contains a traceback
     of error.
     """
-    module = func.__module__
-
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             func(*args, **kwargs)
         except:
-            if settings.SEND_EMAIL:
-                excType, excValue, traceback = sys.exc_info()
-                reporter = ExceptionReporter(FAKE_HTTP_REQUEST, excType,
-                                             excValue, traceback.tb_next)
-                subject = 'Cron: Uncaught exception running %s' % module
-                body = reporter.get_traceback_html()
-                msgFrom = settings.SERVER_EMAIL
-                msgTo = [admin[1] for admin in settings.FAILURE_RECIPIENTS]
-                message = EmailMessage(subject, body, msgFrom, msgTo)
-                message.content_subtype = 'html'
-                message.send(fail_silently=False)
+            logger = logging.getLogger('dbbackup')
+            exc_type, exc_value, tb = sys.exc_info()
+            tb_str = ''.join(traceback.format_tb(tb))
+            msg = '%s: %s\n%s' % (exc_type.__name__, exc_value, tb_str)
+            logger.error(msg)
             raise
         finally:
             connection.close()

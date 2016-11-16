@@ -5,12 +5,15 @@ import os
 import tempfile
 import dj_database_url
 
+DEBUG = False
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TESTAPP_DIR = os.path.join(BASE_DIR, 'testapp/')
 BLOB_DIR = os.path.join(TESTAPP_DIR, 'blobs/')
 
-ADMIN = ('foo@bar')
+ADMINS = (
+    ('ham', 'foo@bar'),
+)
 ALLOWED_HOSTS = ['*']
 MIDDLEWARE_CLASSES = ()
 ROOT_URLCONF = 'dbbackup.tests.testapp.urls'
@@ -31,6 +34,8 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
+
+SERVER_EMAIL = 'dbbackup@test.org'
 
 DBBACKUP_GPG_RECIPIENT = "test@test"
 DBBACKUP_GPG_ALWAYS_TRUST = True,

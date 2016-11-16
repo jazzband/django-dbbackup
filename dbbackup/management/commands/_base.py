@@ -2,7 +2,7 @@
 Abstract Command.
 """
 import sys
-from logging import getLogger
+import logging
 from optparse import make_option as optparse_make_option
 from shutil import copyfileobj
 
@@ -26,6 +26,12 @@ TYPES = {
     'complex': complex,
     'choice': list
 }
+LOGGING_VERBOSITY = {
+    0: logging.WARN,
+    1: logging.INFO,
+    2: logging.DEBUG,
+    3: logging.DEBUG,
+}
 
 
 def make_option(*args, **kwargs):
@@ -46,7 +52,7 @@ class BaseDbBackupCommand(BaseCommand):
 
     verbosity = 1
     quiet = False
-    logger = getLogger('dbbackup.command')
+    logger = logging.getLogger('dbbackup.command')
 
     def __init__(self, *args, **kwargs):
         self.option_list = self.base_option_list + self.option_list
@@ -65,7 +71,7 @@ class BaseDbBackupCommand(BaseCommand):
             parser.add_argument(*args, **kwargs)
 
     def _set_logger_level(self):
-        level = 60 if self.quiet else (self.verbosity + 1) * 10
+        level = 60 if self.quiet else LOGGING_VERBOSITY[int(self.verbosity)]
         self.logger.setLevel(level)
 
     def _ask_confirmation(self):

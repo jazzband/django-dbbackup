@@ -17,13 +17,18 @@ class Command(BaseDbBackupCommand):
     content_type = 'media'
 
     option_list = (
-        make_option("-i", "--input-filename", action='store', help="Specify filename to backup from"),
-        make_option("-I", "--input-path", help="Specify path on local filesystem to backup from"),
-        make_option("-s", "--servername", help="If backup file is not specified, filter the existing ones with the given servername"),
-
-        make_option("-e", "--decrypt", help="Decrypt data before restoring", default=False, action='store_true'),
-        make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
-        make_option("-z", "--uncompress", help="Uncompress gzip data before restoring", action='store_true'),
+        make_option("-i", "--input-filename", action='store',
+                    help="Specify filename to backup from"),
+        make_option("-I", "--input-path",
+                    help="Specify path on local filesystem to backup from"),
+        make_option("-s", "--servername",
+                    help="If backup file is not specified, filter the existing ones with the "
+                         "given servername"),
+        make_option("-e", "--decrypt", default=False, action='store_true',
+                    help="Decrypt data before restoring"),
+        make_option("-p", "--passphrase", default=None, help="Passphrase for decrypt file"),
+        make_option("-z", "--uncompress", action='store_true',
+                    help="Uncompress gzip data before restoring"),
         make_option("-r", "--replace", help="Replace existing files", action='store_true'),
     )
 
@@ -31,14 +36,19 @@ class Command(BaseDbBackupCommand):
         """Django command handler."""
         self.verbosity = int(options.get('verbosity'))
         self.quiet = options.get('quiet')
-        self.filename = options.get('input_filename')
-        self.path = options.get('input_path')
+        self._set_logger_level()
+
         self.servername = options.get('servername')
         self.decrypt = options.get('decrypt')
         self.uncompress = options.get('uncompress')
+
+        self.filename = options.get('input_filename')
+        self.path = options.get('input_path')
+
         self.replace = options.get('replace')
         self.passphrase = options.get('passphrase')
         self.interactive = options.get('interactive')
+
         self.storage = get_storage()
         self.media_storage = get_storage_class()()
         self._restore_backup()
@@ -64,7 +74,7 @@ class Command(BaseDbBackupCommand):
             input_file.close()
             input_file = unencrypted_file
 
-        self.logger.info("Backup size: %s", utils.handle_size(input_file))
+        self.logger.debug("Backup size: %s", utils.handle_size(input_file))
         if self.interactive:
             self._ask_confirmation()
 

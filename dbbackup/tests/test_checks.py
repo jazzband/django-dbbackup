@@ -64,3 +64,9 @@ class ChecksTest(TestCase):
         expected_errors = [checks.W005]
         errors = checks.check_settings(DbbackupConfig)
         self.assertEqual(expected_errors, errors)
+
+    @patch('dbbackup.checks.settings.FAILURE_RECIPIENTS', 'foo@net.pt')
+    def test_Failure_recipients_warning(self):
+        expected_errors = [checks.W006]
+        errors = checks.check_settings(DbbackupConfig)
+        self.assertEqual(expected_errors, errors)

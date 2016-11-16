@@ -1,6 +1,9 @@
 import logging
+from mock import patch
 import django
 from django.test import TestCase
+from django.core import mail
+from dbbackup import log
 from testfixtures import log_capture
 
 
@@ -47,6 +50,21 @@ class LoggerDefaultTestCase(TestCase):
 
     @log_capture()
     def test_dbbackup(self, captures):
+        logger = logging.getLogger('dbbackup')
+        logger.debug('a noise')
+        logger.info('a message')
+        logger.warning('a warning')
+        logger.error('an error')
+        logger.critical('a critical error')
+        captures.check(
+            ('dbbackup', 'INFO', 'a message'),
+            ('dbbackup', 'WARNING', 'a warning'),
+            ('dbbackup', 'ERROR', 'an error'),
+            ('dbbackup', 'CRITICAL', 'a critical error'),
+        )
+
+    @log_capture()
+    def test_dbbackup_storage(self, captures):
         logger = logging.getLogger('dbbackup.storage')
         logger.debug('a noise')
         logger.info('a message')
@@ -54,7 +72,6 @@ class LoggerDefaultTestCase(TestCase):
         logger.error('an error')
         logger.critical('a critical error')
         captures.check(
-            ('dbbackup.storage', 'DEBUG', 'a noise'),
             ('dbbackup.storage', 'INFO', 'a message'),
             ('dbbackup.storage', 'WARNING', 'a warning'),
             ('dbbackup.storage', 'ERROR', 'an error'),
@@ -76,3 +93,36 @@ class LoggerDefaultTestCase(TestCase):
             ('os.path', 'ERROR', 'an error'),
             ('os.path', 'CRITICAL', 'a critical error'),
         )
+
+
+class DbbackupAdminEmailHandlerTest(TestCase):
+    def setUp(self):
+        self.logger = logging.getLogger('dbbackup')
+
+    @patch('dbbackup.settings.SEND_EMAIL', True)
+    def test_send_mail(self):
+        # Test mail error
+        msg = "Super msg"
+        self.logger.error(msg)
+        self.assertEqual(mail.outbox[0].subject, '[dbbackup] ERROR: Super msg')
+        # Test don't mail below
+        self.logger.warning(msg)
+        self.assertEqual(len(mail.outbox), 1)
+
+    @patch('dbbackup.settings.SEND_EMAIL', False)
+    def test_send_mail_is_false(self):
+        msg = "Super msg"
+        self.logger.error(msg)
+        self.assertEqual(len(mail.outbox), 0)
+
+
+class MailEnabledFilterTest(TestCase):
+    @patch('dbbackup.settings.SEND_EMAIL', True)
+    def test_filter_is_true(self):
+        filter_ = log.MailEnabledFilter()
+        self.assertTrue(filter_.filter('foo'))
+
+    @patch('dbbackup.settings.SEND_EMAIL', False)
+    def test_filter_is_false(self):
+        filter_ = log.MailEnabledFilter()
+        self.assertFalse(filter_.filter('foo'))

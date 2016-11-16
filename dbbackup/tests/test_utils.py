@@ -4,12 +4,12 @@ import tempfile
 from mock import patch
 from datetime import datetime
 
+import django
 from django.test import TestCase
 from django.core import mail
-from django.conf import settings
 from django.utils.six import StringIO
 
-from dbbackup import utils, settings as dbbackup_settings
+from dbbackup import utils, settings
 from dbbackup.tests.utils import (ENCRYPTED_FILE, clean_gpg_keys,
                                   add_private_gpg, COMPRESSED_FILE,
                                   callable_for_filename_template,
@@ -37,14 +37,41 @@ class Handle_SizeTest(TestCase):
         self.assertEqual(value, '11.0 B')
 
 
+class MailAdminsTest(TestCase):
+    def test_func(self):
+        subject = 'foo subject'
+        msg = 'bar message'
+
+        utils.mail_admins(subject, msg)
+        self.assertEqual(len(mail.outbox), 1)
+
+        sent_mail = mail.outbox[0]
+        expected_subject = '%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject)
+        expected_to = settings.ADMINS[0][1]
+        expected_from = settings.SERVER_EMAIL
+
+        self.assertEqual(sent_mail.subject, expected_subject)
+        self.assertEqual(sent_mail.body, msg)
+        self.assertEqual(sent_mail.to[0], expected_to)
+        self.assertEqual(sent_mail.from_email, expected_from)
+
+    @patch('dbbackup.settings.ADMINS', None)
+    def test_no_admin(self):
+        subject = 'foo subject'
+        msg = 'bar message'
+        self.assertIsNone(utils.mail_admins(subject, msg))
+        self.assertEqual(len(mail.outbox), 0)
+
+
 class Email_Uncaught_ExceptionTest(TestCase):
     def test_success(self):
         def func():
             pass
         utils.email_uncaught_exception(func)
+        self.assertEqual(len(mail.outbox), 0)
 
     @patch('dbbackup.settings.SEND_EMAIL', False)
-    def test_raise(self):
+    def test_raise_error_without_mail(self):
         def func():
             raise Exception('Foo')
         with self.assertRaises(Exception):
@@ -59,6 +86,11 @@ class Email_Uncaught_ExceptionTest(TestCase):
         with self.assertRaises(Exception):
             utils.email_uncaught_exception(func)()
         self.assertEqual(len(mail.outbox), 1)
+        error_mail = mail.outbox[0]
+        self.assertEqual(['foo@bar'], error_mail.to)
+        self.assertIn("Exception('Foo')", error_mail.subject)
+        if django.VERSION >= (1, 7):
+            self.assertIn("Exception('Foo')", error_mail.body)
 
 
 class Encrypt_FileTest(TestCase):
@@ -170,7 +202,7 @@ class Datefmt_To_Regex(TestCase):
 class Filename_To_DatestringTest(TestCase):
     def test_func(self):
         now = datetime.now()
-        datefmt = dbbackup_settings.DATE_FORMAT
+        datefmt = settings.DATE_FORMAT
         filename = '%s-foo.gz.gpg' % datetime.strftime(now, datefmt)
         datestring = utils.filename_to_datestring(filename, datefmt)
         self.assertIn(datestring, filename)
@@ -184,7 +216,7 @@ class Filename_To_DatestringTest(TestCase):
 class Filename_To_DateTest(TestCase):
     def test_func(self):
         now = datetime.now()
-        datefmt = dbbackup_settings.DATE_FORMAT
+        datefmt = settings.DATE_FORMAT
         filename = '%s-foo.gz.gpg' % datetime.strftime(now, datefmt)
         date = utils.filename_to_date(filename, datefmt)
         self.assertEqual(date.timetuple()[:5], now.timetuple()[:5])
@@ -206,13 +238,13 @@ class Filename_GenerateTest(TestCase):
     def test_db(self, *args):
         extension = 'foo'
         generated_name = utils.filename_generate(extension)
-        self.assertTrue(generated_name.startswith(dbbackup_settings.HOSTNAME))
+        self.assertTrue(generated_name.startswith(settings.HOSTNAME))
         self.assertTrue(generated_name.endswith(extension))
 
     def test_media(self, *args):
         extension = 'foo'
         generated_name = utils.filename_generate(extension, content_type='media')
-        self.assertTrue(generated_name.startswith(dbbackup_settings.HOSTNAME))
+        self.assertTrue(generated_name.startswith(settings.HOSTNAME))
         self.assertTrue(generated_name.endswith(extension))
 
     @patch('django.utils.timezone.settings.USE_TZ', True)

@@ -124,6 +124,10 @@ when making a backup with the ``--encrypt`` or ``--decrypt`` option.
 Email configuration
 -------------------
 
+.. note::
+    
+    Django 1.6 won't send the full traceback
+
 DBBACKUP_SEND_EMAIL
 ~~~~~~~~~~~~~~~~~~~
 
@@ -151,6 +155,7 @@ email address).
 Default: ``django.conf.settings.ADMINS``
 
 .. warning::
+
     ``DBBACKUP_FAILURE_RECIPIENTS`` was used before and is deprecated
 
 DBBACKUP_EMAIL_SUBJECT_PREFIX

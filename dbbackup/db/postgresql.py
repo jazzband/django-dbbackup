@@ -20,7 +20,7 @@ class PgDumpConnector(BaseCommandDBConnector):
         return super(PgDumpConnector, self).run_command(*args, **kwargs)
 
     def _create_dump(self):
-        cmd = '{} --dbname={}'.format(self.dump_cmd, self.settings['NAME'])
+        cmd = '{} {}'.format(self.dump_cmd, self.settings['NAME'])
         if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
         if self.settings.get('PORT'):

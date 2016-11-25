@@ -396,11 +396,11 @@ class PgDumpConnectorTest(TestCase):
         # Without
         connector.settings.pop('USER', None)
         connector.restore_dump(dump)
-        self.assertNotIn(' --user=', mock_restore_cmd.call_args[0][0])
+        self.assertNotIn(' --username=', mock_restore_cmd.call_args[0][0])
         # With
         connector.settings['USER'] = 'foo'
         connector.restore_dump(dump)
-        self.assertIn(' --user=foo', mock_restore_cmd.call_args[0][0])
+        self.assertIn(' --username=foo', mock_restore_cmd.call_args[0][0])
 
 
 @patch('dbbackup.db.postgresql.PgDumpGisConnector.run_command',
@@ -425,7 +425,7 @@ class PgDumpGisConnectorTest(TestCase):
         connector.settings['ADMIN_USER'] = 'foo'
         connector._enable_postgis()
         self.assertIn('"CREATE EXTENSION IF NOT EXISTS postgis;"', mock_dump_cmd.call_args[0][0])
-        self.assertIn('--user=foo', mock_dump_cmd.call_args[0][0])
+        self.assertIn('--username=foo', mock_dump_cmd.call_args[0][0])
 
     def test_enable_postgis_host(self, mock_dump_cmd):
         connector = PgDumpGisConnector()

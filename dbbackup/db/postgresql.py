@@ -43,7 +43,7 @@ class PgDumpConnector(BaseCommandDBConnector):
         if self.settings.get('PORT'):
             cmd += ' --port={}'.format(self.settings['PORT'])
         if self.settings.get('USER'):
-            cmd += ' --user={}'.format(self.settings['USER'])
+            cmd += ' --username={}'.format(self.settings['USER'])
         cmd += ' --no-password'
         # without this, psql terminates with an exit value of 0 regardless of errors
         cmd += ' --set ON_ERROR_STOP=on'
@@ -64,7 +64,7 @@ class PgDumpGisConnector(PgDumpConnector):
     def _enable_postgis(self):
         cmd = '{} -c "CREATE EXTENSION IF NOT EXISTS postgis;"'.format(
             self.psql_cmd)
-        cmd += ' --user={}'.format(self.settings['ADMIN_USER'])
+        cmd += ' --username={}'.format(self.settings['ADMIN_USER'])
         cmd += ' --no-password'
         if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])

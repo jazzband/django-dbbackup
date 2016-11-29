@@ -26,7 +26,7 @@ class PgDumpConnector(BaseCommandDBConnector):
         if self.settings.get('PORT'):
             cmd += ' --port={}'.format(self.settings['PORT'])
         if self.settings.get('USER'):
-            cmd += ' --user={}'.format(self.settings['USER'])
+            cmd += ' --username={}'.format(self.settings['USER'])
         cmd += ' --no-password'
         for table in self.exclude:
             cmd += ' --exclude-table={}'.format(table)

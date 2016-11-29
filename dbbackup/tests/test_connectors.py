@@ -281,11 +281,11 @@ class PgDumpConnectorTest(TestCase):
         # Without
         connector.settings.pop('USER', None)
         connector.create_dump()
-        self.assertNotIn(' --user=', mock_dump_cmd.call_args[0][0])
+        self.assertNotIn(' --username=', mock_dump_cmd.call_args[0][0])
         # With
         connector.settings['USER'] = 'foo'
         connector.create_dump()
-        self.assertIn(' --user=foo', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --username=foo', mock_dump_cmd.call_args[0][0])
 
     def test_create_dump_exclude(self, mock_dump_cmd):
         connector = PgDumpConnector()

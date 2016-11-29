@@ -20,13 +20,13 @@ class PgDumpConnector(BaseCommandDBConnector):
         return super(PgDumpConnector, self).run_command(*args, **kwargs)
 
     def _create_dump(self):
-        cmd = '{} {}'.format(self.dump_cmd, self.settings['NAME'])
+        cmd = '{} --dbname={}'.format(self.dump_cmd, self.settings['NAME'])
         if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
         if self.settings.get('PORT'):
             cmd += ' --port={}'.format(self.settings['PORT'])
         if self.settings.get('USER'):
-            cmd += ' --user={}'.format(self.settings['USER'])
+            cmd += ' --username={}'.format(self.settings['USER'])
         cmd += ' --no-password'
         for table in self.exclude:
             cmd += ' --exclude-table={}'.format(table)

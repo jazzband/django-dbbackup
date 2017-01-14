@@ -12,7 +12,7 @@ class CharModel(models.Model):
 
 
 class ForeignKeyModel(models.Model):
-    field = models.ForeignKey(CharModel)
+    field = models.ForeignKey(CharModel, on_delete=models.CASCADE)
 
 
 class ManyToManyModel(models.Model):

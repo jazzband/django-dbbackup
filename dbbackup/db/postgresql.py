@@ -107,7 +107,7 @@ class PgDumpBinaryConnector(PgDumpConnector):
         return stdout
 
     def _restore_dump(self, dump):
-        cmd = '{} {}'.format(self.restore_cmd, self.settings['NAME'])
+        cmd = '{} --dbname={}'.format(self.restore_cmd, self.settings['NAME'])
         if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
         if self.settings.get('PORT'):

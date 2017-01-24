@@ -20,6 +20,7 @@ class MediabackupBackupMediafilesTest(TestCase):
         self.command.compress = False
         self.command.encrypt = False
         self.command.path = None
+        self.command.filename = None
         self.command.media_storage = get_storage_class()()
 
     def tearDown(self):

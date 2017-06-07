@@ -24,7 +24,7 @@ class Command(BaseDbBackupCommand):
                     default=False),
         make_option("-s", "--servername",
                     help="Specify server name to include in backup filename"),
-        make_option("-z", "--compress", help="Do not compress the archive", action="store_true",
+        make_option("-z", "--compress", help="Compress the archive", action="store_true",
                     default=False),
         make_option("-e", "--encrypt", help="Encrypt the backup files", action="store_true",
                     default=False),

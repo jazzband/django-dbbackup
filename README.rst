@@ -116,7 +116,7 @@ Backup media files by get them one by one, include in a TAR file. ::
     -c, --clean           Clean up old backup files
     -s SERVERNAME, --servername=SERVERNAME
                           Specify server name to include in backup filename
-    -z, --compress        Do not compress the archive
+    -z, --compress        Compress the archive
     -e, --encrypt         Encrypt the backup files
     -o OUTPUT_FILENAME, --output-filename=OUTPUT_FILENAME
                           Specify filename on storage

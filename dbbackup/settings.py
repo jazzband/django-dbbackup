@@ -19,6 +19,7 @@ TMP_FILE_READ_SIZE = getattr(settings, 'DBBACKUP_TMP_FILE_READ_SIZE', 1024*1000)
 # Days to keep
 CLEANUP_KEEP = getattr(settings, 'DBBACKUP_CLEANUP_KEEP', 10)
 CLEANUP_KEEP_MEDIA = getattr(settings, 'DBBACKUP_CLEANUP_KEEP_MEDIA', CLEANUP_KEEP)
+CLEANUP_KEEP_FILTER = getattr(settings, 'DBBACKUP_CLEANUP_KEEP_FILTER', lambda x: False)
 
 MEDIA_PATH = getattr(settings, 'DBBACKUP_MEDIA_PATH', settings.MEDIA_ROOT)
 

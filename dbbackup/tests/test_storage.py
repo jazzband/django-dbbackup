@@ -1,5 +1,5 @@
 from mock import patch
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from dbbackup.storage import get_storage, Storage
 from dbbackup.tests.utils import HANDLED_FILES, FakeStorage
 from dbbackup import utils

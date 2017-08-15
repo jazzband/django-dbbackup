@@ -1,3 +1,4 @@
+from dbbackup import utils
 from .base import BaseCommandDBConnector
 
 
@@ -19,7 +20,7 @@ class MongoDumpConnector(BaseCommandDBConnector):
         if self.settings.get('USER'):
             cmd += ' --username {}'.format(self.settings['USER'])
         if self.settings.get('PASSWORD'):
-            cmd += ' --password {}'.format(self.settings['PASSWORD'])
+            cmd += ' --password {}'.format(utils.get_escaped_command_arg(self.settings['PASSWORD']))
         for collection in self.exclude:
             cmd += ' --excludeCollection {}'.format(collection)
         cmd += ' --archive'
@@ -35,7 +36,7 @@ class MongoDumpConnector(BaseCommandDBConnector):
         if self.settings.get('USER'):
             cmd += ' --username {}'.format(self.settings['USER'])
         if self.settings.get('PASSWORD'):
-            cmd += ' --password {}'.format(self.settings['PASSWORD'])
+            cmd += ' --password {}'.format(utils.get_escaped_command_arg(self.settings['PASSWORD']))
         if self.object_check:
             cmd += ' --objcheck'
         if self.drop:

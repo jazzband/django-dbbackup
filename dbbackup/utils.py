@@ -20,6 +20,11 @@ from django.db import connection
 from django.http import HttpRequest
 from django.utils import six, timezone
 
+try:
+    from pipes import quote
+except ImportError:
+    from shlex import quote
+
 from . import settings
 
 input = raw_input if six.PY2 else input  # noqa
@@ -417,3 +422,7 @@ def filename_generate(extension, database_name='', servername=None, content_type
         filename = REG_FILENAME_CLEAN.sub('-', filename)
         filename = filename[1:] if filename.startswith('-') else filename
     return filename
+
+
+def get_escaped_command_arg(arg):
+    return quote(arg)

@@ -258,3 +258,8 @@ class Filename_GenerateTest(TestCase):
         extension = 'foo'
         generated_name = utils.filename_generate(extension)
         self.assertTrue(generated_name.endswith('foo'))
+
+
+class QuoteCommandArg(TestCase):
+    def test_arg_with_space(self):
+        assert utils.get_escaped_command_arg('foo bar') == '\'foo bar\''

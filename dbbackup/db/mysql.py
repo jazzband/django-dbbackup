@@ -1,3 +1,4 @@
+from dbbackup import utils
 from .base import BaseCommandDBConnector
 
 
@@ -18,7 +19,7 @@ class MysqlDumpConnector(BaseCommandDBConnector):
         if self.settings.get('USER'):
             cmd += ' --user={}'.format(self.settings['USER'])
         if self.settings.get('PASSWORD'):
-            cmd += ' --password={}'.format(self.settings['PASSWORD'])
+            cmd += ' --password={}'.format(utils.get_escaped_command_arg(self.settings['PASSWORD']))
         for table in self.exclude:
             cmd += ' --ignore-table={}.{}'.format(self.settings['NAME'], table)
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
@@ -34,7 +35,7 @@ class MysqlDumpConnector(BaseCommandDBConnector):
         if self.settings.get('USER'):
             cmd += ' --user={}'.format(self.settings['USER'])
         if self.settings.get('PASSWORD'):
-            cmd += ' --password={}'.format(self.settings['PASSWORD'])
+            cmd += ' --password={}'.format(utils.get_escaped_command_arg(self.settings['PASSWORD']))
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr

@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.utils.six import BytesIO
 
 from dbbackup.db.sqlite import SqliteConnector, SqliteCPConnector
-from dbbackup.tests.testapp.models import CharModel
+from dbbackup.tests.testapp.models import CharModel, TextModel
 
 
 class SqliteConnectorTest(TestCase):

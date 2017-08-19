@@ -36,6 +36,19 @@ number of old backup files are looked for and removed.
 
 Default: ``10`` (backups)
 
+
+DBBACKUP_CLEANUP_FILTER
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A callable that takes a filename (of an old backup, to be cleaned) and returns
+a boolean indicating whether the backup should be kept (``True``) or deleted
+(``False``).
+
+Default: ``lambda filename: False``
+
+This can be used to keep monthly backups, for example.
+
+
 DBBACKUP_DATE_FORMAT
 ~~~~~~~~~~~~~~~~~~~~
 

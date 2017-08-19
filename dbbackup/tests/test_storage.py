@@ -152,6 +152,11 @@ class StorageGetMostRecentTest(TestCase):
         self.assertEqual(filename, '2015-02-06-042810.bak')
 
 
+def keep_only_even_files(filename):
+    from dbbackup.utils import filename_to_date
+    return filename_to_date(filename).day % 2 == 0
+
+
 class StorageCleanOldBackupsTest(TestCase):
     def setUp(self):
         self.storage = get_storage()
@@ -165,3 +170,8 @@ class StorageCleanOldBackupsTest(TestCase):
     def test_func(self):
         self.storage.clean_old_backups(keep_number=1)
         self.assertEqual(2, len(HANDLED_FILES['deleted_files']))
+
+    @patch('dbbackup.settings.CLEANUP_KEEP_FILTER', keep_only_even_files)
+    def test_keep_filter(self):
+        self.storage.clean_old_backups(keep_number=1)
+        self.assertListEqual(['2015-02-07-042810.bak'], HANDLED_FILES['deleted_files'])

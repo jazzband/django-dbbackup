@@ -269,7 +269,7 @@ Jail storage to this directory
 
 **params** - Default ``{}``
 
-Arugment used by meth:`paramikor.SSHClient.connect()`.
+Argument used by method:`paramikor.SSHClient.connect()`.
 See `paramiko SSHClient.connect() documentation`_ for details.
 
 **interactive** - Default ``False``

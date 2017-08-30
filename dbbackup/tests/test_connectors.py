@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import os
+from django.db import DEFAULT_DB_ALIAS
 from mock import patch, mock_open
 from tempfile import SpooledTemporaryFile
 
@@ -25,14 +26,28 @@ class GetConnectorTest(TestCase):
 class BaseDBConnectorTest(TestCase):
     def test_init(self):
         connector = BaseDBConnector()
+        self.assertEqual(connector.database_name, DEFAULT_DB_ALIAS)
+        self.assertTrue(connector.connection)
+
+    @patch('django.db.connections')
+    def test_init_with_args(self, mocked_connections):
+        connector = BaseDBConnector(database_name='foo')
+        self.assertEqual(connector.database_name, 'foo')
+        self.assertEqual(connector.connection, mocked_connections['foo'])
+
+    def test_init_with_kwargs(self):
+        connector = BaseDBConnector(FoO='bar')
+        self.assertEqual(connector.foo, 'bar')
 
     def test_settings(self):
         connector = BaseDBConnector()
-        connector.settings
+        self.assertFalse(hasattr(connector, '_settings'))
+        self.assertTrue(connector.settings)
+        self.assertTrue(hasattr(connector, '_settings'))
 
     def test_generate_filename(self):
         connector = BaseDBConnector()
-        filename = connector.generate_filename()
+        self.assertIsNotNone(connector.generate_filename())
 
 
 class BaseCommandDBConnectorTest(TestCase):
@@ -193,9 +208,9 @@ class MysqlDumpConnectorTest(TestCase):
         connector.create_dump()
         self.assertNotIn(' --password=', mock_dump_cmd.call_args[0][0])
         # With
-        connector.settings['PASSWORD'] = 'foo'
+        connector.settings['PASSWORD'] = 'foo bar'
         connector.create_dump()
-        self.assertIn(' --password=foo', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --password=\'foo bar\'', mock_dump_cmd.call_args[0][0])
 
     def test_create_dump_exclude(self, mock_dump_cmd):
         connector = MysqlDumpConnector()
@@ -512,9 +527,9 @@ class MongoDumpConnectorTest(TestCase):
         connector.create_dump()
         self.assertNotIn(' --password ', mock_dump_cmd.call_args[0][0])
         # With
-        connector.settings['PASSWORD'] = 'foo'
+        connector.settings['PASSWORD'] = 'foo bar'
         connector.create_dump()
-        self.assertIn(' --password foo', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --password \'foo bar\'', mock_dump_cmd.call_args[0][0])
 
     @patch('dbbackup.db.mongodb.MongoDumpConnector.run_command',
            return_value=(BytesIO(), BytesIO()))

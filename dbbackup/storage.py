@@ -84,7 +84,7 @@ class Storage(object):
     def read_file(self, filepath):
         self.logger.debug('Reading file %s', filepath)
         file_ = self.storage.open(name=filepath, mode='rb')
-        if file_.name is None:
+        if not getattr(file_, 'name', None):
             file_.name = filepath
         return file_
 

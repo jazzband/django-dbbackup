@@ -28,6 +28,9 @@ INSTALLED_APPS = (
 DATABASE = dj_database_url.config(default='sqlite:///%s' %
                                   tempfile.mktemp())
 DATABASES = {'default': DATABASE}
+if os.environ.get('CONNECTOR'):
+    CONNECTOR = {'CONNECTOR': os.environ['CONNECTOR']}
+    DBBACKUP_CONNECTORS = {'default': CONNECTOR}
 
 CACHES = {
     'default': {

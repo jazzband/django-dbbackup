@@ -130,22 +130,34 @@ MySQL uses by default :class:`dbbackup.db.mysql.MysqlDumpConnector`. It uses
 PostgreSQL
 ----------
 
-Postgres uses by default :class:`dbbackup.db.postgres.PgDumpConnector`. It
-allows PostGIS usage, and uses ``pg_dump`` and ``pqsl`` for its job.
-It can also use ``psql`` for launch administration command.
+Postgres uses by default :class:`dbbackup.db.postgres.PgDumpConnector`, but
+we advise to to use :class:`dbbackup.db.postgres.PgDumpBinaryConnector`. The
+first one uses ``pg_dump`` and ``pqsl`` for its job, creating RAW SQL files.
+
+The second uses ``pg_restore`` with binary dump files.
+
+They can also use ``psql`` for launch administration command.
 
 SINGLE_TRANSACTION
 ~~~~~~~~~~~~~~~~~~
 
-When doing a restore, wrap everything in a single transaction, so that errors
+When doing a restore, wrap everything in a single transaction, so errors
 cause a rollback.
+
+This corresponds to ``--single-transaction`` argument of ``psql`` and
+``pg_restore``.
 
 Default: ``True``
 
 DROP
 ~~~~
 
-Include tables dropping statements in dump. Default: ``True``
+With ``PgDumpConnector``, it includes tables dropping statements in dump file.
+``PgDumpBinaryConnector`` drops at restoring.
+
+This corresponds to ``--clean`` argument of ``pg_dump`` and ``pg_restore``.
+
+Default: ``True``
 
 PostGis
 -------
@@ -199,8 +211,8 @@ Custom connector
 ----------------
 
 Create your connector is easy, create a children class from
-:class:`dbbackup.db.base.BaseDBConnector` and create ``create_dump`` and
-``restore_dump``.  If your connector uses a command line tool heritate from
+:class:`dbbackup.db.base.BaseDBConnector` and create ``_create_dump`` and
+``_restore_dump``.  If your connector uses a command line tool, heritate from
 :class:`dbbackup.db.base.BaseCommandDBConnector`
 
 Connecting a Custom connector

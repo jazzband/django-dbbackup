@@ -6,8 +6,11 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+  - "3.6"
+  - "3.7"
   - "pypy"
   - "pypy3"
+  - "nightly"
 
 services:
   - mysql
@@ -23,6 +26,8 @@ env:
     - DJANGO=1.8
     - DJANGO=1.9
     - DJANGO=1.10
+    - DJANGO=1.11
+    - DJANGO=master
 
 install:
   - TOX_ENV=py${TRAVIS_PYTHON_VERSION}-django${DJANGO}
@@ -59,6 +64,7 @@ matrix:
         - DATABASE_URL=sqlite:////tmp/db.sqlite tox -e functional
         - DATABASE_URL=mysql://travis:@localhost/test tox -e functional
         - DATABASE_URL=postgres://postgres:@localhost/test tox -e functional
+        - CONNECTOR=dbbackup.db.postgresql.PgDumpBinaryConnector DATABASE_URL=postgres://postgres:@localhost/test tox -e functional
     - python: "3.4"
       env: TOX_ENV=upgrade
       install:
@@ -74,7 +80,15 @@ matrix:
   exclude:
     - python: "3.5"
       env: DJANGO=1.6
+    - python: "nightly"
+      env: DJANGO=1.6
+    - python: "3.6"
+      env: DJANGO=1.6
     - python: "3.5"
+      env: DJANGO=1.7
+    - python: "3.6"
+      env: DJANGO=1.7
+    - python: "nightly"
       env: DJANGO=1.7
     - python: "3.2"
       env: DJANGO=1.9
@@ -94,5 +108,26 @@ matrix:
       env: DJANGO=1.10
     - python: "pypy3"
       env: DJANGO=1.10
+    - python: "3.2"
+      env: DJANGO=1.11
+    - python: "3.3"
+      env: DJANGO=1.11
+    - python: "pypy3"
+      env: DJANGO=1.11
+    - python: "2.7"
+      env: DJANGO=master
+    - python: "3.2"
+      env: DJANGO=master
+    - python: "3.3"
+      env: DJANGO=master
+    - python: "pypy"
+      env: DJANGO=master
+    - python: "pypy3"
+      env: DJANGO=master
+    - python: "nightly"
+      env: DJANGO=master
   allow_failures:
-    - python: pypy3
+    - python: "pypy3"
+    - python: "nightly"
+    - python: "3.7"
+    - env: DJANGO=master

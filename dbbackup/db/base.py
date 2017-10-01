@@ -73,18 +73,12 @@ class BaseDBConnector(object):
                                        server_name)
 
     def create_dump(self):
-        """
-        :return: File object
-        :rtype: file
-        """
         dump = self._create_dump()
         return dump
 
     def _create_dump(self):
         """
         Override this method to define dump creation.
-        :return: File object
-        :rtype: file
         """
         raise NotImplementedError("_create_dump not implemented")
 

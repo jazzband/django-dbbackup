@@ -144,7 +144,7 @@ Setup your Dropbox account
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Login to Dropbox and navigate to Developers » MyApps.
-   https://www.dropbox.com/developers/start/setup#python
+   https://www.dropbox.com/developers/apps
 
 2. Click the button to create a new app and name it whatever you like.
    For reference, I named mine 'Website Backups'.

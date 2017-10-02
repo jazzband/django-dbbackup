@@ -18,11 +18,11 @@ Django Database Backup
 
 This Django application provides management commands to help backup and
 restore your project database and media files with various storages such as
-Amazon S3, DropBox, local file storage or any Django storage.
+Amazon S3, Dropbox, local file storage or any Django storage.
 
 It is made for:
 
-- Ensure yours backup with GPG signature and encryption
+- Ensure your backup with GPG signature and encryption
 - Archive with compression
 - Deal easily with remote archiving
 - Great to keep your development database up to date.
@@ -126,7 +126,7 @@ Backup media files by get them one by one, include in a TAR file. ::
 mediarestore
 ------------
 
-Restore media files ftom storage backup to your media storage. ::
+Restore media files from storage backup to your media storage. ::
 
   Usage: ./manage.py mediarestore [options]
   

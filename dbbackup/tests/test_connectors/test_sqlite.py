@@ -29,6 +29,12 @@ class SqliteConnectorTest(TestCase):
         dump = connector.create_dump()
         self.assertTrue(dump.read())
 
+    def test_create_dump_with_newline(self):
+        TextModel.objects.create(field='foo\nbar')
+        connector = SqliteConnector()
+        dump = connector.create_dump()
+        self.assertTrue(dump.read())
+
     def test_restore_dump(self):
         connector = SqliteConnector()
         dump = connector.create_dump()

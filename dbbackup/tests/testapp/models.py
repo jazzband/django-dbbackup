@@ -10,7 +10,11 @@ ___all__ = ('CharModel', 'IntegerModel', 'TextModel', 'BooleanModel'
 class CharModel(models.Model):
     field = models.CharField(max_length=10)
 
+    
+class TextModel(models.Model):
+    field = models.TextField()
 
+    
 class ForeignKeyModel(models.Model):
     field = models.ForeignKey(CharModel, on_delete=models.CASCADE)
 

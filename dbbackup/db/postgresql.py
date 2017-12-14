@@ -21,7 +21,7 @@ class PgDumpConnector(BaseCommandDBConnector):
         return super(PgDumpConnector, self).run_command(*args, **kwargs)
 
     def _create_dump(self):
-        cmd = '{} {}'.format(self.dump_cmd, self.settings['NAME'])
+        cmd = '{} '.format(self.dump_cmd)
         if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
         if self.settings.get('PORT'):
@@ -33,12 +33,13 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += ' --exclude-table={}'.format(table)
         if self.drop:
             cmd += ' --clean'
+        cmd += ' {}'.format(self.settings['NAME'])
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
         stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
 
     def _restore_dump(self, dump):
-        cmd = '{} {}'.format(self.restore_cmd, self.settings['NAME'])
+        cmd = '{} '.format(self.restore_cmd)
         if self.settings.get('HOST'):
             cmd += ' --host={}'.format(self.settings['HOST'])
         if self.settings.get('PORT'):
@@ -50,6 +51,7 @@ class PgDumpConnector(BaseCommandDBConnector):
         cmd += ' --set ON_ERROR_STOP=on'
         if self.single_transaction:
             cmd += ' --single-transaction'
+        cmd += ' {}'.format(self.settings['NAME'])
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr

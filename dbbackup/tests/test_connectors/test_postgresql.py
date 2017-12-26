@@ -78,16 +78,16 @@ class PgDumpConnectorTest(TestCase):
     def test_create_dump_exclude(self, mock_dump_cmd):
         # Without
         self.connector.create_dump()
-        self.assertNotIn(' --exclude-table=', mock_dump_cmd.call_args[0][0])
+        self.assertNotIn(' --exclude-table-data=', mock_dump_cmd.call_args[0][0])
         # With
         self.connector.exclude = ('foo',)
         self.connector.create_dump()
-        self.assertIn(' --exclude-table=foo', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --exclude-table-data=foo', mock_dump_cmd.call_args[0][0])
         # With serveral
         self.connector.exclude = ('foo', 'bar')
         self.connector.create_dump()
-        self.assertIn(' --exclude-table=foo', mock_dump_cmd.call_args[0][0])
-        self.assertIn(' --exclude-table=bar', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --exclude-table-data=foo', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --exclude-table-data=bar', mock_dump_cmd.call_args[0][0])
 
     def test_create_dump_drop(self, mock_dump_cmd):
         # Without
@@ -152,16 +152,16 @@ class PgDumpBinaryConnectorTest(TestCase):
     def test_create_dump_exclude(self, mock_dump_cmd):
         # Without
         self.connector.create_dump()
-        self.assertNotIn(' --exclude-table=', mock_dump_cmd.call_args[0][0])
+        self.assertNotIn(' --exclude-table-data=', mock_dump_cmd.call_args[0][0])
         # With
         self.connector.exclude = ('foo',)
         self.connector.create_dump()
-        self.assertIn(' --exclude-table=foo', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --exclude-table-data=foo', mock_dump_cmd.call_args[0][0])
         # With serveral
         self.connector.exclude = ('foo', 'bar')
         self.connector.create_dump()
-        self.assertIn(' --exclude-table=foo', mock_dump_cmd.call_args[0][0])
-        self.assertIn(' --exclude-table=bar', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --exclude-table-data=foo', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --exclude-table-data=bar', mock_dump_cmd.call_args[0][0])
 
     def test_create_dump_drop(self, mock_dump_cmd):
         # Without

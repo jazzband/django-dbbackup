@@ -30,7 +30,7 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += ' --username={}'.format(self.settings['USER'])
         cmd += ' --no-password'
         for table in self.exclude:
-            cmd += ' --exclude-table={}'.format(table)
+            cmd += ' --exclude-table-data={}'.format(table)
         if self.drop:
             cmd += ' --clean'
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
@@ -101,7 +101,7 @@ class PgDumpBinaryConnector(PgDumpConnector):
         cmd += ' --no-password'
         cmd += ' --format=custom'
         for table in self.exclude:
-            cmd += ' --exclude-table={}'.format(table)
+            cmd += ' --exclude-table-data={}'.format(table)
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
         stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout

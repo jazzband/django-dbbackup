@@ -59,16 +59,16 @@ class PgDumpConnectorTest(TestCase):
         connector = PgDumpConnector()
         # Without
         connector.create_dump()
-        self.assertNotIn(' --exclude-table=', mock_dump_cmd.call_args[0][0])
+        self.assertNotIn(' --exclude-table-data=', mock_dump_cmd.call_args[0][0])
         # With
         connector.exclude = ('foo',)
         connector.create_dump()
-        self.assertIn(' --exclude-table=foo', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --exclude-table-data=foo', mock_dump_cmd.call_args[0][0])
         # With serveral
         connector.exclude = ('foo', 'bar')
         connector.create_dump()
-        self.assertIn(' --exclude-table=foo', mock_dump_cmd.call_args[0][0])
-        self.assertIn(' --exclude-table=bar', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --exclude-table-data=foo', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --exclude-table-data=bar', mock_dump_cmd.call_args[0][0])
 
     def test_create_dump_drop(self, mock_dump_cmd):
         connector = PgDumpConnector()
@@ -183,16 +183,16 @@ class PgDumpBinaryConnectorTest(TestCase):
         connector = PgDumpBinaryConnector()
         # Without
         connector.create_dump()
-        self.assertNotIn(' --exclude-table=', mock_dump_cmd.call_args[0][0])
+        self.assertNotIn(' --exclude-table-data=', mock_dump_cmd.call_args[0][0])
         # With
         connector.exclude = ('foo',)
         connector.create_dump()
-        self.assertIn(' --exclude-table=foo', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --exclude-table-data=foo', mock_dump_cmd.call_args[0][0])
         # With serveral
         connector.exclude = ('foo', 'bar')
         connector.create_dump()
-        self.assertIn(' --exclude-table=foo', mock_dump_cmd.call_args[0][0])
-        self.assertIn(' --exclude-table=bar', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --exclude-table-data=foo', mock_dump_cmd.call_args[0][0])
+        self.assertIn(' --exclude-table-data=bar', mock_dump_cmd.call_args[0][0])
 
     def test_create_dump_drop(self, mock_dump_cmd):
         connector = PgDumpBinaryConnector()

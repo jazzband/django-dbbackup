@@ -3,8 +3,10 @@ Base database connectors
 """
 import os
 import shlex
+from django.core.files.base import ContentFile
+from storages.backends.sftpstorage import SFTPStorageFile
 from tempfile import SpooledTemporaryFile
-from subprocess import Popen
+from subprocess import Popen, PIPE
 from importlib import import_module
 from dbbackup import settings, utils
 from . import exceptions
@@ -135,8 +137,11 @@ class BaseCommandDBConnector(BaseDBConnector):
         full_env.update(self.env)
         full_env.update(env or {})
         try:
-            process = Popen(cmd, stdin=stdin, stdout=stdout, stderr=stderr,
-                            env=full_env)
+            if isinstance(stdin, (ContentFile, SFTPStorageFile)):
+                process = Popen(cmd, stdin=PIPE, stdout=stdout, stderr=stderr, env=full_env)
+                process.communicate(input=stdin.read())
+            else:
+                process = Popen(cmd, stdin=stdin, stdout=stdout, stderr=stderr, env=full_env)
             process.wait()
             if process.poll():
                 stderr.seek(0)

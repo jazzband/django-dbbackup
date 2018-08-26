@@ -146,7 +146,7 @@ class BaseCommandDBConnector(BaseDBConnector):
             if process.poll():
                 stderr.seek(0)
                 raise exceptions.CommandConnectorError(
-                    "Error running: {}\n{}".format(command, stderr.read()))
+                    "Error running: {}\n{}".format(command, stderr.read().decode('utf-8')))
             stdout.seek(0)
             stderr.seek(0)
             return stdout, stderr

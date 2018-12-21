@@ -9,3 +9,4 @@ pytz
 dj-database-url
 testfixtures
 paramiko
+astroid==1.6.5

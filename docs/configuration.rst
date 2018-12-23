@@ -73,7 +73,7 @@ also be made a function which takes the following keyword arguments:
 
 ::
 
-    def backup_filename(databasename, servername, datetime, extension):
+    def backup_filename(databasename, servername, datetime, extension, content_type):
         pass
 
     DBBACKUP_FILENAME_TEMPLATE = backup_filename

@@ -10,9 +10,9 @@ The following databases are supported by this application:
 - And the ones you will implement
 
 By default, DBBackup will try to use your database settings in ``DATABASES``
-for handle database, but some databases required custom options and you could
-want to use different parameters for backup. That why we included a
-``DBBACKUP_CONNECTORS`` setting, it act like the ``DATABASES`` one: ::
+for handle database, but some databases require custom options so you could
+want to use different parameters for backup. That's why we included a
+``DBBACKUP_CONNECTORS`` setting; it acts like the ``DATABASES`` one: ::
 
     DBBACKUP_CONNECTORS = {
         'default': {
@@ -22,10 +22,10 @@ want to use different parameters for backup. That why we included a
         }
     }
 
-This configuration will allow to use a replica with different host and user,
+This configuration will allow you to use a replica with a different host and user,
 which is a great pratice if you don't want to overload your main database.
 
-DBBackup uses ``Connectors`` for create and restore backups, below you'll see
+DBBackup uses ``Connectors`` for creating and restoring backups; below you'll see
 specific parameters for the built-in ones.
 
 Common
@@ -36,7 +36,7 @@ All connectors have the following parameters:
 CONNECTOR
 ~~~~~~~~~
 
-Absolute path to a connector class by default it is:
+Absolute path to a connector class by default is:
 
 - :class:`dbbackup.db.sqlite.SqliteConnector` for ``'django.db.backends.sqlite3'``
 - :class:`dbbackup.db.mysql.MysqlDumpConnector` for ``django.db.backends.mysql``
@@ -61,12 +61,12 @@ Command connectors
 ------------------
 
 Some connectors use command line tools as dump engine, ``mysqldump`` for
-example. This kind of tools has common attributes:
+example. These kinds of tools have common attributes:
 
 DUMP_CMD
 ~~~~~~~~
 
-Path to the command used for create a backup, default is the appropriate
+Path to the command used to create a backup; default is the appropriate
 command supposed to be in your PATH, for example: ``'mysqldump'`` for MySQL.
 
 This setting is useful only for connectors using command line tools (children
@@ -110,14 +110,14 @@ SQLite uses by default :class:`dbbackup.db.sqlite.SqliteConnector`.
 SqliteConnector
 ~~~~~~~~~~~~~~~
 
-It is in pure Python and copy the behavior of ``.dump`` command for create a
+It is in pure Python and copys the behavior of ``.dump`` command for creating a
 SQL dump.
 
 SqliteCPConnector
 ~~~~~~~~~~~~~~~~~
 
-You can also use :class:`dbbackup.db.sqlite.SqliteCPConnector` for make simple
-raw copy of your database file, like a snapshot.
+You can also use :class:`dbbackup.db.sqlite.SqliteCPConnector` for making a 
+simple raw copy of your database file, like a snapshot.
 
 In-memory database aren't dumpable with it.
 
@@ -131,7 +131,7 @@ PostgreSQL
 ----------
 
 Postgres uses by default :class:`dbbackup.db.postgres.PgDumpConnector`, but
-we advise to to use :class:`dbbackup.db.postgres.PgDumpBinaryConnector`. The
+we advise you to use :class:`dbbackup.db.postgres.PgDumpBinaryConnector`. The
 first one uses ``pg_dump`` and ``pqsl`` for its job, creating RAW SQL files.
 
 The second uses ``pg_restore`` with binary dump files.
@@ -159,11 +159,11 @@ This corresponds to ``--clean`` argument of ``pg_dump`` and ``pg_restore``.
 
 Default: ``True``
 
-PostGis
+PostGIS
 -------
 
-Set in :class:`dbbackup.db.postgres.PgDumpGisConnector`, it does the same than
-PostgreSQL but launch ``CREATE EXTENSION IF NOT EXISTS postgis;`` before
+Set in :class:`dbbackup.db.postgres.PgDumpGisConnector`, it does the same as
+PostgreSQL but launchs ``CREATE EXTENSION IF NOT EXISTS postgis;`` before
 restore database.
 
 PSQL_CMD
@@ -200,7 +200,7 @@ uses ``mongodump`` and ``mongorestore`` for its job.
 OBJECT_CHECK
 ~~~~~~~~~~~~
 
-Validate documents before insert in database (option ``--objcheck`` in command line), default is ``True``.
+Validate documents before inserting in database (option ``--objcheck`` in command line), default is ``True``.
 
 DROP
 ~~~~
@@ -210,9 +210,9 @@ Replace objects that are already in database, (option ``--drop`` in command line
 Custom connector
 ----------------
 
-Create your connector is easy, create a children class from
+Creating your connector is easy; create a children class from
 :class:`dbbackup.db.base.BaseDBConnector` and create ``_create_dump`` and
-``_restore_dump``.  If your connector uses a command line tool, heritate from
+``_restore_dump``.  If your connector uses a command line tool, inherit it from
 :class:`dbbackup.db.base.BaseCommandDBConnector`
 
 Connecting a Custom connector

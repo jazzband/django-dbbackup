@@ -18,7 +18,7 @@ In general, you should not be downloading and installing stuff
 directly off repositories -- especially not if you are backing
 up sensitive data.
 
-Security is important, bypassing PyPi repositories is a bad habbit,
+Security is important, bypassing PyPi repositories is a bad habit,
 because it will bypass the fragile key signatures authentication
 that are at least present when using PyPi repositories.
 

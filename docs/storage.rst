@@ -66,12 +66,55 @@ See `FileSystemStorage's documentation`_ for a full list of available settings.
 
 .. _`FileSystemStorage's documentation`: https://docs.djangoproject.com/en/1.9/ref/files/storage/#the-filesystemstorage-class
 
-Amazon S3
+Aliyum OSS2
 ---------
 
-Our S3 backend uses Django Storages which uses `boto`_.
+Setup
+~~~~~
 
-.. _`boto`: http://docs.pythonboto.org/en/latest/#
+In order to backup to Aliyun OSS2, you'll first need to create an Aliyum
+Webservices Account and setup your Aliyum OSS2 bucket. Once that is
+complete, you can follow the required setup below. ::
+
+    pip install django-aliyun-oss2-storage
+
+Add the following to your project's settings: ::
+
+    DBBACKUP_STORAGE = 'aliyun_oss2_storage.backends.AliyunBaseStorage'
+    ACCESS_KEY_ID = "ACCESS_KEY_ID"
+    ACCESS_KEY_SECRET = "ACCESS_KEY_SECRET"
+    END_POINT = "END_POINT"
+    BUCKET_NAME = "BUCKET_NAME"
+    BUCKET_ACL_TYPE = "BUCKET_ACL_TYPE"
+    
+Available settings
+~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+    More settings are available see `official documentation`_ for get more about.
+
+.. _`official documentation`: https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+
+**ACCESS_KEY_ID** - Required
+
+Your OSS2 access key as string. This can be found on your `OSS2 Account
+Security Credentials page`_.
+
+.. _`Amazon Account Security Credentials page`: https://console.aws.amazon.com/iam/home#security_credential
+
+**ACCESS_KEY_SECRET** - Required
+
+Your OSS2 Web Services secret access key, as a string.
+
+**BUCKET_NAME** - Required
+
+Your OSS2 Web Services storage bucket name, as a string. 
+
+**END_POINT** - Required: 
+
+**BUCKET_ACL_TYPE** - Required: "private" # private, public-read, public-read-write `
+
 
 Setup
 ~~~~~

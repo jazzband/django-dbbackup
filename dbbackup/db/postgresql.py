@@ -124,3 +124,23 @@ class PgDumpBinaryConnector(PgDumpConnector):
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr
+
+
+class FixtureConnector(BaseCommandDBConnector):
+    """
+    Dump data using django dumpdata command.
+    """
+    extension = 'json'
+
+    def run_command(self, *args, **kwargs):
+        return super(FixtureConnector, self).run_command(*args, **kwargs)
+
+    def _create_dump(self):
+        cmd = 'python manage.py dumpdata'
+        stdout, stderr = self.run_command(cmd, env=self.dump_env)
+        return stdout
+
+    def _restore_dump(self, dump):
+        cmd = 'python manage.py loaddata --format json -'
+        stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
+        return stdout, stderr

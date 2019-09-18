@@ -38,7 +38,9 @@ def get_connector(database_name=None):
     connection = connections[database_name]
     engine = connection.settings_dict['ENGINE']
     connector_settings = settings.CONNECTORS.get(database_name, {})
-    connector_path = connector_settings.get('CONNECTOR', CONNECTOR_MAPPING[engine])
+    connector_path = connector_settings.get('CONNECTOR', CONNECTOR_MAPPING.get(engine))
+    if connector_path is None:
+        raise KeyError("Must provide CONNECTOR classpath in DBBACKUP_CONNECTORS for engine %s" % engine)
     connector_module_path = '.'.join(connector_path.split('.')[:-1])
     module = import_module(connector_module_path)
     connector_name = connector_path.split('.')[-1]

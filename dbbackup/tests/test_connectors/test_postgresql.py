@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from mock import patch, mock_open
 
 from django.test import TestCase
-from django.utils.six import BytesIO
+from six import BytesIO
 
 from dbbackup.db.postgresql import (PgDumpConnector, PgDumpGisConnector,
                                     PgDumpBinaryConnector)

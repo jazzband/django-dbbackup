@@ -8,7 +8,7 @@ from shutil import copyfileobj
 
 import django
 from django.core.management.base import BaseCommand, CommandError
-from django.utils import six
+import six
 
 from ...storage import StorageError
 

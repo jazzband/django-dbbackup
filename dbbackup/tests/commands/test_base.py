@@ -5,7 +5,7 @@ import os
 import logging
 from mock import patch
 from django.test import TestCase
-from django.utils import six
+import six
 from django.core.files import File
 from dbbackup.management.commands._base import BaseDbBackupCommand
 from dbbackup.storage import get_storage

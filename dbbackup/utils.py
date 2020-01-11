@@ -15,10 +15,12 @@ from shutil import copyfileobj
 from functools import wraps
 from datetime import datetime
 
+import six
+
 from django.core.mail import EmailMultiAlternatives
 from django.db import connection
 from django.http import HttpRequest
-from django.utils import six, timezone
+from django.utils import timezone
 
 try:
     from pipes import quote
@@ -114,7 +116,7 @@ def email_uncaught_exception(func):
     def wrapper(*args, **kwargs):
         try:
             func(*args, **kwargs)
-        except:
+        except Exception:
             logger = logging.getLogger('dbbackup')
             exc_type, exc_value, tb = sys.exc_info()
             tb_str = ''.join(traceback.format_tb(tb))

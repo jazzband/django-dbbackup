@@ -1,6 +1,6 @@
 import re
 from django.core.checks import Warning, register, Tags
-from django.utils.six import string_types
+from six import string_types
 from dbbackup import settings
 
 W001 = Warning('Invalid HOSTNAME parameter',

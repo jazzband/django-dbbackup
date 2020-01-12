@@ -7,7 +7,7 @@ from datetime import datetime
 import django
 from django.test import TestCase
 from django.core import mail
-from django.utils.six import StringIO
+from six import StringIO
 
 from dbbackup import utils, settings
 from dbbackup.tests.utils import (ENCRYPTED_FILE, clean_gpg_keys,

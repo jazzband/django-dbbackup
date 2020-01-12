@@ -3,7 +3,7 @@ import warnings
 from tempfile import SpooledTemporaryFile
 from shutil import copyfileobj
 from django.db import IntegrityError, OperationalError
-from django.utils.six import BytesIO
+from six import BytesIO
 from .base import BaseDBConnector
 
 

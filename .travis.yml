@@ -63,7 +63,7 @@ matrix:
         - mysql -e 'CREATE DATABASE test;'
         - psql -c 'CREATE DATABASE test;' -U postgres
       script:
-        - DB_NAME=/tmp/db.sqlite tox -e functional
+        - tox -e functional
         - DB_ENGINE=django.db.backends.mysql DB_USER=travis DB_HOST=localhost DB_NAME=test tox -e functional
         - DB_ENGINE=djongo DB_USER=travis DB_HOST=localhost DB_NAME=test DB_PASSWORD=test tox -e functional
         - DB_ENGINE=django.db.backends.postgresql DB_USER=postgres DB_HOST=localhost DB_NAME=test tox -e functional

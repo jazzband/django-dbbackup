@@ -88,6 +88,5 @@ matrix:
     - python: "3.5"
       env: DJANGO=master
   allow_failures:
-    - python: "pypy3"
     - python: "nightly"
     - env: DJANGO=master

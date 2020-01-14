@@ -112,6 +112,7 @@ class DbrestoreCommandGetDatabaseTest(TestCase):
 
 
 @patch('dbbackup.management.commands._base.input', return_value='y')
+@patch('dbbackup.management.commands.dbrestore.get_connector', return_value=MongoDumpConnector())
 @patch('dbbackup.db.mongodb.MongoDumpConnector.restore_dump')
 class DbMongoRestoreCommandRestoreBackupTest(TestCase):
     def setUp(self):

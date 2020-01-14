@@ -6,4 +6,3 @@ python-gnupg
 django-storages
 pytz
 testfixtures
-djongo

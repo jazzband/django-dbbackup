@@ -35,7 +35,7 @@ install:
   - tox -e $TOX_ENV --notest
 
 before_script:
-  - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
+  - mongo test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
 script:
   - tox -e $TOX_ENV
 

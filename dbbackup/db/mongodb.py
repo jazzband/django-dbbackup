@@ -14,8 +14,8 @@ class MongoDumpConnector(BaseCommandDBConnector):
 
     def _create_dump(self):
         cmd = '{} --db {}'.format(self.dump_cmd, self.settings['NAME'])
-        host = self.settings.get('HOST', 'localhost')
-        port = self.settings.get('PORT', 27017)
+        host = self.settings.get('HOST') or 'localhost'
+        port = self.settings.get('PORT') or 27017
         cmd += ' --host {}:{}'.format(host, port)
         if self.settings.get('USER'):
             cmd += ' --username {}'.format(self.settings['USER'])
@@ -30,8 +30,8 @@ class MongoDumpConnector(BaseCommandDBConnector):
 
     def _restore_dump(self, dump):
         cmd = self.restore_cmd
-        host = self.settings.get('HOST', 'localhost')
-        port = self.settings.get('PORT', 27017)
+        host = self.settings.get('HOST') or 'localhost'
+        port = self.settings.get('PORT') or 27017
         cmd += ' --host {}:{}'.format(host, port)
         if self.settings.get('USER'):
             cmd += ' --username {}'.format(self.settings['USER'])

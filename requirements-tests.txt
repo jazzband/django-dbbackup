@@ -5,5 +5,5 @@ coverage
 python-gnupg
 django-storages
 pytz
-dj-database-url
 testfixtures
+djongo

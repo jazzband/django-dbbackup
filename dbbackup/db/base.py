@@ -17,6 +17,7 @@ CONNECTOR_MAPPING = {
     'django.db.backends.postgresql_psycopg2': 'dbbackup.db.postgresql.PgDumpConnector',
     'django.db.backends.oracle': None,
     'django_mongodb_engine': 'dbbackup.db.mongo.MongoDumpConnector',
+    'djongo': 'dbbackup.db.mongo.MongoDumpConnector',
     'django.contrib.gis.db.backends.postgis': 'dbbackup.db.postgresql.PgDumpGisConnector',
     'django.contrib.gis.db.backends.mysql': 'dbbackup.db.mysql.MysqlDumpConnector',
     'django.contrib.gis.db.backends.oracle': None,

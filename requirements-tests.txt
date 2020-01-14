@@ -6,3 +6,4 @@ python-gnupg
 django-storages
 pytz
 testfixtures
+mock

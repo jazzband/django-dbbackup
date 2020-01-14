@@ -34,8 +34,6 @@ install:
   - pip install virtualenv tox
   - tox -e $TOX_ENV --notest
 
-before_script:
-  - mongo test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
 script:
   - tox -e $TOX_ENV
 
@@ -65,7 +63,7 @@ matrix:
       script:
         - tox -e functional
         - DB_ENGINE=django.db.backends.mysql DB_USER=travis DB_HOST=localhost DB_NAME=test tox -e functional
-        - DB_ENGINE=djongo DB_USER=travis DB_HOST=localhost DB_NAME=test DB_PASSWORD=test tox -e functional
+        - DB_ENGINE=djongo DB_NAME=test tox -e functional
         - DB_ENGINE=django.db.backends.postgresql DB_USER=postgres DB_HOST=localhost DB_NAME=test tox -e functional
         - CONNECTOR=dbbackup.db.postgresql.PgDumpBinaryConnector DB_ENGINE=django.db.backends.postgresql DB_USER=postgres DB_HOST=localhost DB_NAME=test tox -e functional
   exclude:

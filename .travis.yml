@@ -10,8 +10,6 @@ python:
   - "pypy3"
   - "nightly"
 
-  before_script:
-  - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
 
 services:
   - mysql
@@ -19,6 +17,8 @@ services:
   - mongodb
 addons:
   postgresql: "10"
+  apt:
+    update: true
 
 env:
   matrix:
@@ -27,11 +27,15 @@ env:
     - DJANGO=3.0
     - DJANGO=master
 
+before_install:
+  - sudo apt-get -y install gnupg
 install:
   - TOX_ENV=py${TRAVIS_PYTHON_VERSION}-django${DJANGO}
   - pip install virtualenv tox
   - tox -e $TOX_ENV --notest
 
+before_script:
+  - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
 script:
   - tox -e $TOX_ENV
 

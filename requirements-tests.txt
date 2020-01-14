@@ -1,8 +1,7 @@
 pep8
 flake8
 pylint
-mock
-coverage<5
+coverage
 python-gnupg
 django-storages
 pytz

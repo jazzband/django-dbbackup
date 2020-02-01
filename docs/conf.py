@@ -45,13 +45,12 @@ master_doc = 'index'
 project = u'django-dbbackup'
 copyright = u'2016, Michael Shepanski'
 
-path = os.path.join(
-    os.path.split(
-        os.path.abspath(
-            os.path.dirname(__file__)
-        )
-    )[:-1]
-)[0]
+# basepath
+path = os.path.dirname(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    )
+)
 
 sys.path = [path] + sys.path
 sys.path = [os.path.join(path, 'dbbackup')] + sys.path

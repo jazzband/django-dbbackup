@@ -46,9 +46,10 @@ test_media_results () {
 
 
 main () {
-    if [[ -z "$DATABASE_URL" ]]; then
-        DATABASE_FILE="$(mktemp)"
-        export DATABASE_URL="sqlite:///$DATABASE_FILE"
+    if [[ -z "$DB_ENGINE" ]] || [[ "$DB_ENGINE" = "django.db.backends.sqlite3" ]]; then
+        if [[ -z "$DB_NAME" ]]; then
+            export DB_NAME="$(mktemp)"
+        fi
     fi
     export PYTHON=${PYTHON:-python}
     export STORAGE="${STORAGE:-django.core.files.storage.FileSystemStorage}"
@@ -56,15 +57,17 @@ main () {
     export STORAGE_OPTIONS="${STORAGE_OPTIONS:-location=$STORAGE_LOCATION}"
     export MEDIA_ROOT="/tmp/media/"
 
-    make_db_test 
+    make_db_test
     test_db_results
 
     mkdir -p $STORAGE_LOCATION
     mkdir -p $MEDIA_ROOT
-    make_media_test 
+    make_media_test
     test_media_results
 
-    [[ -n "$DATABASE_FILE" ]] && rm "$DATABASE_FILE"
+    if [[ -z "$DB_ENGINE" ]] || [[ "$DB_ENGINE" = "django.db.backends.sqlite3" ]]; then
+        rm "$DB_NAME"
+    fi
     rm -rf "$MEDIA_ROOT"
 
     return $((db_success + media_success))

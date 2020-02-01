@@ -84,12 +84,29 @@ DBBackup contains a test Django project at ``dbbackup.tests`` and its
 ``settings`` module. This configuration takes care of the following
 environment variables:
 
-**DATABASE_URL** - Default: ``'sqlite:///%s' % tempfile.mktemp()``
+**DB_ENGINE** - Default: ``django.db.backends.sqlite3``
 
-A URL representing the used database, see `DJ-Database-URL`_ for all the
-available format.
+Databank-Engine to use. See in django.db.backends for default backends.
 
-.. _`DJ-Database-URL`: https://github.com/kennethreitz/dj-database-url
+**DB_NAME** - Default: ``:memory:``
+
+Database name. Should be set correctly if an other db is used than sqlite3
+
+**DB_USER** - Default: ``None``
+
+DB Username
+
+**DB_PASSWORD** - Default: ``None``
+
+DB Password
+
+**DB_HOST** - Default: ``None``
+
+DB Host
+
+Why is this more complicated than the earlier solution?
+For mongodb tests dj-database-url had no ENGINE defined.
+
 
 **MEDIA_ROOT** - Default= ``tempfile.mkdtemp()``
 

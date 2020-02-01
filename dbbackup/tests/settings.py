@@ -3,7 +3,6 @@ Configuration and launcher for dbbackup tests.
 """
 import os
 import tempfile
-import dj_database_url
 
 DEBUG = False
 
@@ -25,9 +24,13 @@ INSTALLED_APPS = (
     'dbbackup.tests.testapp',
 )
 
-DATABASE = dj_database_url.config(default='sqlite:///%s' %
-                                  tempfile.mktemp())
-DATABASES = {'default': DATABASE}
+DATABASES = {'default': {
+    "ENGINE": os.environ.get('DB_ENGINE', "django.db.backends.sqlite3"),
+    "NAME": os.environ.get('DB_NAME', ":memory:"),
+    "USER": os.environ.get('DB_USER'),
+    "PASSWORD": os.environ.get('DB_PASSWORD'),
+    "HOST": os.environ.get('DB_HOST'),
+}}
 if os.environ.get('CONNECTOR'):
     CONNECTOR = {'CONNECTOR': os.environ['CONNECTOR']}
     DBBACKUP_CONNECTORS = {'default': CONNECTOR}

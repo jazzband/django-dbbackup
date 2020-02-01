@@ -10,12 +10,11 @@ python:
   - "pypy3"
   - "nightly"
 
+
 services:
   - mysql
   - postgresql
   - mongodb
-addons:
-  postgresql: "10"
 
 env:
   matrix:
@@ -48,7 +47,7 @@ matrix:
       install: pip install tox
       script: tox -e $TOX_ENV
     - python: "3.7"
-      env: ENV=functional
+      env: TOX_ENV=functional
       install:
         - pip install tox
         - export PYTHON='coverage run -a'
@@ -56,10 +55,17 @@ matrix:
         - mysql -e 'CREATE DATABASE test;'
         - psql -c 'CREATE DATABASE test;' -U postgres
       script:
-        - DATABASE_URL=sqlite:////tmp/db.sqlite tox -e functional
-        - DATABASE_URL=mysql://travis:@localhost/test tox -e functional
-        - DATABASE_URL=postgres://postgres:@localhost/test tox -e functional
-        - CONNECTOR=dbbackup.db.postgresql.PgDumpBinaryConnector DATABASE_URL=postgres://postgres:@localhost/test tox -e functional
+        - tox -e $TOX_ENV
+        - DB_ENGINE=django.db.backends.mysql DB_USER=travis DB_HOST=localhost DB_NAME=test tox -e $TOX_ENV
+        - DB_ENGINE=django.db.backends.postgresql DB_USER=postgres DB_HOST=localhost DB_NAME=test tox -e $TOX_ENV
+        - CONNECTOR=dbbackup.db.postgresql.PgDumpBinaryConnector DB_ENGINE=django.db.backends.postgresql DB_USER=postgres DB_HOST=localhost DB_NAME=test tox -e $TOX_ENV
+    - python: "3.7"
+      env: TOX_ENV=functional-mongodb
+      install:
+        - pip install tox
+        - export PYTHON='coverage run -a'
+      script:
+        - DB_ENGINE=djongo DB_NAME=test tox -e $TOX_ENV
   exclude:
     - python: "nightly"
       env: DJANGO=1.11
@@ -80,6 +86,6 @@ matrix:
     - python: "3.5"
       env: DJANGO=master
   allow_failures:
-    - python: "pypy3"
     - python: "nightly"
     - env: DJANGO=master
+    - env: TOX_ENV=functional-mongodb

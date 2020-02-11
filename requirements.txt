@@ -1,3 +1,5 @@
 pytz
 six
 Django>=1.5
+paramiko #django-dbbackup
+django-storages #django-dbbackup

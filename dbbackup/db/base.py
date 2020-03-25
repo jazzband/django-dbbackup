@@ -5,7 +5,7 @@ import os
 import shlex
 from django.core.files.base import File
 from tempfile import SpooledTemporaryFile
-from subprocess import Popen
+from subprocess import Popen, PIPE
 from importlib import import_module
 from dbbackup import settings, utils
 from . import exceptions
@@ -138,10 +138,8 @@ class BaseCommandDBConnector(BaseDBConnector):
         full_env.update(env or {})
         try:
             if isinstance(stdin, File):
-                process = Popen(
-                    cmd, stdin=stdin.open("rb"), stdout=stdout, stderr=stderr,
-                    env=full_env
-                )
+                process = Popen(cmd, stdin=PIPE, stdout=stdout, stderr=stderr, env=full_env)
+                process.communicate(input=stdin.read())
             else:
                 process = Popen(cmd, stdin=stdin, stdout=stdout, stderr=stderr, env=full_env)
             process.wait()

@@ -47,8 +47,9 @@ class PgDumpConnector(BaseCommandDBConnector):
         if self.settings.get('USER'):
             cmd += ' --username={}'.format(self.settings['USER'])
         cmd += ' --no-password'
-        # without this, psql terminates with an exit value of 0 regardless of errors
-        # cmd += ' --set ON_ERROR_STOP=on'
+        if self.settings.get('ON_ERROR_STOP', True):
+            # without this, psql terminates with an exit value of 0 regardless of errors
+            cmd += ' --set ON_ERROR_STOP=on'
         if self.single_transaction:
             cmd += ' --single-transaction'
         cmd += ' {}'.format(self.settings['NAME'])

@@ -85,11 +85,15 @@ class Command(BaseDbBackupCommand):
         """
         Create backup file and write it to storage.
         """
-        # Create file name
-        extension = "tar%s" % ('.gz' if self.compress else '')
-        filename = utils.filename_generate(extension,
-                                           servername=self.servername,
-                                           content_type=self.content_type)
+        # Check for filename option
+        if self.filename:
+            filename = self.filename
+        else:
+            extension = "tar%s" % ('.gz' if self.compress else '')
+            filename = utils.filename_generate(extension,
+                                               servername=self.servername,
+                                               content_type=self.content_type)
+        
         tarball = self._create_tar(filename)
         # Apply trans
         if self.encrypt:

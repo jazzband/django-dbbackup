@@ -21,6 +21,7 @@ class MediabackupBackupMediafilesTest(TestCase):
         self.command.encrypt = False
         self.command.path = None
         self.command.media_storage = get_storage_class()()
+        self.command.filename = None
 
     def tearDown(self):
         if self.command.path is not None:
@@ -63,3 +64,8 @@ class MediabackupBackupMediafilesTest(TestCase):
         self.command.backup_mediafiles()
         self.assertTrue(os.path.exists(self.command.path))
         self.assertEqual(0, len(HANDLED_FILES['written_files']))
+    
+    def test_output_filename(self):
+        self.command.filename = "my_new_name.tar"
+        self.command.backup_mediafiles()
+        self.assertEqual(HANDLED_FILES['written_files'][0][0], self.command.filename)

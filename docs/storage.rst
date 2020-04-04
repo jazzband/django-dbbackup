@@ -88,7 +88,8 @@ Add the following to your project's settings: ::
     DBBACKUP_STORAGE_OPTIONS = {
         'access_key': 'my_id',
         'secret_key': 'my_secret',
-        'bucket_name': 'my_bucket_name'
+        'bucket_name': 'my_bucket_name',
+        'default_acl': 'private'
     }
 
 Available settings
@@ -127,7 +128,16 @@ For example, this can be set to ``'s3-eu-west-1.amazonaws.com'``.
 
 **default_acl** - Required
 
-See `Django Storage S3 storage official documentation`_ for more informations
+This setting can either be ``'private'`` or ``'public'``. Since you want your backups to be secure you'll want to
+set ``'default_scl'`` to ``'private'``.
+
+**location** - Optional
+
+If you want to store your backups inside a particular folder in your bucket you need to specify the ``'location'``.
+The folder can be specified as ``'folder_name/'``. 
+You can specify a longer path with ``'location': 'root_folder/sub_folder/sub_sub_folder/'``.
+
+See `Django Storage S3 storage official documentation`_ for more information
 about available settings.
 
 .. _`Django Storage S3 storage official documentation`: http://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html

@@ -1,14 +1,26 @@
 #!/usr/bin/env python
+import os
 from setuptools import setup, find_packages
 import dbbackup
 
 
+ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
+
+
 def get_requirements():
-    return open('requirements.txt').read().splitlines()
+    with open(os.path.join(ROOT_DIR, 'requirements.txt')) as fh:
+        return fh.read().splitlines()
 
 
 def get_test_requirements():
-    return open('requirements-tests.txt').read().splitlines()
+    with open(os.path.join(ROOT_DIR, 'requirements-tests.txt')) as fh:
+        return fh.read().splitlines()
+
+
+def get_long_description():
+    with open(os.path.join(ROOT_DIR, 'README.rst')) as fh:
+        return fh.read()
+
 
 keywords = [
     'django', 'database', 'media', 'backup',
@@ -19,6 +31,7 @@ setup(
     name='django-dbbackup',
     version=dbbackup.__version__,
     description=dbbackup.__doc__,
+    long_description=get_long_description(),
     author=dbbackup.__author__,
     author_email=dbbackup.__email__,
     install_requires=get_requirements(),

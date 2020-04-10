@@ -10,7 +10,6 @@ python:
   - "pypy3"
   - "nightly"
 
-
 services:
   - mysql
   - postgresql
@@ -89,3 +88,22 @@ matrix:
     - python: "nightly"
     - env: DJANGO=master
     - env: TOX_ENV=functional-mongodb
+
+stages:
+  - test
+  - deploy
+
+jobs:
+  include:
+    - stage: deploy
+      python: 3.8
+      install: skip  # no tests, no dependencies needed
+      script: skip  # we're not running tests
+      deploy:
+        provider: pypi
+        user: ZuluPro  # TODO - is this correct
+        password:
+          secure: "TODO"  # TODO - populate this
+        on:
+          tags: true
+        distributions: sdist bdist_wheel

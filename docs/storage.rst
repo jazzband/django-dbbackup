@@ -80,11 +80,11 @@ In order to backup to Amazon S3, you'll first need to create an Amazon
 Webservices Account and setup your Amazon S3 bucket. Once that is
 complete, you can follow the required setup below. ::
 
-    pip install boto django-storages
+    pip install boto3 django-storages
 
 Add the following to your project's settings: ::
 
-    DBBACKUP_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+    DBBACKUP_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     DBBACKUP_STORAGE_OPTIONS = {
         'access_key': 'my_id',
         'secret_key': 'my_secret',

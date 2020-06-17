@@ -28,6 +28,5 @@ def load():
     mail_admins_handler.addFilter(MailEnabledFilter())
 
     logger = logging.getLogger("dbbackup")
-    logger.propagate = True
     logger.setLevel(logging.INFO)
-    logger.handlers = [mail_admins_handler, logging.StreamHandler()]
+    logger.handlers = [mail_admins_handler]

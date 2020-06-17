@@ -1,6 +1,9 @@
 """Apps for DBBackup"""
+
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
+
+from dbbackup import log
 
 
 class DbbackupConfig(AppConfig):
@@ -12,4 +15,4 @@ class DbbackupConfig(AppConfig):
     verbose_name = _('Backup and restore')
 
     def ready(self):
-        from dbbackup import checks
+        log.load()

@@ -22,7 +22,8 @@ DBBackup uses by default the `built-in file system storage`_ to manage files on
 a local directory. Feel free to use any Django storage, you can find a variety
 of them at `Django Packages`_.
 
-.. _`built-in file system storage`: https://docs.djangoproject.com/en/1.8/ref/files/storage/#the-filesystemstorage-class
+.. _`built-in file system storage`:
+    https://docs.djangoproject.com/en/stable/ref/files/storage/#the-filesystemstorage-class
 .. _`Django Packages`: https://djangopackages.org/grids/g/storage-backends/
 
 .. note::
@@ -46,11 +47,11 @@ settings below. ::
 Available settings
 ~~~~~~~~~~~~~~~~~~
 
-**location** 
+**location**
 
 Absolute path to the directory that will hold the files.
 
-**base_url** 
+**base_url**
 
 URL that serves the files stored at this location.
 
@@ -64,14 +65,15 @@ The file system permissions that the directory will receive when it is saved.
 
 See `FileSystemStorage's documentation`_ for a full list of available settings.
 
-.. _`FileSystemStorage's documentation`: https://docs.djangoproject.com/en/1.9/ref/files/storage/#the-filesystemstorage-class
+.. _`FileSystemStorage's documentation`:
+    https://docs.djangoproject.com/en/stable/ref/files/storage/#the-filesystemstorage-class
 
 Amazon S3
 ---------
 
-Our S3 backend uses Django Storages which uses `boto`_.
+Our S3 backend uses Django Storages which uses `boto3`_.
 
-.. _`boto`: http://docs.pythonboto.org/en/latest/#
+.. _`boto3`: https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 
 Setup
 ~~~~~
@@ -80,7 +82,7 @@ In order to backup to Amazon S3, you'll first need to create an Amazon
 Webservices Account and setup your Amazon S3 bucket. Once that is
 complete, you can follow the required setup below. ::
 
-    pip install boto3 django-storages
+    pip install django-storages[boto3]
 
 Add the following to your project's settings: ::
 
@@ -89,7 +91,7 @@ Add the following to your project's settings: ::
         'access_key': 'my_id',
         'secret_key': 'my_secret',
         'bucket_name': 'my_bucket_name',
-        'default_acl': 'private'
+        'default_acl': 'private',
     }
 
 Available settings
@@ -97,16 +99,25 @@ Available settings
 
 .. note::
 
-    More settings are available see `official documentation`_ for get more about.
+    See the `Django Storage S3 storage official documentation`_ for all options.
 
-.. _`official documentation`: https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+    The options listed here are a selection of dictionary keys returned by
+    ``get_default_settings`` in django-storages' `storages/backends/s3boto3.py`_,
+    which allows us to write nicer code compared to using the ``AWS_`` prefixed
+    settings.
+
+.. _`Django Storage S3 storage official documentation`:
+    https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+.. _`storages/backends/s3boto3.py`:
+    https://github.com/jschneier/django-storages/blob/master/storages/backends/s3boto3.py#L293-L324
 
 **access_key** - Required
 
 Your AWS access key as string. This can be found on your `Amazon Account
 Security Credentials page`_.
 
-.. _`Amazon Account Security Credentials page`: https://console.aws.amazon.com/iam/home#security_credential
+.. _`Amazon Account Security Credentials page`:
+    https://console.aws.amazon.com/iam/home#security_credential
 
 **secret_key** - Required
 
@@ -117,31 +128,31 @@ Your Amazon Web Services secret access key, as a string.
 Your Amazon Web Services storage bucket name, as a string. This directory must
 exist before attempting to create your first backup.
 
-**host** - Default: ``'s3.amazonaws.com'``
-(``boto.s3.connection.S3Connection.DefaultHost``)
+**region_name** - Optional
 
-Specify the Amazon domain to use when transferring the generated backup files.
-For example, this can be set to ``'s3-eu-west-1.amazonaws.com'``.
+Specify the Amazon region, e.g. ``'us-east-1'``
 
-**use_ssl** - Default: ``True``
+**endpoint_url** - Optional
 
+Set this to fully override the endpoint, e.g. to use an alternative S3 service,
+which is compatible with AWS S3.  The value must contain the protocol, e.g.
+``'https://compatible-s3-service.example.com'``.
 
 **default_acl** - Required
 
-This setting can either be ``'private'`` or ``'public'``. Since you want your backups to be secure you'll want to
-set ``'default_scl'`` to ``'private'``.
+This setting can either be ``'private'`` or ``'public'``. Since you want your
+backups to be secure you'll want to set ``'default_acl'`` to ``'private'``.
+
+*NOTE: This value will be removed in a future version of django-storages.*
+See their `CHANGELOG`_ for details.
 
 **location** - Optional
 
 If you want to store your backups inside a particular folder in your bucket you need to specify the ``'location'``.
-The folder can be specified as ``'folder_name/'``. 
+The folder can be specified as ``'folder_name/'``.
 You can specify a longer path with ``'location': 'root_folder/sub_folder/sub_sub_folder/'``.
 
-See `Django Storage S3 storage official documentation`_ for more information
-about available settings.
-
-.. _`Django Storage S3 storage official documentation`: http://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
-
+.. _`CHANGELOG`: https://github.com/jschneier/django-storages/blob/master/CHANGELOG.rst
 
 Dropbox
 -------
@@ -256,7 +267,7 @@ This backend is from Django-Storages with `paramiko`_ under. ::
 
     pip install paramiko django-storages
 
-.. _`paramiko`: http://www.paramiko.org/ 
+.. _`paramiko`: http://www.paramiko.org/
 
 The next configuration admit SSH server grant a the local user: ::
 

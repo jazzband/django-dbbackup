@@ -29,7 +29,7 @@ dbrestore
 =========
 
 Restore a database. ::
-
+    $ ./manage.py dbrestore
     Restoring backup for database: /tmp/tmp.x0kN9sYSqk
     Finding latest backup
     Restoring: tmp-zuluvm-2016-07-29-100954.dump

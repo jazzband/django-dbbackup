@@ -1,6 +1,7 @@
 from dbbackup import utils
-from .base import BaseCommandDBConnector
 from django.conf import settings
+
+from .base import BaseCommandDBConnector
 
 
 class PgDumpConnector(BaseCommandDBConnector):

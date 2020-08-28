@@ -1,5 +1,6 @@
 from dbbackup import utils
 from .base import BaseCommandDBConnector
+from django.conf import settings
 
 
 class PgDumpConnector(BaseCommandDBConnector):
@@ -55,6 +56,13 @@ class PgDumpConnector(BaseCommandDBConnector):
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr
+
+
+class PgDumpConnectorExcludeTables(PgDumpConnector):
+
+    def __init__(self, database_name=None, **kwargs):
+        super().__init__(database_name, **kwargs)
+        self.exclude = getattr(settings, 'DBBACKUP_EXCLUDE_TABLES', [])
 
 
 class PgDumpGisConnector(PgDumpConnector):

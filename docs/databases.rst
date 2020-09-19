@@ -130,8 +130,8 @@ MySQL uses by default :class:`dbbackup.db.mysql.MysqlDumpConnector`. It uses
 PostgreSQL
 ----------
 
-Postgres uses by default :class:`dbbackup.db.postgres.PgDumpConnector`, but
-we advise you to use :class:`dbbackup.db.postgres.PgDumpBinaryConnector`. The
+Postgres uses by default :class:`dbbackup.db.postgresql.PgDumpConnector`, but
+we advise you to use :class:`dbbackup.db.postgresql.PgDumpBinaryConnector`. The
 first one uses ``pg_dump`` and ``pqsl`` for its job, creating RAW SQL files.
 
 The second uses ``pg_restore`` with binary dump files.
@@ -162,7 +162,7 @@ Default: ``True``
 PostGIS
 -------
 
-Set in :class:`dbbackup.db.postgres.PgDumpGisConnector`, it does the same as
+Set in :class:`dbbackup.db.postgresql.PgDumpGisConnector`, it does the same as
 PostgreSQL but launchs ``CREATE EXTENSION IF NOT EXISTS postgis;`` before
 restore database.
 

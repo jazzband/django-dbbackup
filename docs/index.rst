@@ -20,7 +20,7 @@ It is made for:
     Django DBBackup version 3 make great changements see
     `Upgrade documentation`_ to help to up to date.
 
-.. _`Upgrade documentation`: upgrade 
+.. _`Upgrade documentation`: upgrade.html
 
 Contents:
 

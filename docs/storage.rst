@@ -51,10 +51,6 @@ Available settings
 
 Absolute path to the directory that will hold the files.
 
-**base_url**
-
-URL that serves the files stored at this location.
-
 **file_permissions_mode**
 
 The file system permissions that the file will receive when it is saved.
@@ -237,10 +233,6 @@ Settings
 **location** -  Required
 
 A FTP URI with optional user, password and port. example: ``'ftp://anonymous@myftp.net'``
-
-**base_url**
-
-URL that serves with HTTP(S) the files stored at this location.
 
 Setup
 ~~~~~

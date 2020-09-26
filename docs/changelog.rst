@@ -1,11 +1,14 @@
-Unreleased
+Changelog
 =====
+
+Unreleased
+-----------
 * Replace ugettext_lazy with gettext_lazy `#342`_
 * Documentation fixes `#341`_ `#333`_ `#349`_ `#348`_ `#337`_
 
 
 3.3.0
-=====
+------
 
 * Documentation fixes `#341`_ `#333`_ `#328`_ `#320`_ `#305`_ `#303`_ `#302`_ `#298`_ `#281`_ `#266`_ `#349`_ `#348`_ `#337`_
 * "output-filename" in mediabackup command `#324`_

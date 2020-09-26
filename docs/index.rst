@@ -33,8 +33,9 @@ Contents:
    storage
    commands
    integration
-   contributing
    upgrade
+   contributing
+   changelog
 
 Compatibility
 -------------

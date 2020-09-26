@@ -13,8 +13,8 @@ HOSTNAME = getattr(settings, 'DBBACKUP_HOSTNAME', socket.gethostname())
 
 # Directory to use for temporary files
 TMP_DIR = getattr(settings, 'DBBACKUP_TMP_DIR', tempfile.gettempdir())
-TMP_FILE_MAX_SIZE = getattr(settings, 'DBBACKUP_TMP_FILE_MAX_SIZE', 10*1024*1024)
-TMP_FILE_READ_SIZE = getattr(settings, 'DBBACKUP_TMP_FILE_READ_SIZE', 1024*1000)
+TMP_FILE_MAX_SIZE = getattr(settings, 'DBBACKUP_TMP_FILE_MAX_SIZE', 10 * 1024 * 1024)
+TMP_FILE_READ_SIZE = getattr(settings, 'DBBACKUP_TMP_FILE_READ_SIZE', 1024 * 1000)
 
 # Days to keep
 CLEANUP_KEEP = getattr(settings, 'DBBACKUP_CLEANUP_KEEP', 10)
@@ -36,11 +36,6 @@ STORAGE_OPTIONS = getattr(settings, 'DBBACKUP_STORAGE_OPTIONS', {})
 CONNECTORS = getattr(settings, 'DBBACKUP_CONNECTORS', {})
 
 CUSTOM_CONNECTOR_MAPPING = getattr(settings, 'DBBACKUP_CONNECTOR_MAPPING', {})
-
-# Logging
-LOGGING = getattr(settings, 'DBBACKUP_LOGGING', dbbackup.log.DEFAULT_LOGGING)
-LOG_CONFIGURATOR = logging.config.DictConfigurator(LOGGING)
-LOG_CONFIGURATOR.configure()
 
 # Mail
 SEND_EMAIL = getattr(settings, 'DBBACKUP_SEND_EMAIL', True)

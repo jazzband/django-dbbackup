@@ -2,42 +2,6 @@ import logging
 import django
 from django.utils.log import AdminEmailHandler
 
-DEFAULT_LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'dbbackup.console': {
-            'formatter': 'base',
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-        },
-        'dbbackup.mail_admins': {
-            'level': 'ERROR',
-            'class': 'dbbackup.log.DbbackupAdminEmailHandler',
-            'filters': ['require_dbbackup_mail_enabled'],
-            'include_html': True,
-        }
-    },
-    'filters': {
-        'require_dbbackup_mail_enabled': {
-            '()': 'dbbackup.log.MailEnabledFilter'
-        }
-    },
-    'formatters': {
-        'base': {'format': '%(message)s'},
-        'simple': {'format': '%(levelname)s %(message)s'}
-    },
-    'loggers': {
-        'dbbackup': {
-            'handlers': [
-                'dbbackup.mail_admins',
-                'dbbackup.console'
-            ],
-            'level': 'INFO'
-        },
-    }
-}
-
 
 class DbbackupAdminEmailHandler(AdminEmailHandler):
     def emit(self, record):
@@ -56,3 +20,13 @@ class MailEnabledFilter(logging.Filter):
     def filter(self, record):
         from .settings import SEND_EMAIL
         return SEND_EMAIL
+
+
+def load():
+    mail_admins_handler = DbbackupAdminEmailHandler(include_html=True)
+    mail_admins_handler.setLevel(logging.ERROR)
+    mail_admins_handler.addFilter(MailEnabledFilter())
+
+    logger = logging.getLogger("dbbackup")
+    logger.setLevel(logging.INFO)
+    logger.handlers = [mail_admins_handler]

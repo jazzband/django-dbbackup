@@ -64,6 +64,28 @@ See `FileSystemStorage's documentation`_ for a full list of available settings.
 .. _`FileSystemStorage's documentation`:
     https://docs.djangoproject.com/en/stable/ref/files/storage/#the-filesystemstorage-class
 
+Google cloud storage
+--------------------
+Our backend for Google cloud storage uses django-storages.
+
+Setup
+~~~~~
+
+In order to backup to Google cloud storage, you'll first need to create an account at google. Once that is complete, you can follow the required setup below. ::
+
+    pip install django-storages[google]
+
+Add the following to your project's settings. Strictly speaking only `bucket_name` is required, but we'd recommend to add the other two as well. You can also find more settings in the readme for `django-storages`_ ::
+
+    DBBACKUP_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+    DBBACKUP_STORAGE_OPTIONS = {
+        "bucket_name": "your_bucket_name",
+        "project_id": "your_project_id",
+        "blob_chunk_size": 1024 * 1024
+    }
+
+.. _`django-storages`: https://django-storages.readthedocs.io/en/latest/backends/gcloud.html
+
 Amazon S3
 ---------
 

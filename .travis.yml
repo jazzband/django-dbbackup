@@ -1,7 +1,6 @@
 language: python
 
 python:
-  - "2.7"
   - "3.5"
   - "3.6"
   - "3.7"
@@ -18,7 +17,6 @@ services:
 
 env:
   matrix:
-    - DJANGO=1.11
     - DJANGO=2.2
     - DJANGO=3.0
     - DJANGO=master
@@ -67,19 +65,11 @@ matrix:
       script:
         - DB_ENGINE=djongo DB_NAME=test tox -e $TOX_ENV
   exclude:
-    - python: "nightly"
-      env: DJANGO=1.11
     - python: "pypy"
       env: DJANGO=2.2
     - python: "pypy"
       env: DJANGO=3.0
     - python: "pypy"
-      env: DJANGO=master
-    - python: "2.7"
-      env: DJANGO=2.2
-    - python: "2.7"
-      env: DJANGO=3.0
-    - python: "2.7"
       env: DJANGO=master
     - python: "3.5"
       env: DJANGO=3.0

@@ -1,6 +1,8 @@
 """
 Tests for dbrestore command.
 """
+from django.core.exceptions import ImproperlyConfigured
+from django.core.management import execute_from_command_line
 from mock import patch
 from tempfile import mktemp
 from shutil import copyfileobj
@@ -9,6 +11,7 @@ from django.test import TestCase
 from django.core.management.base import CommandError
 from django.core.files import File
 from django.conf import settings
+from six import StringIO
 
 from dbbackup import utils
 from dbbackup.db.base import get_connector
@@ -89,6 +92,16 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
             (self.command.filepath, get_dump())
         )
         self.command._restore_backup()
+
+    def test_fallback(self, *args):
+        stdout = StringIO()
+        with self.assertRaises(ImproperlyConfigured) as ic:
+            with patch('sys.stdout', stdout):
+                execute_from_command_line(['', 'dbrestore', '--fallback'])
+        self.assertEqual(str(ic.exception),
+                         'You must specify a storage class using DBBACKUP_FALLBACK_STORAGE settings.')
+
+        # TODO: Update DBBACKUP_FALLBACK_STORAGE and verify successful restore.
 
 
 class DbrestoreCommandGetDatabaseTest(TestCase):

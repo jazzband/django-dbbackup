@@ -2,6 +2,8 @@
 Tests for dbbackup command.
 """
 import os
+
+from django.core.exceptions import ImproperlyConfigured
 from six import StringIO
 from django.core.management import execute_from_command_line
 
@@ -53,15 +55,15 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         # tearDown
         os.remove(self.command.path)
 
-    # def test_fallback(self):
-    #     stdout = StringIO()
-    #     with patch('sys.stdout', stdout):
-    #         execute_from_command_line(['', 'dbbackup', '--fallback'])
-    #     stdout.seek(0)
-    #     stdout.readline()
-    #     for line in stdout.readlines():
-    #         self.assertIn('You must specify a storage class using '
-    #                       'DBBACKUP_FALLBACK_STORAGE settings.', line)
+    def test_fallback(self):
+        stdout = StringIO()
+        with self.assertRaises(ImproperlyConfigured) as ic:
+            with patch('sys.stdout', stdout):
+                execute_from_command_line(['', 'dbbackup', '--fallback'])
+        self.assertEqual(str(ic.exception),
+                         'You must specify a storage class using DBBACKUP_FALLBACK_STORAGE settings.')
+
+        # TODO: Update DBBACKUP_FALLBACK_STORAGE and verify successful backup.
 
 
 @patch('dbbackup.settings.GPG_RECIPIENT', 'test@test')

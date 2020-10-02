@@ -32,7 +32,7 @@ GPG_RECIPIENT = GPG_ALWAYS_TRUST = getattr(settings, 'DBBACKUP_GPG_RECIPIENT', N
 
 STORAGE = getattr(settings, 'DBBACKUP_STORAGE', 'django.core.files.storage.FileSystemStorage')
 STORAGE_OPTIONS = getattr(settings, 'DBBACKUP_STORAGE_OPTIONS', {})
-FALLBACK_STORAGE = getattr(settings, 'DBBACKUP_FALLBACK_STORAGE', None)
+STORAGES = getattr(settings, 'DBBACKUP_STORAGES', {'default': 'django.core.files.storage.FileSystemStorage'})
 
 CONNECTORS = getattr(settings, 'DBBACKUP_CONNECTORS', {})
 

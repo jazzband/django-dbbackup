@@ -30,11 +30,11 @@ def get_storage(path=None, options=None):
     return Storage(path, **options)
 
 
-def get_fallback_storage():
-    if not settings.FALLBACK_STORAGE:
+def get_db_storage(db_storage):
+    if db_storage not in settings.STORAGES:
         raise ImproperlyConfigured('You must specify a storage class using '
-                                   'DBBACKUP_FALLBACK_STORAGE settings.')
-    return get_storage(path=settings.FALLBACK_STORAGE)
+                                   'DBBACKUP_STORAGES settings.')
+    return get_storage(path=settings.STORAGES[db_storage])
 
 
 class StorageError(Exception):

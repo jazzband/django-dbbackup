@@ -45,6 +45,7 @@ coverage.xml
 *,cover
 tests/media/
 coverage_html_report/
+file:memorydb_default?mode=memory&cache=shared
 
 # Translations
 *.mo

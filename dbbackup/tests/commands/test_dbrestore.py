@@ -97,9 +97,9 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         stdout = StringIO()
         with self.assertRaises(ImproperlyConfigured) as ic:
             with patch('sys.stdout', stdout):
-                execute_from_command_line(['', 'dbrestore', '--fallback'])
+                execute_from_command_line(['', 'dbrestore', '--storage=s3'])
         self.assertEqual(str(ic.exception),
-                         'You must specify a storage class using DBBACKUP_FALLBACK_STORAGE settings.')
+                         'You must specify a storage class using DBBACKUP_STORAGES settings.')
 
         # TODO: Update DBBACKUP_FALLBACK_STORAGE and verify successful restore.
 

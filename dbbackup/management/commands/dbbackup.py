@@ -9,7 +9,7 @@ from django.core.management.base import CommandError
 
 from ._base import BaseDbBackupCommand, make_option
 from ...db.base import get_connector
-from ...storage import get_storage, get_fallback_storage, StorageError
+from ...storage import get_storage, get_db_storage, StorageError
 from ... import utils, settings
 
 
@@ -34,8 +34,8 @@ class Command(BaseDbBackupCommand):
                     help="Specify filename on storage"),
         make_option("-O", "--output-path", default=None,
                     help="Specify where to store on local filesystem"),
-        make_option("-f", "--fallback", action="store_true", default=False,
-                    help="Use alternate (fallback) storage class.")
+        make_option("--storage", default=None,
+                    help="Specify storage from DBACKUP_STORAGES to use"),
     )
 
     @utils.email_uncaught_exception
@@ -50,13 +50,13 @@ class Command(BaseDbBackupCommand):
         self.compress = options.get('compress')
         self.encrypt = options.get('encrypt')
 
-        self.fallback = options.get('fallback')
+        self.db_storage = options.get('storage')
 
         self.filename = options.get('output_filename')
         self.path = options.get('output_path')
 
-        if self.fallback:
-            self.storage = get_fallback_storage()
+        if self.db_storage:
+            self.storage = get_db_storage(self.db_storage)
         else:
             self.storage = get_storage()
 

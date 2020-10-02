@@ -5,13 +5,15 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import CommandError
+
 from django.db import connection
 
 from ._base import BaseDbBackupCommand, make_option
 from ... import utils
 from ...db.base import get_connector
-from ...storage import get_storage, StorageError
+from ...storage import get_storage, get_fallback_storage, StorageError
 
 
 class Command(BaseDbBackupCommand):
@@ -30,7 +32,9 @@ class Command(BaseDbBackupCommand):
                     help="Decrypt data before restoring"),
         make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
         make_option("-z", "--uncompress", action='store_true', default=False,
-                    help="Uncompress gzip data before restoring")
+                    help="Uncompress gzip data before restoring"),
+        make_option("-f", "--fallback", action="store_true", default=False,
+                    help="Use alternate (fallback) storage class.")
     )
 
     def handle(self, *args, **options):
@@ -48,8 +52,14 @@ class Command(BaseDbBackupCommand):
             self.uncompress = options.get('uncompress')
             self.passphrase = options.get('passphrase')
             self.interactive = options.get('interactive')
+            self.fallback = options.get('fallback')
             self.database_name, self.database = self._get_database(options)
-            self.storage = get_storage()
+
+            if self.fallback:
+                self.storage = get_fallback_storage()
+            else:
+                self.storage = get_storage()
+
             self._restore_backup()
         except StorageError as err:
             raise CommandError(err)

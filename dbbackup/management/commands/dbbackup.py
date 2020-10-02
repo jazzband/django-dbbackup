@@ -4,11 +4,12 @@ Command for backup database.
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import CommandError
 
 from ._base import BaseDbBackupCommand, make_option
 from ...db.base import get_connector
-from ...storage import get_storage, StorageError
+from ...storage import get_storage, get_fallback_storage, StorageError
 from ... import utils, settings
 
 
@@ -32,7 +33,9 @@ class Command(BaseDbBackupCommand):
         make_option("-o", "--output-filename", default=None,
                     help="Specify filename on storage"),
         make_option("-O", "--output-path", default=None,
-                    help="Specify where to store on local filesystem")
+                    help="Specify where to store on local filesystem"),
+        make_option("-f", "--fallback", action="store_true", default=False,
+                    help="Use alternate (fallback) storage class.")
     )
 
     @utils.email_uncaught_exception
@@ -47,9 +50,15 @@ class Command(BaseDbBackupCommand):
         self.compress = options.get('compress')
         self.encrypt = options.get('encrypt')
 
+        self.fallback = options.get('fallback')
+
         self.filename = options.get('output_filename')
         self.path = options.get('output_path')
-        self.storage = get_storage()
+
+        if self.fallback:
+            self.storage = get_fallback_storage()
+        else:
+            self.storage = get_storage()
 
         self.database = options.get('database') or ''
         database_keys = self.database.split(',') or settings.DATABASES

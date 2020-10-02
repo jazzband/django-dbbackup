@@ -2,6 +2,9 @@
 Tests for dbbackup command.
 """
 import os
+from six import StringIO
+from django.core.management import execute_from_command_line
+
 from mock import patch
 
 from django.test import TestCase
@@ -49,6 +52,16 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         self.assertTrue(os.path.exists(self.command.path))
         # tearDown
         os.remove(self.command.path)
+
+    # def test_fallback(self):
+    #     stdout = StringIO()
+    #     with patch('sys.stdout', stdout):
+    #         execute_from_command_line(['', 'dbbackup', '--fallback'])
+    #     stdout.seek(0)
+    #     stdout.readline()
+    #     for line in stdout.readlines():
+    #         self.assertIn('You must specify a storage class using '
+    #                       'DBBACKUP_FALLBACK_STORAGE settings.', line)
 
 
 @patch('dbbackup.settings.GPG_RECIPIENT', 'test@test')

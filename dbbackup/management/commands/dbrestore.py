@@ -13,7 +13,7 @@ from django.db import connection
 from ._base import BaseDbBackupCommand, make_option
 from ... import utils
 from ...db.base import get_connector
-from ...storage import get_storage, get_db_storage, StorageError
+from ...storage import get_storage, get_backup_storage, StorageError
 
 
 class Command(BaseDbBackupCommand):
@@ -56,7 +56,7 @@ class Command(BaseDbBackupCommand):
             self.database_name, self.database = self._get_database(options)
 
             if self.db_storage:
-                self.storage = get_db_storage(self.db_storage)
+                self.storage = get_backup_storage(self.db_storage)
             else:
                 self.storage = get_storage()
 

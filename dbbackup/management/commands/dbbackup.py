@@ -9,7 +9,7 @@ from django.core.management.base import CommandError
 
 from ._base import BaseDbBackupCommand, make_option
 from ...db.base import get_connector
-from ...storage import get_storage, get_db_storage, StorageError
+from ...storage import get_storage, get_backup_storage, StorageError
 from ... import utils, settings
 
 
@@ -56,7 +56,7 @@ class Command(BaseDbBackupCommand):
         self.path = options.get('output_path')
 
         if self.db_storage:
-            self.storage = get_db_storage(self.db_storage)
+            self.storage = get_backup_storage(self.db_storage)
         else:
             self.storage = get_storage()
 

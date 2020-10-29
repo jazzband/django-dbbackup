@@ -1,5 +1,19 @@
 from dbbackup import utils
+import logging
 from .base import BaseCommandDBConnector
+
+logger = logging.getLogger('dbbackup.command')
+
+
+def create_postgres_uri(self):
+    host = self.settings.get('HOST', '')
+    dbname = self.settings.get('NAME', '')
+    user = self.settings.get('USER', '')
+    password = self.settings.get('PASSWORD')
+    password = ':{}'.format(password) if password else ''
+    port = ':{}'.format(self.settings.get('PORT')) if self.settings.get('PORT') else ''
+    dbname = f'--dbname=postgresql://{user}{password}@{host}{port}/{dbname}'
+    return dbname
 
 
 class PgDumpConnector(BaseCommandDBConnector):
@@ -22,31 +36,22 @@ class PgDumpConnector(BaseCommandDBConnector):
 
     def _create_dump(self):
         cmd = '{} '.format(self.dump_cmd)
-        if self.settings.get('HOST'):
-            cmd += ' --host={}'.format(self.settings['HOST'])
-        if self.settings.get('PORT'):
-            cmd += ' --port={}'.format(self.settings['PORT'])
-        if self.settings.get('USER'):
-            cmd += ' --username={}'.format(self.settings['USER'])
-        cmd += ' --no-password'
+        cmd = cmd + create_postgres_uri(self)
+
         for table in self.exclude:
             cmd += ' --exclude-table={}'.format(table)
         if self.drop:
             cmd += ' --clean'
-        cmd += ' {}'.format(self.settings['NAME'])
+
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
+        logger.debug('Postgres cmd: ' + cmd)
         stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
 
     def _restore_dump(self, dump):
         cmd = '{} '.format(self.restore_cmd)
-        if self.settings.get('HOST'):
-            cmd += ' --host={}'.format(self.settings['HOST'])
-        if self.settings.get('PORT'):
-            cmd += ' --port={}'.format(self.settings['PORT'])
-        if self.settings.get('USER'):
-            cmd += ' --username={}'.format(self.settings['USER'])
-        cmd += ' --no-password'
+        cmd = cmd + create_postgres_uri(self)
+
         # without this, psql terminates with an exit value of 0 regardless of errors
         cmd += ' --set ON_ERROR_STOP=on'
         if self.single_transaction:
@@ -93,14 +98,9 @@ class PgDumpBinaryConnector(PgDumpConnector):
     drop = True
 
     def _create_dump(self):
-        cmd = '{} {}'.format(self.dump_cmd, self.settings['NAME'])
-        if self.settings.get('HOST'):
-            cmd += ' --host={}'.format(self.settings['HOST'])
-        if self.settings.get('PORT'):
-            cmd += ' --port={}'.format(self.settings['PORT'])
-        if self.settings.get('USER'):
-            cmd += ' --user={}'.format(self.settings['USER'])
-        cmd += ' --no-password'
+        cmd = '{} '.format(self.dump_cmd)
+        cmd = cmd + create_postgres_uri(self)
+
         cmd += ' --format=custom'
         for table in self.exclude:
             cmd += ' --exclude-table={}'.format(table)
@@ -109,14 +109,9 @@ class PgDumpBinaryConnector(PgDumpConnector):
         return stdout
 
     def _restore_dump(self, dump):
-        cmd = '{} --dbname={}'.format(self.restore_cmd, self.settings['NAME'])
-        if self.settings.get('HOST'):
-            cmd += ' --host={}'.format(self.settings['HOST'])
-        if self.settings.get('PORT'):
-            cmd += ' --port={}'.format(self.settings['PORT'])
-        if self.settings.get('USER'):
-            cmd += ' --user={}'.format(self.settings['USER'])
-        cmd += ' --no-password'
+        dbname = create_postgres_uri(self)
+        cmd = '{} {}'.format(self.restore_cmd, dbname)
+
         if self.single_transaction:
             cmd += ' --single-transaction'
         if self.drop:

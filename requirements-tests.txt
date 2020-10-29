@@ -7,3 +7,5 @@ django-storages
 pytz
 testfixtures
 mock
+python-dotenv
+psycopg2

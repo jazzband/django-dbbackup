@@ -1,18 +1,27 @@
 from dbbackup import utils
 import logging
 from .base import BaseCommandDBConnector
+from .exceptions import DumpError
 
 logger = logging.getLogger('dbbackup.command')
 
 
 def create_postgres_uri(self):
-    host = self.settings.get('HOST', '')
-    dbname = self.settings.get('NAME', '')
-    user = self.settings.get('USER', '')
-    password = self.settings.get('PASSWORD')
+    host = self.settings.get('HOST')
+    if not host:
+        raise DumpError('A host name is required')
+
+    dbname = self.settings.get('NAME') or ''
+    user = self.settings.get('USER') or ''
+    password = self.settings.get('PASSWORD') or ''
     password = ':{}'.format(password) if password else ''
+    if not user:
+        password = ''
+    else:
+        host = '@' + host
+
     port = ':{}'.format(self.settings.get('PORT')) if self.settings.get('PORT') else ''
-    dbname = f'--dbname=postgresql://{user}{password}@{host}{port}/{dbname}'
+    dbname = f'--dbname=postgresql://{user}{password}{host}{port}/{dbname}'
     return dbname
 
 
@@ -44,7 +53,6 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += ' --clean'
 
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
-        logger.debug('Postgres cmd: ' + cmd)
         stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
 

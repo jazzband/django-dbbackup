@@ -41,8 +41,8 @@ Compatibility
 -------------
 
 As we want to ensure a lot of platforms will be able to save data before
-upgrading, Django-DBBackup supports PyPy, Python 2.7, 3.2 to 3.5 and Django
-greater than 1.6.
+upgrading, Django-DBBackup supports PyPy, 3.2 to 3.5 and Django
+greater than 2.2
 
 Other Resources
 ===============

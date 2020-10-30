@@ -137,10 +137,6 @@ when making a backup with the ``--encrypt`` or ``--decrypt`` option.
 Email configuration
 -------------------
 
-.. note::
-    
-    Django 1.6 won't send the full traceback
-
 DBBACKUP_SEND_EMAIL
 ~~~~~~~~~~~~~~~~~~~
 

@@ -21,6 +21,14 @@ class PgDumpConnectorTest(TestCase):
         self.connector.settings['NAME'] = 'dbname'
         self.connector.settings['HOST'] = 'hostname'
 
+    def test_user_password_uses_special_characters(self, mock_dump_cmd):
+        self.connector.settings['PASSWORD'] = '@!'
+        self.connector.settings['USER'] = '@'
+
+        self.connector.create_dump()
+
+        self.assertIn('postgresql://%40:%40%21@hostname/dbname', mock_dump_cmd.call_args[0][0])
+
     def test_create_dump(self, mock_dump_cmd):
         dump = self.connector.create_dump()
         # Test dump

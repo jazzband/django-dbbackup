@@ -1,5 +1,7 @@
-from dbbackup import utils
+from urllib.parse import quote
 import logging
+
+from dbbackup import utils
 from .base import BaseCommandDBConnector
 from .exceptions import DumpError
 
@@ -12,9 +14,9 @@ def create_postgres_uri(self):
         raise DumpError('A host name is required')
 
     dbname = self.settings.get('NAME') or ''
-    user = self.settings.get('USER') or ''
+    user = quote(self.settings.get('USER') or '')
     password = self.settings.get('PASSWORD') or ''
-    password = ':{}'.format(password) if password else ''
+    password = ':{}'.format(quote(password)) if password else ''
     if not user:
         password = ''
     else:

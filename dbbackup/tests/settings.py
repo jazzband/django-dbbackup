@@ -6,7 +6,7 @@ import tempfile
 import sys
 from dotenv import load_dotenv
 
-test = len(sys.argv) < 0 or sys.argv[1] == 'test'
+test = len(sys.argv) <= 1 or sys.argv[1] == 'test'
 if not test:
     load_dotenv()
 

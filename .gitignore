@@ -7,6 +7,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+.env
 env/
 build/
 develop-eggs/
@@ -62,3 +63,4 @@ target/
 .idea/
 *.sw[po]
 test-sqlite
+venv

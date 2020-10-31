@@ -7,8 +7,14 @@ from django.core.files.base import File
 from tempfile import SpooledTemporaryFile
 from subprocess import Popen
 from importlib import import_module
+import logging
+
 from dbbackup import settings, utils
 from . import exceptions
+
+logger = logging.getLogger('dbbackup.command')
+logger.setLevel(logging.DEBUG)
+
 
 CONNECTOR_MAPPING = {
     'django.db.backends.sqlite3': 'dbbackup.db.sqlite.SqliteConnector',
@@ -128,6 +134,7 @@ class BaseCommandDBConnector(BaseDBConnector):
         :return: Standard output of command
         :rtype: file
         """
+        logger.debug(command)
         cmd = shlex.split(command)
         stdout = SpooledTemporaryFile(max_size=settings.TMP_FILE_MAX_SIZE,
                                       dir=settings.TMP_DIR)

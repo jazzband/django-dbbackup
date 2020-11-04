@@ -249,8 +249,6 @@ class PgDumpConnectorRunCommandTest(TestCase):
         connector.settings['PASSWORD'] = 'foo'
         connector.create_dump()
         self.assertEqual(mock_popen.call_args[0][0][0], 'pg_dump')
-        self.assertIn('PGPASSWORD', mock_popen.call_args[1]['env'])
-        self.assertEqual('foo', mock_popen.call_args[1]['env']['PGPASSWORD'])
 
     def test_run_command_with_password_and_other(self, mock_popen):
         connector = PgDumpConnector(env={'foo': 'bar'})
@@ -260,5 +258,3 @@ class PgDumpConnectorRunCommandTest(TestCase):
         self.assertEqual(mock_popen.call_args[0][0][0], 'pg_dump')
         self.assertIn('foo', mock_popen.call_args[1]['env'])
         self.assertEqual('bar', mock_popen.call_args[1]['env']['foo'])
-        self.assertIn('PGPASSWORD', mock_popen.call_args[1]['env'])
-        self.assertEqual('foo', mock_popen.call_args[1]['env']['PGPASSWORD'])

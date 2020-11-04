@@ -5,7 +5,7 @@ Django Database Backup
         :target: https://travis-ci.org/django-dbbackup/django-dbbackup
 
 .. image:: https://readthedocs.org/projects/django-dbbackup/badge/?version=latest
-        :target: http://django-dbbackup.readthedocs.io/en/latest/
+        :target: http://django-dbbackup.readthedocs.io/
         :alt: Documentation Status
 
 .. image:: https://coveralls.io/repos/django-dbbackup/django-dbbackup/badge.svg?branch=master&service=github

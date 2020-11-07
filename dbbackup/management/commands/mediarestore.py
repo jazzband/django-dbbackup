@@ -3,11 +3,10 @@ Restore media files.
 """
 import tarfile
 
-from django.core.management.base import CommandError
 from django.core.files.storage import get_storage_class
 
 from ._base import BaseDbBackupCommand, make_option
-from ...storage import get_storage, StorageError
+from ...storage import get_storage
 from ... import utils
 
 

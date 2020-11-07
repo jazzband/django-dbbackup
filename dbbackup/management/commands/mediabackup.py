@@ -93,7 +93,7 @@ class Command(BaseDbBackupCommand):
             filename = utils.filename_generate(extension,
                                                servername=self.servername,
                                                content_type=self.content_type)
-        
+
         tarball = self._create_tar(filename)
         # Apply trans
         if self.encrypt:

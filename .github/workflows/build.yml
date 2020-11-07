@@ -26,6 +26,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements-tests.txt
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Linting
+      run: flake8
     - name: Run unittests
       env:
         TOX_ENV: py${{ matrix.python-version}}-django${{ matrix.django }}

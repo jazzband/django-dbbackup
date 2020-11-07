@@ -13,7 +13,7 @@ import six
 from ...storage import StorageError
 
 if six.PY2:
-    input = raw_input
+    input = raw_input # noqa
 else:
     long = int
 

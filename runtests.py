@@ -20,5 +20,6 @@ def main(argv=None):
         return result
     execute_from_command_line(argv)
 
+
 if __name__ == '__main__':
     sys.exit(bool(main(sys.argv)))

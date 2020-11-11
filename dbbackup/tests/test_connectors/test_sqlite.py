@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from mock import patch, mock_open
+from io import BytesIO
 
 from django.test import TestCase
-from six import BytesIO
+from mock import mock_open, patch
 
 from dbbackup.db.sqlite import SqliteConnector, SqliteCPConnector
 from dbbackup.tests.testapp.models import CharModel

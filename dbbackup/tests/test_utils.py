@@ -1,19 +1,19 @@
 import os
-import pytz
 import tempfile
-from mock import patch
 from datetime import datetime
+from io import StringIO
 
 import django
-from django.test import TestCase
+import pytz
 from django.core import mail
-from six import StringIO
+from django.test import TestCase
+from mock import patch
 
-from dbbackup import utils, settings
-from dbbackup.tests.utils import (ENCRYPTED_FILE, clean_gpg_keys,
-                                  add_private_gpg, COMPRESSED_FILE,
+from dbbackup import settings, utils
+from dbbackup.tests.utils import (COMPRESSED_FILE, DEV_NULL, ENCRYPTED_FILE,
+                                  add_private_gpg, add_public_gpg,
                                   callable_for_filename_template,
-                                  DEV_NULL, add_public_gpg)
+                                  clean_gpg_keys)
 
 
 class Bytes_To_StrTest(TestCase):

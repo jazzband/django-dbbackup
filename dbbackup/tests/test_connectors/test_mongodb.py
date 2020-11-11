@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from mock import patch
+from io import BytesIO
 
 from django.test import TestCase
-from six import BytesIO
+from mock import patch
 
 from dbbackup.db.mongodb import MongoDumpConnector
 

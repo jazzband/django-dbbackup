@@ -1,10 +1,11 @@
 import os
 import subprocess
-import six
+
 from django.conf import settings
-from django.utils import timezone
 from django.core.files import File
 from django.core.files.storage import Storage
+from django.utils import timezone
+
 from dbbackup.db.base import get_connector
 
 BASE_FILE = os.path.join(settings.BLOB_DIR, 'test.txt')
@@ -94,12 +95,7 @@ def add_public_gpg():
     subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
 
 
-def skip_py3(testcase, reason="Not in Python 3"):
-    """Decorator for skip Python 3 tests."""
-    if six.PY3:
-        setup = lambda s: s.skipTest(reason)
-        testcase.setUp = setup
-    return testcase
+
 
 
 def callable_for_filename_template(datetime, **kwargs):

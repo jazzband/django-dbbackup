@@ -10,10 +10,15 @@ from django.test import TestCase
 from mock import patch
 
 from dbbackup import settings, utils
-from dbbackup.tests.utils import (COMPRESSED_FILE, DEV_NULL, ENCRYPTED_FILE,
-                                  add_private_gpg, add_public_gpg,
-                                  callable_for_filename_template,
-                                  clean_gpg_keys)
+from dbbackup.tests.utils import (
+    COMPRESSED_FILE,
+    DEV_NULL,
+    ENCRYPTED_FILE,
+    add_private_gpg,
+    add_public_gpg,
+    callable_for_filename_template,
+    clean_gpg_keys,
+)
 
 
 class Bytes_To_StrTest(TestCase):

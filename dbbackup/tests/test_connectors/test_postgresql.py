@@ -6,8 +6,11 @@ from django.test import TestCase
 from mock import patch
 
 from dbbackup.db.exceptions import DumpError
-from dbbackup.db.postgresql import (PgDumpBinaryConnector, PgDumpConnector,
-                                    PgDumpGisConnector)
+from dbbackup.db.postgresql import (
+    PgDumpBinaryConnector,
+    PgDumpConnector,
+    PgDumpGisConnector,
+)
 
 
 @patch('dbbackup.db.postgresql.PgDumpConnector.run_command',

@@ -1,12 +1,14 @@
 """
 Tests for base command class.
 """
-import os
 import logging
-from mock import patch
-from django.test import TestCase
-import six
+import os
+from io import BytesIO
+
 from django.core.files import File
+from django.test import TestCase
+from mock import patch
+
 from dbbackup.management.commands._base import BaseDbBackupCommand
 from dbbackup.storage import get_storage
 from dbbackup.tests.utils import DEV_NULL, HANDLED_FILES
@@ -49,12 +51,12 @@ class BaseDbBackupCommandMethodsTest(TestCase):
         self.command.storage = get_storage()
 
     def test_read_from_storage(self):
-        HANDLED_FILES['written_files'].append(['foo', File(six.BytesIO(b'bar'))])
+        HANDLED_FILES['written_files'].append(['foo', File(BytesIO(b'bar'))])
         file_ = self.command.read_from_storage('foo')
         self.assertEqual(file_.read(), b'bar')
 
     def test_write_to_storage(self):
-        self.command.write_to_storage(six.BytesIO(b'foo'), 'bar')
+        self.command.write_to_storage(BytesIO(b'foo'), 'bar')
         self.assertEqual(HANDLED_FILES['written_files'][0][0], 'bar')
 
     def test_read_local_file(self):
@@ -67,7 +69,7 @@ class BaseDbBackupCommandMethodsTest(TestCase):
         os.remove(self.command.path)
 
     def test_write_local_file(self):
-        fd, path = File(six.BytesIO(b"foo")), '/tmp/foo.bak'
+        fd, path = File(BytesIO(b"foo")), '/tmp/foo.bak'
         self.command.write_local_file(fd, path)
         self.assertTrue(os.path.exists(path))
         # tearDown

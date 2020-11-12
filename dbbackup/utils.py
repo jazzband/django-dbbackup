@@ -3,19 +3,17 @@ Utility functions for dbbackup.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import sys
-import os
-import traceback
-import tempfile
 import gzip
-import re
 import logging
+import os
+import re
+import sys
+import tempfile
+import traceback
+from datetime import datetime
+from functools import wraps
 from getpass import getpass
 from shutil import copyfileobj
-from functools import wraps
-from datetime import datetime
-
-import six
 
 from django.core.mail import EmailMultiAlternatives
 from django.db import connection
@@ -28,8 +26,6 @@ except ImportError:
     from shlex import quote
 
 from . import settings
-
-input = raw_input if six.PY2 else input  # noqa
 
 FAKE_HTTP_REQUEST = HttpRequest()
 FAKE_HTTP_REQUEST.META['SERVER_NAME'] = ''

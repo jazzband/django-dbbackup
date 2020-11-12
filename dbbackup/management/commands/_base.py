@@ -1,27 +1,21 @@
 """
 Abstract Command.
 """
-import sys
 import logging
+import sys
 from optparse import make_option as optparse_make_option
 from shutil import copyfileobj
 
 import django
 from django.core.management.base import BaseCommand, CommandError
-import six
 
 from ...storage import StorageError
-
-if six.PY2:
-    input = raw_input # noqa
-else:
-    long = int
 
 USELESS_ARGS = ('callback', 'callback_args', 'callback_kwargs', 'metavar')
 TYPES = {
     'string': str,
     'int': int,
-    'long': long,
+    'long': int,
     'float': float,
     'complex': complex,
     'choice': list

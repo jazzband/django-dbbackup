@@ -1,15 +1,16 @@
 from __future__ import unicode_literals
 
-from mock import patch
-from django.test import TestCase
-from six import BytesIO
+from io import BytesIO
 
+from django.test import TestCase
+from mock import patch
+
+from dbbackup.db.exceptions import DumpError
 from dbbackup.db.postgresql import (
+    PgDumpBinaryConnector,
     PgDumpConnector,
     PgDumpGisConnector,
-    PgDumpBinaryConnector
 )
-from dbbackup.db.exceptions import DumpError
 
 
 @patch('dbbackup.db.postgresql.PgDumpConnector.run_command',

@@ -1,7 +1,9 @@
-from mock import patch
-from django.test import TestCase
+from io import StringIO
+
 from django.core.management import execute_from_command_line
-from six import StringIO
+from django.test import TestCase
+from mock import patch
+
 from dbbackup.management.commands.listbackups import Command as ListbackupsCommand
 from dbbackup.storage import get_storage
 from dbbackup.tests.utils import HANDLED_FILES

@@ -71,6 +71,8 @@ filename. ::
                           Specify filename on storage
     -O OUTPUT_PATH, --output-path=OUTPUT_PATH
                           Specify where to store on local filesystem
+    -x EXCLUDE_TABLES, --exclude-tables=EXCLUDE_TABLES
+                          Exclude tables data from backup (-x 'public.table1, public.table2')
 
 dbrestore
 ---------

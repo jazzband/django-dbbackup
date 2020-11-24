@@ -32,7 +32,9 @@ class Command(BaseDbBackupCommand):
         make_option("-o", "--output-filename", default=None,
                     help="Specify filename on storage"),
         make_option("-O", "--output-path", default=None,
-                    help="Specify where to store on local filesystem")
+                    help="Specify where to store on local filesystem"),
+        make_option("-x", "--exclude-tables", default=None,
+                    help="Exclude tables from backup")
     )
 
     @utils.email_uncaught_exception
@@ -49,6 +51,7 @@ class Command(BaseDbBackupCommand):
 
         self.filename = options.get('output_filename')
         self.path = options.get('output_path')
+        self.exclude_tables = options.get("exclude_tables")
         self.storage = get_storage()
 
         self.database = options.get('database') or ''
@@ -56,6 +59,8 @@ class Command(BaseDbBackupCommand):
 
         for database_key in database_keys:
             self.connector = get_connector(database_key)
+            if self.connector and self.exclude_tables:
+                self.connector.exclude.extend(list(self.exclude_tables.replace(" ", "").split(',')))
             database = self.connector.settings
             try:
                 self._save_new_backup(database)

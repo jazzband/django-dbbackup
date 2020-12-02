@@ -20,6 +20,8 @@ class MysqlDumpConnector(BaseCommandDBConnector):
             cmd += ' --user={}'.format(self.settings['USER'])
         if self.settings.get('PASSWORD'):
             cmd += ' --password={}'.format(utils.get_escaped_command_arg(self.settings['PASSWORD']))
+        if self.settings.get("SINGLE_TRANSACTION", True) is True:
+            cmd += ' --single-transaction'
         for table in self.exclude:
             cmd += ' --ignore-table={}.{}'.format(self.settings['NAME'], table)
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)

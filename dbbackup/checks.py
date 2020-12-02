@@ -56,7 +56,7 @@ def check_settings(app_configs, **kwargs):
                 and connector_settings.get("SINGLE_TRANSACTION") is True
         ):
             hint = '"SINGLE_TRANSACTION" in "settings.DBBACKUP_CONNECTORS" has no ' \
-                   'effect on "%s" connector' % connector_settings.get("CONNECTOR")
+                   'effect on "%s" class' % connector_settings.get("CONNECTOR")
             W007.hint = hint
             errors.append(W007)
             break

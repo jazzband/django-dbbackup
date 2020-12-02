@@ -15,4 +15,5 @@ class DbbackupConfig(AppConfig):
     verbose_name = gettext_lazy('Backup and restore')
 
     def ready(self):
+        from .checks import check_settings  # noqa: F401
         log.load()

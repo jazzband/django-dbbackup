@@ -4,6 +4,10 @@ Changelog
 Unreleased
 -----------
 * Replace ugettext_lazy with gettext_lazy `#342`_
+* Changed logging settings from settings.py to late init `#332`_
+* Fix authentication error when postgres is password protected `#361`_
+* Use exclude-table-data instead of exclude-table `#363`_
+* Add support for exclude tables data in the command interface `#375`_
 * Documentation fixes `#341`_ `#333`_ `#349`_ `#348`_ `#337`_
 
 
@@ -21,6 +25,10 @@ Unreleased
 * Quick fix for proper selection of DB name to restore `#260`_
 
 .. _`#342`: https://github.com/django-dbbackup/django-dbbackup/pull/342
+.. _`#332`: https://github.com/django-dbbackup/django-dbbackup/pull/332
+.. _`#361`: https://github.com/django-dbbackup/django-dbbackup/pull/361
+.. _`#363`: https://github.com/django-dbbackup/django-dbbackup/pull/363
+.. _`#375`: https://github.com/django-dbbackup/django-dbbackup/pull/375
 .. _`#341`: https://github.com/django-dbbackup/django-dbbackup/pull/341
 .. _`#333`: https://github.com/django-dbbackup/django-dbbackup/pull/333
 .. _`#328`: https://github.com/django-dbbackup/django-dbbackup/pull/328

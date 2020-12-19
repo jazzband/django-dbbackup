@@ -1,11 +1,13 @@
 from __future__ import unicode_literals
-import warnings
-from tempfile import SpooledTemporaryFile
-from shutil import copyfileobj
-from django.db import IntegrityError, OperationalError
-from six import BytesIO
-from .base import BaseDBConnector
 
+import warnings
+from io import BytesIO
+from shutil import copyfileobj
+from tempfile import SpooledTemporaryFile
+
+from django.db import IntegrityError, OperationalError
+
+from .base import BaseDBConnector
 
 DUMP_TABLES = """
 SELECT "name", "type", "sql"

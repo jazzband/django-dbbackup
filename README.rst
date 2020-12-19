@@ -5,7 +5,7 @@ Django Database Backup
         :target: https://travis-ci.org/django-dbbackup/django-dbbackup
 
 .. image:: https://readthedocs.org/projects/django-dbbackup/badge/?version=latest
-        :target: http://django-dbbackup.readthedocs.io/en/latest/
+        :target: http://django-dbbackup.readthedocs.io/
         :alt: Documentation Status
 
 .. image:: https://coveralls.io/repos/django-dbbackup/django-dbbackup/badge.svg?branch=master&service=github
@@ -71,6 +71,8 @@ filename. ::
                           Specify filename on storage
     -O OUTPUT_PATH, --output-path=OUTPUT_PATH
                           Specify where to store on local filesystem
+    -x EXCLUDE_TABLES, --exclude-tables=EXCLUDE_TABLES
+                          Exclude tables data from backup (-x 'public.table1, public.table2')
 
 dbrestore
 ---------

@@ -10,6 +10,7 @@ def get_requirements():
 def get_test_requirements():
     return open('requirements-tests.txt').read().splitlines()
 
+
 keywords = [
     'django', 'database', 'media', 'backup',
     'amazon', 's3' 'dropbox',

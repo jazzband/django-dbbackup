@@ -4,7 +4,6 @@ Command for backup database.
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import CommandError
 
 from ._base import BaseDbBackupCommand, make_option
@@ -32,7 +31,9 @@ class Command(BaseDbBackupCommand):
                     help="Encrypt the backup files"),
         make_option("-o", "--output-filename", default=None,
                     help="Specify filename on storage"),
-        make_option("-O", "--output-path", default=None,
+        make_option("-x", "--exclude-tables", default=None,
+                    help="Exclude tables from backup"),
+        make_option("-p", "--output-path", default=None,
                     help="Specify where to store on local filesystem"),
         make_option("--storage", default=None,
                     help="Specify storage from DBACKUP_STORAGES to use"),
@@ -54,6 +55,8 @@ class Command(BaseDbBackupCommand):
 
         self.filename = options.get('output_filename')
         self.path = options.get('output_path')
+        self.exclude_tables = options.get("exclude_tables")
+
 
         if self.db_storage:
             self.storage = get_backup_storage(self.db_storage)
@@ -65,6 +68,8 @@ class Command(BaseDbBackupCommand):
 
         for database_key in database_keys:
             self.connector = get_connector(database_key)
+            if self.connector and self.exclude_tables:
+                self.connector.exclude.extend(list(self.exclude_tables.replace(" ", "").split(',')))
             database = self.connector.settings
             try:
                 self._save_new_backup(database)

@@ -1,7 +1,6 @@
 from urllib.parse import quote
 import logging
 
-from dbbackup import utils
 from .base import BaseCommandDBConnector
 from .exceptions import DumpError
 

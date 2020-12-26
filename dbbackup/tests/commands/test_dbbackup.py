@@ -65,8 +65,6 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         self.assertEqual(str(ic.exception),
                          'You must specify a storage class using DBBACKUP_STORAGES settings.')
 
-        # TODO: Update DBBACKUP_FALLBACK_STORAGE and verify successful backup.
-
 
 @patch('dbbackup.settings.GPG_RECIPIENT', 'test@test')
 @patch('sys.stdout', DEV_NULL)

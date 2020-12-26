@@ -57,7 +57,6 @@ class Command(BaseDbBackupCommand):
         self.path = options.get('output_path')
         self.exclude_tables = options.get("exclude_tables")
 
-
         if self.db_storage:
             self.storage = get_backup_storage(self.db_storage)
         else:

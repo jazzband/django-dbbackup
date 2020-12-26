@@ -1,27 +1,29 @@
 """
 Tests for dbrestore command.
 """
-from django.core.exceptions import ImproperlyConfigured
-from django.core.management import execute_from_command_line
-from mock import patch
-from tempfile import mktemp
 from shutil import copyfileobj
+from tempfile import mktemp
 
-from django.test import TestCase
-from django.core.management.base import CommandError
-from django.core.files import File
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from django.core.files import File
+from django.core.files.storage import FileSystemStorage
+from django.core.management import execute_from_command_line
+from django.core.management.base import CommandError
+from django.test import TestCase
+from mock import patch
 from six import StringIO
+from storages.backends.s3boto3 import S3Boto3Storage
 
 from dbbackup import utils
 from dbbackup.db.base import get_connector
 from dbbackup.db.mongodb import MongoDumpConnector
 from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
-from dbbackup.storage import get_storage
 from dbbackup.settings import HOSTNAME
+from dbbackup.storage import get_storage
 from dbbackup.tests.utils import (TEST_DATABASE, add_private_gpg, DEV_NULL,
                                   clean_gpg_keys, HANDLED_FILES, TEST_MONGODB, TARED_FILE,
-                                  get_dump, get_dump_name)
+                                  get_dump, get_dump_name, FakeStorage)
 
 
 @patch('dbbackup.management.commands._base.input', return_value='y')
@@ -152,3 +154,43 @@ class DbMongoRestoreCommandRestoreBackupTest(TestCase):
         HANDLED_FILES['written_files'].append((TARED_FILE, open(TARED_FILE, 'rb')))
         self.command._restore_backup()
         self.assertTrue(mock_runcommands.called)
+
+
+class DbrestoreCommandRestoreMultipleBackupTest(TestCase):
+    def setUp(self):
+        self.command = DbrestoreCommand()
+        self.command.stdout = DEV_NULL
+        self.command.uncompress = False
+        self.command.decrypt = False
+        self.command.backup_extension = 'bak'
+        self.command.filename = 'foofile'
+        self.command.database = TEST_DATABASE
+        self.command.passphrase = None
+        self.command.interactive = True
+        self.command.servername = HOSTNAME
+        self.command.database_name = 'default'
+        self.command.connector = get_connector('default')
+        HANDLED_FILES.clean()
+
+    @staticmethod
+    def fake_restore():
+        return True
+
+    def test_default(self):
+        self.command.handle(storage='default', verbosity=1)
+        self.assertIsInstance(self.command.storage.storage, FileSystemStorage)
+
+    @patch.object(DbrestoreCommand, '_restore_backup')
+    def test_fake(self, fake_restore):
+        self.command.handle(storage='fake_storage', verbosity=1)
+        self.assertIsInstance(self.command.storage.storage, FakeStorage)
+
+    @patch.object(DbrestoreCommand, '_restore_backup')
+    def test_S3(self, fake_restore):
+        self.command.handle(storage='s3_storage', verbosity=1)
+        self.assertIsInstance(self.command.storage.storage, S3Boto3Storage)
+        self.assertEqual(vars(self.command.storage.storage)['_constructor_args'][1],
+                         {'access_key': 'my_id',
+                          'secret_key': 'my_secret',
+                          'bucket_name': 'my_bucket_name',
+                          'default_acl': 'private'})

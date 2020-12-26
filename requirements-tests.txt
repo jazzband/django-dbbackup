@@ -1,5 +1,5 @@
 coverage
-django-storages
+django-storages[boto3]
 flake8
 mock
 pep8

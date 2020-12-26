@@ -34,11 +34,12 @@ def get_backup_storage(db_storage):
     if db_storage not in settings.STORAGES:
         raise ImproperlyConfigured('You must specify a storage class using '
                                    'DBBACKUP_STORAGES settings.')
-    storage_options = settings.STORAGES[db_storage]
+    storage_options = settings.STORAGES[db_storage].copy()
     if 'storage' in storage_options:
         storage = storage_options.pop('storage', None)
         options = storage_options
         return get_storage(path=storage, options=options)
+    print(settings.STORAGES)
     raise ImproperlyConfigured('You must specify a storage class "storage" using '
                                'DBBACKUP_STORAGES settings.')
 

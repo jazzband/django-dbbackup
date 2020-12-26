@@ -1,8 +1,11 @@
-from mock import patch
 from django.test import TestCase
-from dbbackup.storage import get_storage, Storage
-from dbbackup.tests.utils import HANDLED_FILES, FakeStorage
+from django.core.files.storage import FileSystemStorage
+from mock import patch
+from storages.backends.s3boto3 import S3Boto3Storage
+
 from dbbackup import utils
+from dbbackup.storage import get_storage, Storage, get_backup_storage
+from dbbackup.tests.utils import HANDLED_FILES, FakeStorage
 
 DEFAULT_STORAGE_PATH = 'django.core.files.storage.FileSystemStorage'
 STORAGE_OPTIONS = {'location': '/tmp'}
@@ -175,3 +178,18 @@ class StorageCleanOldBackupsTest(TestCase):
     def test_keep_filter(self):
         self.storage.clean_old_backups(keep_number=1)
         self.assertListEqual(['2015-02-07-042810.bak'], HANDLED_FILES['deleted_files'])
+
+
+class StorageBackendsTest(TestCase):
+    def test_default(self):
+        self.storage = get_backup_storage('default')
+        self.assertIsInstance(self.storage.storage, FileSystemStorage)
+
+    def test_custom(self):
+        self.storage = get_backup_storage('s3_storage')
+        self.assertIsInstance(self.storage.storage, S3Boto3Storage)
+        self.assertEqual(vars(self.storage.storage)['_constructor_args'][1],
+                         {'access_key': 'my_id',
+                          'secret_key': 'my_secret',
+                          'bucket_name': 'my_bucket_name',
+                          'default_acl': 'private'})

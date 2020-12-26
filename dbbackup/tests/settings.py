@@ -2,8 +2,9 @@
 Configuration and launcher for dbbackup tests.
 """
 import os
-import tempfile
 import sys
+import tempfile
+
 from dotenv import load_dotenv
 
 test = len(sys.argv) <= 1 or sys.argv[1] == 'test'
@@ -58,6 +59,22 @@ DBBACKUP_STORAGE = os.environ.get('STORAGE', 'dbbackup.tests.utils.FakeStorage')
 DBBACKUP_STORAGE_OPTIONS = dict([keyvalue.split('=') for keyvalue in
                                  os.environ.get('STORAGE_OPTIONS', '').split(',')
                                  if keyvalue])
+
+DBBACKUP_STORAGES = {
+    'default': {
+        'storage': 'django.core.files.storage.FileSystemStorage',
+    },
+    'fake_storage': {
+        'storage': 'dbbackup.tests.utils.FakeStorage',
+    },
+    's3_storage': {
+        'storage': 'storages.backends.s3boto3.S3Boto3Storage',
+        'access_key': 'my_id',
+        'secret_key': 'my_secret',
+        'bucket_name': 'my_bucket_name',
+        'default_acl': 'private',
+    }
+}
 
 LOGGING = {
     'version': 1,

@@ -4,6 +4,7 @@ Tests for dbbackup command.
 import os
 
 from django.core.exceptions import ImproperlyConfigured
+from django.core.files.storage import FileSystemStorage
 from six import StringIO
 from django.core.management import execute_from_command_line
 
@@ -13,7 +14,7 @@ from django.test import TestCase
 
 from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
 from dbbackup.db.base import get_connector
-from dbbackup.storage import get_storage
+from dbbackup.storage import get_storage, get_backup_storage
 from dbbackup.tests.utils import (TEST_DATABASE, add_public_gpg, clean_gpg_keys,
                                   DEV_NULL)
 
@@ -88,3 +89,29 @@ class DbbackupCommandSaveNewMongoBackupTest(TestCase):
     def test_func(self, mock_run_commands, mock_handle_size):
         self.command._save_new_backup(TEST_DATABASE)
         self.assertTrue(mock_run_commands.called)
+
+
+class DbbackupCommandSaveMultipleStorages(TestCase):
+    def setUp(self):
+        self.command = DbbackupCommand()
+        self.command.servername = 'foo-server'
+        self.command.encrypt = False
+        self.command.compress = False
+        self.command.connector = get_connector()
+        self.command.stdout = DEV_NULL
+        self.command.filename = None
+        self.command.path = None
+
+    def test_default_func(self):
+        self.command.database = TEST_DATABASE['NAME']
+        self.command.storage = get_backup_storage('default')
+        self.command._save_new_backup(TEST_DATABASE)
+
+    def test_fake_func(self):
+        self.command.database = TEST_DATABASE['NAME']
+        self.command.storage = get_backup_storage('fake_storage')
+        self.command._save_new_backup(TEST_DATABASE)
+
+    def test_default(self):
+        self.storage = get_backup_storage('default')
+        self.assertIsInstance(self.storage.storage, FileSystemStorage)

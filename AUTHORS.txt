@@ -12,3 +12,5 @@ Contributors:
  * Toumhi (Bitbucket)
  * Tobias McNulty
  * Grant McConnaughey
+ * Dominik George (Natureshadow)
+ 

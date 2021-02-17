@@ -1,29 +1,55 @@
-from urllib.parse import quote
+from tempfile import mkstemp
 import logging
+import os
 
 from .base import BaseCommandDBConnector
-from .exceptions import DumpError
 
 logger = logging.getLogger('dbbackup.command')
 
 
-def create_postgres_uri(self):
-    host = self.settings.get('HOST')
-    if not host:
-        raise DumpError('A host name is required')
+class PgEnvWrapper:
+    """
+    Context manager that updates the OS environment with the libpq variables
+    derived from settings, and if necessary a temporary .pgpass file.
+    """
+    def __init__(self, settings):
+        self.settings = settings
+        self.pgpass_path = None
 
-    dbname = self.settings.get('NAME') or ''
-    user = quote(self.settings.get('USER') or '')
-    password = self.settings.get('PASSWORD') or ''
-    password = ':{}'.format(quote(password)) if password else ''
-    if not user:
-        password = ''
-    else:
-        host = '@' + host
+    def __enter__(self):
+        # Get all settings, with empty defaults to detect later
+        pghost = self.settings.get('HOST', None)
+        pgport = self.settings.get('PORT', None)
+        pguser = self.settings.get('USER', None)
+        pgdatabase = self.settings.get('NAME', None)
+        pgpassword = self.settings.get('PASSWORD', None)
 
-    port = ':{}'.format(self.settings.get('PORT')) if self.settings.get('PORT') else ''
-    dbname = f'--dbname=postgresql://{user}{password}{host}{port}/{dbname}'
-    return dbname
+        # Set PG* environment variables for everything we got
+        # All defaults are thus left to libpq
+        env = os.environ.copy()
+        if pghost:
+            env['PGHOST'] = pghost
+        if pgport:
+            env['PGPORT'] = pgport
+        if pguser:
+            env['PGUSER'] = pguser
+        if pgdatabase:
+            env['PGDATABASE'] = pgdatabase
+
+        if pgpassword:
+            # Open a temporary file (safe name, mode 600) as .pgpass file
+            fd, self.pgpass_path = mkstemp(text=True)
+            os.close(fd)
+            with open(self.pgpass_path, 'w') as pgpass_file:
+                # Write a catch-all entry, as this .pgass is only used once and by us
+                pgpass_file.write(f'*:*:*:*:{pgpassword}\n')
+            env['PGPASSFILE'] = self.pgpass_path
+
+        return env
+
+    def __exit__(self, *args):
+        if self.pgpass_path:
+            os.unlink(self.pgpass_path)
 
 
 class PgDumpConnector(BaseCommandDBConnector):
@@ -39,7 +65,6 @@ class PgDumpConnector(BaseCommandDBConnector):
 
     def _create_dump(self):
         cmd = '{} '.format(self.dump_cmd)
-        cmd = cmd + create_postgres_uri(self)
 
         for table in self.exclude:
             cmd += ' --exclude-table-data={}'.format(table)
@@ -47,20 +72,20 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += ' --clean'
 
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
-        stdout, stderr = self.run_command(cmd, env=self.dump_env)
+        with PgEnvWrapper(self.settings) as env:
+            stdout, stderr = self.run_command(cmd, env={**self.dump_env, **env})
         return stdout
 
     def _restore_dump(self, dump):
         cmd = '{} '.format(self.restore_cmd)
-        cmd = cmd + create_postgres_uri(self)
 
         # without this, psql terminates with an exit value of 0 regardless of errors
         cmd += ' --set ON_ERROR_STOP=on'
         if self.single_transaction:
             cmd += ' --single-transaction'
-        cmd += ' {}'.format(self.settings['NAME'])
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
-        stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
+        with PgEnvWrapper(self.settings) as env:
+            stdout, stderr = self.run_command(cmd, stdin=dump, env={**self.restore_env, **env})
         return stdout, stderr
 
 
@@ -76,11 +101,8 @@ class PgDumpGisConnector(PgDumpConnector):
             self.psql_cmd)
         cmd += ' --username={}'.format(self.settings['ADMIN_USER'])
         cmd += ' --no-password'
-        if self.settings.get('HOST'):
-            cmd += ' --host={}'.format(self.settings['HOST'])
-        if self.settings.get('PORT'):
-            cmd += ' --port={}'.format(self.settings['PORT'])
-        return self.run_command(cmd)
+        with PgEnvWrapper(self.settings) as env:
+            return self.run_command(cmd, env=env)
 
     def _restore_dump(self, dump):
         if self.settings.get('ADMIN_USER'):
@@ -101,23 +123,24 @@ class PgDumpBinaryConnector(PgDumpConnector):
 
     def _create_dump(self):
         cmd = '{} '.format(self.dump_cmd)
-        cmd = cmd + create_postgres_uri(self)
 
         cmd += ' --format=custom'
         for table in self.exclude:
             cmd += ' --exclude-table-data={}'.format(table)
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
-        stdout, stderr = self.run_command(cmd, env=self.dump_env)
+        with PgEnvWrapper(self.settings) as env:
+            stdout, stderr = self.run_command(cmd, env={**self.dump_env, **env})
         return stdout
 
     def _restore_dump(self, dump):
-        dbname = create_postgres_uri(self)
-        cmd = '{} {}'.format(self.restore_cmd, dbname)
+        cmd = '{} '.format(self.restore_cmd)
 
         if self.single_transaction:
             cmd += ' --single-transaction'
         if self.drop:
             cmd += ' --clean'
+        cmd += '-d {}'.format(self.settings.get('NAME'))
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
-        stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
+        with PgEnvWrapper(self.settings) as env:
+            stdout, stderr = self.run_command(cmd, stdin=dump, env={**self.restore_env, **env})
         return stdout, stderr

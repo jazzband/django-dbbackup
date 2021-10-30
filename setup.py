@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
+from setuptools import setup,  find_packages
 import dbbackup
 
 
 def get_requirements():
-    return open('requirements.txt').read().splitlines()
+    return open( 'requirements.txt').read().splitlines()
 
 
 def get_test_requirements():

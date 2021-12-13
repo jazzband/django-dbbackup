@@ -3,7 +3,7 @@
 from django.apps import AppConfig
 try:
     from django.utils.translation import gettext_lazy as _  # noqa: F401
-except:  # noqa: E722
+except ImportError:  # noqa: E722
     from django.utils.translation import ugettext_lazy as _  # noqa: F401
 
 from dbbackup import log

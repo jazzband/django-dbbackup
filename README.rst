@@ -200,3 +200,18 @@ Django3.2 you would run:
     tox -e py3.9-django3.2
 
 The available test environments can be found in ``tox.ini``.
+
+Publishing
+==========
+
+To build a source distribution and wheel:
+
+::
+
+    tox -e build
+
+To publish to PyPI:
+
+::
+
+    tox -e upload

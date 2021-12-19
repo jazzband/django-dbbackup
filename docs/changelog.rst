@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 -----------
+* Explicitly support Python 3.6+. `#408`_
+* Drop support for end of life Django versions. Currently support 2.2, 3.2, 4.0. `#408`_
 * Replace ugettext_lazy with gettext_lazy `#342`_
 * Changed logging settings from settings.py to late init `#332`_
 * Fix authentication error when postgres is password protected `#361`_
@@ -50,9 +52,4 @@ Unreleased
 .. _`#349`: https://github.com/django-dbbackup/django-dbbackup/pull/349
 .. _`#348`: https://github.com/django-dbbackup/django-dbbackup/pull/348
 .. _`#337`: https://github.com/django-dbbackup/django-dbbackup/pull/337
-.. _`#`:
-.. _`#`:
-.. _`#`:
-.. _`#`:
-.. _`#`:
-.. _`#`:_
+.. _`#408`: https://github.com/django-dbbackup/django-dbbackup/pull/408

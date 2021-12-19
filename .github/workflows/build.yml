@@ -13,8 +13,6 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-        django: ["2.2", "3.0", "3.1", "3.2"]
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -28,8 +26,6 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Linting
       run: flake8
-    - name: Run unittests
-      env:
-        TOX_ENV: py${{ matrix.python-version}}-django${{ matrix.django }}
-      run: |
-        tox -e $TOX_ENV
+    # Environments are selected using tox-gh-actions configuration in tox.ini.
+    - name: Test with tox
+      run: tox

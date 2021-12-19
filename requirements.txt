@@ -1,2 +1,2 @@
 pytz
-Django>=1.5
+Django>=2.2

@@ -1,20 +1,15 @@
 Django Database Backup
 ======================
 
-.. image:: https://api.travis-ci.org/django-dbbackup/django-dbbackup.svg
-        :target: https://travis-ci.org/django-dbbackup/django-dbbackup
+.. image:: https://github.com/django-dbbackup/django-dbbackup/actions/workflows/build.yml/badge.svg
+        :target: https://github.com/django-dbbackup/django-dbbackup/actions
 
-.. image:: https://readthedocs.org/projects/django-dbbackup/badge/?version=latest
-        :target: http://django-dbbackup.readthedocs.io/
+.. image:: https://readthedocs.org/projects/django-dbbackup/badge/?version=stable
+        :target: https://django-dbbackup.readthedocs.io/
         :alt: Documentation Status
 
 .. image:: https://coveralls.io/repos/django-dbbackup/django-dbbackup/badge.svg?branch=master&service=github
         :target: https://coveralls.io/github/django-dbbackup/django-dbbackup?branch=master
-
-.. image:: https://landscape.io/github/django-dbbackup/django-dbbackup/master/landscape.svg?style=flat
-        :target: https://landscape.io/github/django-dbbackup/django-dbbackup/master
-        :alt: Code Health
-
 
 This Django application provides management commands to help backup and
 restore your project database and media files with various storages such as
@@ -31,7 +26,7 @@ It is made for:
 Docs
 ====
 
-See our offical documentation at `Read The Docs`_.
+See our official documentation at `Read The Docs`_.
 
 Why use DBBackup
 ================
@@ -149,20 +144,16 @@ Contributing
 ============
 
 All contribution are very welcomed, propositions, problems, bugs and
-enhancement are tracked with `GitHub issues`_ system and patch are submitted
+enhancement are tracked with `GitHub issues`_ system and patches are submitted
 via `pull requests`_.
 
-We use `Travis`_ coupled with `Coveralls`_ as continious integration tools.
+We use GitHub Actions as continuous integration tools.
 
-.. _`Read The Docs`: http://django-dbbackup.readthedocs.org/
+.. _`Read The Docs`: https://django-dbbackup.readthedocs.org/
 .. _`GitHub issues`: https://github.com/django-dbbackup/django-dbbackup/issues
 .. _`pull requests`: https://github.com/django-dbbackup/django-dbbackup/pulls
-.. _Travis: https://travis-ci.org/django-dbbackup/django-dbbackup
+.. _`GitHub Actions`: https://github.com/django-dbbackup/django-dbbackup/actions
 .. _Coveralls: https://coveralls.io/github/django-dbbackup/django-dbbackup
-
-
-.. image:: https://ga-beacon.appspot.com/UA-87461-7/django-dbbackup/home
-        :target: https://github.com/igrigorik/ga-beacon
 
 Tests
 =====
@@ -182,7 +173,7 @@ are available. So you could launch:
 
 For get a Python shell configured with the test project. Also all test
 command options are available and usable for run only some chosen tests.
-See `Django test command documentation`_ for more informations about it.
+See `Django test command documentation`_ for more information about it.
 
 .. _`Django test command documentation`: https://docs.djangoproject.com/en/stable/topics/testing/overview/#running-tests
 
@@ -201,11 +192,11 @@ can use Tox. Firstly install Tox:
 
 To run the tests just use the command ``tox`` in the command line.  If you
 want to run the tests against just one specific test environment you can run
-``tox -e <testenv>``.  For example, to run the tests with Python3.3 and
-Django1.9 you would run:
+``tox -e <testenv>``.  For example, to run the tests with Python3.9 and
+Django3.2 you would run:
 
 ::
 
-    tox -e py3.3-django1.9
+    tox -e py3.9-django3.2
 
 The available test environments can be found in ``tox.ini``.

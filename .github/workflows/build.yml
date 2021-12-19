@@ -1,4 +1,4 @@
-name: Running unittests
+name: Lint and Unit Test
 
 on:
   push:

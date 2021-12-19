@@ -13,7 +13,7 @@ Unreleased
 * Fix authentication error when postgres is password protected `#361`_
 * Use exclude-table-data instead of exclude-table `#363`_
 * Add support for exclude tables data in the command interface `#375`_
-* Documentation fixes `#341`_ `#333`_ `#349`_ `#348`_ `#337`_
+* Documentation fixes `#341`_ `#333`_ `#349`_ `#348`_ `#337`_ `#411`_
 
 
 3.3.0 (2020-04-14)
@@ -58,3 +58,4 @@ Unreleased
 .. _`#408`: https://github.com/django-dbbackup/django-dbbackup/pull/408
 .. _`#371`: https://github.com/django-dbbackup/django-dbbackup/pull/371
 .. _`#379`: https://github.com/django-dbbackup/django-dbbackup/pull/379
+.. _`#411`: https://github.com/django-dbbackup/django-dbbackup/pull/411

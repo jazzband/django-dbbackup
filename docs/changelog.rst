@@ -4,6 +4,7 @@ Changelog
 Unreleased
 -----------
 
+* Fix RemovedInDjango41Warning related to default_app_config `#413`_
 * Add authentication database support for MongoDB `#379`_
 * Remove six dependency `#371`_
 * Explicitly support Python 3.6+. `#408`_
@@ -59,3 +60,4 @@ Unreleased
 .. _`#371`: https://github.com/django-dbbackup/django-dbbackup/pull/371
 .. _`#379`: https://github.com/django-dbbackup/django-dbbackup/pull/379
 .. _`#411`: https://github.com/django-dbbackup/django-dbbackup/pull/411
+.. _`#413`: https://github.com/django-dbbackup/django-dbbackup/pull/413

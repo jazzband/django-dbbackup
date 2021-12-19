@@ -3,6 +3,9 @@ Changelog
 
 Unreleased
 -----------
+
+* Add authentication database support for MongoDB `#379`_
+* Remove six dependency `#371`_
 * Explicitly support Python 3.6+. `#408`_
 * Drop support for end of life Django versions. Currently support 2.2, 3.2, 4.0. `#408`_
 * Replace ugettext_lazy with gettext_lazy `#342`_
@@ -13,8 +16,8 @@ Unreleased
 * Documentation fixes `#341`_ `#333`_ `#349`_ `#348`_ `#337`_
 
 
-3.3.0
-------
+3.3.0 (2020-04-14)
+------------------
 
 * Documentation fixes `#341`_ `#333`_ `#328`_ `#320`_ `#305`_ `#303`_ `#302`_ `#298`_ `#281`_ `#266`_ `#349`_ `#348`_ `#337`_
 * "output-filename" in mediabackup command `#324`_
@@ -53,3 +56,5 @@ Unreleased
 .. _`#348`: https://github.com/django-dbbackup/django-dbbackup/pull/348
 .. _`#337`: https://github.com/django-dbbackup/django-dbbackup/pull/337
 .. _`#408`: https://github.com/django-dbbackup/django-dbbackup/pull/408
+.. _`#371`: https://github.com/django-dbbackup/django-dbbackup/pull/371
+.. _`#379`: https://github.com/django-dbbackup/django-dbbackup/pull/379

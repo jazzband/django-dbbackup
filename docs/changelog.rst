@@ -1,8 +1,8 @@
 Changelog
-=====
+=========
 
-Unreleased
------------
+4.0.0b0 (2021-12-19)
+--------------------
 
 * Fix RemovedInDjango41Warning related to default_app_config `#413`_
 * Add authentication database support for MongoDB `#379`_
@@ -14,6 +14,8 @@ Unreleased
 * Fix authentication error when postgres is password protected `#361`_
 * Use exclude-table-data instead of exclude-table `#363`_
 * Add support for exclude tables data in the command interface `#375`_
+* Move author and version information into setup.py to allow building package in isolated
+  environment (e.g. with the ``build`` package). `#414`_
 * Documentation fixes `#341`_ `#333`_ `#349`_ `#348`_ `#337`_ `#411`_
 
 
@@ -61,3 +63,4 @@ Unreleased
 .. _`#379`: https://github.com/django-dbbackup/django-dbbackup/pull/379
 .. _`#411`: https://github.com/django-dbbackup/django-dbbackup/pull/411
 .. _`#413`: https://github.com/django-dbbackup/django-dbbackup/pull/413
+.. _`#414`: https://github.com/django-dbbackup/django-dbbackup/pull/414

@@ -1,15 +1,15 @@
 Django Database Backup
 ======================
 
-.. image:: https://github.com/django-dbbackup/django-dbbackup/actions/workflows/build.yml/badge.svg
-        :target: https://github.com/django-dbbackup/django-dbbackup/actions
+.. image:: https://github.com/jazzband/django-dbbackup/actions/workflows/build.yml/badge.svg
+        :target: https://github.com/jazzband/django-dbbackup/actions
 
 .. image:: https://readthedocs.org/projects/django-dbbackup/badge/?version=stable
         :target: https://django-dbbackup.readthedocs.io/
         :alt: Documentation Status
 
-.. image:: https://coveralls.io/repos/django-dbbackup/django-dbbackup/badge.svg?branch=master&service=github
-        :target: https://coveralls.io/github/django-dbbackup/django-dbbackup?branch=master
+.. image:: https://coveralls.io/repos/jazzband/django-dbbackup/badge.svg?branch=master&service=github
+        :target: https://coveralls.io/github/jazzband/django-dbbackup?branch=master
 
 This Django application provides management commands to help backup and
 restore your project database and media files with various storages such as
@@ -150,10 +150,10 @@ via `pull requests`_.
 We use GitHub Actions as continuous integration tools.
 
 .. _`Read The Docs`: https://django-dbbackup.readthedocs.org/
-.. _`GitHub issues`: https://github.com/django-dbbackup/django-dbbackup/issues
-.. _`pull requests`: https://github.com/django-dbbackup/django-dbbackup/pulls
-.. _`GitHub Actions`: https://github.com/django-dbbackup/django-dbbackup/actions
-.. _Coveralls: https://coveralls.io/github/django-dbbackup/django-dbbackup
+.. _`GitHub issues`: https://github.com/jazzband/django-dbbackup/issues
+.. _`pull requests`: https://github.com/jazzband/django-dbbackup/pulls
+.. _`GitHub Actions`: https://github.com/jazzband/django-dbbackup/actions
+.. _Coveralls: https://coveralls.io/github/jazzband/django-dbbackup
 
 Tests
 =====

@@ -11,6 +11,10 @@ Django Database Backup
 .. image:: https://coveralls.io/repos/jazzband/django-dbbackup/badge.svg?branch=master&service=github
         :target: https://coveralls.io/github/jazzband/django-dbbackup?branch=master
 
+.. image:: https://jazzband.co/static/img/badge.svg
+        :target: https://jazzband.co/
+        :alt: Jazzband
+
 This Django application provides management commands to help backup and
 restore your project database and media files with various storages such as
 Amazon S3, Dropbox, local file storage or any Django storage.

@@ -156,7 +156,6 @@ We use GitHub Actions as continuous integration tools.
 .. _`Read The Docs`: https://django-dbbackup.readthedocs.org/
 .. _`GitHub issues`: https://github.com/jazzband/django-dbbackup/issues
 .. _`pull requests`: https://github.com/jazzband/django-dbbackup/pulls
-.. _`GitHub Actions`: https://github.com/jazzband/django-dbbackup/actions
 .. _Coveralls: https://coveralls.io/github/jazzband/django-dbbackup
 
 Tests

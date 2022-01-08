@@ -8,8 +8,8 @@ Django Database Backup
         :target: https://django-dbbackup.readthedocs.io/
         :alt: Documentation Status
 
-.. image:: https://coveralls.io/repos/jazzband/django-dbbackup/badge.svg?branch=master&service=github
-        :target: https://coveralls.io/github/jazzband/django-dbbackup?branch=master
+.. image:: https://codecov.io/gh/jazzband/django-dbbackup/branch/master/graph/badge.svg?token=zaYmStcsuX
+        :target: https://codecov.io/gh/jazzband/django-dbbackup
 
 .. image:: https://jazzband.co/static/img/badge.svg
         :target: https://jazzband.co/

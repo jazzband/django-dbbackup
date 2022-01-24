@@ -34,7 +34,9 @@ class Command(BaseDbBackupCommand):
         make_option("-O", "--output-path", default=None,
                     help="Specify where to store on local filesystem"),
         make_option("-x", "--exclude-tables", default=None,
-                    help="Exclude tables from backup")
+                    help="Exclude tables from backup"),
+        make_option("-n", "--schema", default=None,
+                    help="Specify schema to limit backup to given schema only")
     )
 
     @utils.email_uncaught_exception
@@ -52,6 +54,7 @@ class Command(BaseDbBackupCommand):
         self.filename = options.get('output_filename')
         self.path = options.get('output_path')
         self.exclude_tables = options.get("exclude_tables")
+        self.schema = options.get("schema")
         self.storage = get_storage()
 
         self.database = options.get('database') or ''

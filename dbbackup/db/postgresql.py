@@ -45,6 +45,8 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += ' --exclude-table-data={}'.format(table)
         if self.drop:
             cmd += ' --clean'
+        if self.schema:
+            cmd += ' -n {}'.format(self.schema)
 
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
         stdout, stderr = self.run_command(cmd, env=self.dump_env)
@@ -56,6 +58,8 @@ class PgDumpConnector(BaseCommandDBConnector):
 
         # without this, psql terminates with an exit value of 0 regardless of errors
         cmd += ' --set ON_ERROR_STOP=on'
+        if self.schema:
+            cmd += ' -n {}'.format(self.schema)
         if self.single_transaction:
             cmd += ' --single-transaction'
         cmd += ' {}'.format(self.settings['NAME'])
@@ -102,6 +106,8 @@ class PgDumpBinaryConnector(PgDumpConnector):
     def _create_dump(self):
         cmd = '{} '.format(self.dump_cmd)
         cmd = cmd + create_postgres_uri(self)
+        if self.schema:
+            cmd += ' -n {}'.format(self.schema)
 
         cmd += ' --format=custom'
         for table in self.exclude:
@@ -114,6 +120,8 @@ class PgDumpBinaryConnector(PgDumpConnector):
         dbname = create_postgres_uri(self)
         cmd = '{} {}'.format(self.restore_cmd, dbname)
 
+        if self.schema:
+            cmd += ' -n {}'.format(self.schema)
         if self.single_transaction:
             cmd += ' --single-transaction'
         if self.drop:

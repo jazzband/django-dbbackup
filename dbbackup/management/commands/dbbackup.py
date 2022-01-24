@@ -3,7 +3,6 @@ Command for backup database.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-from tkinter.messagebox import NO
 
 from django.core.management.base import CommandError
 

@@ -3,6 +3,7 @@ Command for backup database.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
+from tkinter.messagebox import NO
 
 from django.core.management.base import CommandError
 
@@ -79,6 +80,8 @@ class Command(BaseDbBackupCommand):
         self.logger.info("Backing Up Database: %s", database['NAME'])
         # Get backup and name
         filename = self.connector.generate_filename(self.servername)
+        if self.schema:
+            self.connector.schema = self.schema or None
         outputfile = self.connector.create_dump()
         # Apply trans
         if self.compress:

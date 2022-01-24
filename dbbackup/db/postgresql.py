@@ -36,6 +36,7 @@ class PgDumpConnector(BaseCommandDBConnector):
     restore_cmd = 'psql'
     single_transaction = True
     drop = True
+    schema = None
 
     def _create_dump(self):
         cmd = '{} '.format(self.dump_cmd)
@@ -47,7 +48,6 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += ' --clean'
         if self.schema:
             cmd += ' -n {}'.format(self.schema)
-
         cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
         stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
@@ -106,9 +106,9 @@ class PgDumpBinaryConnector(PgDumpConnector):
     def _create_dump(self):
         cmd = '{} '.format(self.dump_cmd)
         cmd = cmd + create_postgres_uri(self)
+
         if self.schema:
             cmd += ' -n {}'.format(self.schema)
-
         cmd += ' --format=custom'
         for table in self.exclude:
             cmd += ' --exclude-table-data={}'.format(table)

@@ -30,7 +30,9 @@ class Command(BaseDbBackupCommand):
                     help="Decrypt data before restoring"),
         make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
         make_option("-z", "--uncompress", action='store_true', default=False,
-                    help="Uncompress gzip data before restoring")
+                    help="Uncompress gzip data before restoring"),
+        make_option("-n", "--schema", default=None,
+                    help="Restore backup to given schema only")
     )
 
     def handle(self, *args, **options):
@@ -48,6 +50,7 @@ class Command(BaseDbBackupCommand):
             self.uncompress = options.get('uncompress')
             self.passphrase = options.get('passphrase')
             self.interactive = options.get('interactive')
+            self.schema = options.get("schema")
             self.database_name, self.database = self._get_database(options)
             self.storage = get_storage()
             self._restore_backup()
@@ -73,6 +76,8 @@ class Command(BaseDbBackupCommand):
                                                            servername=self.servername)
         self.logger.info("Restoring backup for database '%s' and server '%s'",
                          self.database_name, self.servername)
+        if self.schema:
+            self.logger.info("Restoring to schema: %s" % self.schema)
         self.logger.info("Restoring: %s" % input_filename)
 
         if self.decrypt:
@@ -91,4 +96,6 @@ class Command(BaseDbBackupCommand):
 
         input_file.seek(0)
         self.connector = get_connector(self.database_name)
+        if self.schema:
+            self.connector.schema = self.schema
         self.connector.restore_dump(input_file)

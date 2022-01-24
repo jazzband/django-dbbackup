@@ -30,7 +30,7 @@ class Command(BaseDbBackupCommand):
                     help="Decrypt data before restoring"),
         make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
         make_option("-z", "--uncompress", action='store_true', default=False,
-                    help="Uncompress gzip data before restoring"),
+                    help="Uncompress gzip data before restoringX"),
         make_option("-n", "--schema", default=None,
                     help="Restore backup to given schema only")
     )

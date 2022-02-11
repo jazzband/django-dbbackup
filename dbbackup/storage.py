@@ -30,6 +30,20 @@ def get_storage(path=None, options=None):
     return Storage(path, **options)
 
 
+def get_backup_storage(db_storage):
+    if db_storage not in settings.STORAGES:
+        raise ImproperlyConfigured('You must specify a storage class using '
+                                   'DBBACKUP_STORAGES settings.')
+    storage_options = settings.STORAGES[db_storage].copy()
+    if 'storage' in storage_options:
+        storage = storage_options.pop('storage', None)
+        options = storage_options
+        return get_storage(path=storage, options=options)
+    print(settings.STORAGES)
+    raise ImproperlyConfigured('You must specify a storage class "storage" using '
+                               'DBBACKUP_STORAGES settings.')
+
+
 class StorageError(Exception):
     pass
 
@@ -44,6 +58,7 @@ class Storage(object):
     list and filter files. It uses a Django storage object for low-level
     operations.
     """
+
     @property
     def logger(self):
         if not hasattr(self, '_logger'):
@@ -61,7 +76,9 @@ class Storage(object):
         """
         self._storage_path = storage_path or settings.STORAGE
         options = options.copy()
-        options.update(settings.STORAGE_OPTIONS)
+        for option in settings.STORAGE_OPTIONS.keys():
+            if option not in options:
+                options[option] = settings.STORAGE_OPTIONS[option]
         options = dict([(key.lower(), value) for key, value in options.items()])
         self.storageCls = get_storage_class(self._storage_path)
         self.storage = self.storageCls(**options)

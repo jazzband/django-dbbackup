@@ -8,7 +8,7 @@ from django.core.management.base import CommandError
 
 from ._base import BaseDbBackupCommand, make_option
 from ...db.base import get_connector
-from ...storage import get_storage, StorageError
+from ...storage import get_storage, get_backup_storage, StorageError
 from ... import utils, settings
 
 
@@ -31,10 +31,12 @@ class Command(BaseDbBackupCommand):
                     help="Encrypt the backup files"),
         make_option("-o", "--output-filename", default=None,
                     help="Specify filename on storage"),
-        make_option("-O", "--output-path", default=None,
-                    help="Specify where to store on local filesystem"),
         make_option("-x", "--exclude-tables", default=None,
-                    help="Exclude tables from backup")
+                    help="Exclude tables from backup"),
+        make_option("-p", "--output-path", default=None,
+                    help="Specify where to store on local filesystem"),
+        make_option("--storage", default=None,
+                    help="Specify storage from DBACKUP_STORAGES to use"),
     )
 
     @utils.email_uncaught_exception
@@ -49,10 +51,16 @@ class Command(BaseDbBackupCommand):
         self.compress = options.get('compress')
         self.encrypt = options.get('encrypt')
 
+        self.db_storage = options.get('storage')
+
         self.filename = options.get('output_filename')
         self.path = options.get('output_path')
         self.exclude_tables = options.get("exclude_tables")
-        self.storage = get_storage()
+
+        if self.db_storage:
+            self.storage = get_backup_storage(self.db_storage)
+        else:
+            self.storage = get_storage()
 
         self.database = options.get('database') or ''
         database_keys = self.database.split(',') or settings.DATABASES

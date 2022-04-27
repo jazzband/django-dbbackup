@@ -146,20 +146,6 @@ Restore media files from storage backup to your media storage. ::
     -z, --uncompress      Uncompress gzip data before restoring
     -r, --replace         Replace existing files
 
-Contributing
-============
-
-All contribution are very welcomed, propositions, problems, bugs and
-enhancement are tracked with `GitHub issues`_ system and patches are submitted
-via `pull requests`_.
-
-We use GitHub Actions as continuous integration tools.
-
-.. _`Read The Docs`: https://django-dbbackup.readthedocs.org/
-.. _`GitHub issues`: https://github.com/jazzband/django-dbbackup/issues
-.. _`pull requests`: https://github.com/jazzband/django-dbbackup/pulls
-.. _Coveralls: https://coveralls.io/github/jazzband/django-dbbackup
-
 Tests
 =====
 
@@ -220,3 +206,25 @@ To publish to PyPI:
 ::
 
     tox -e upload
+
+Contributing
+============
+
+.. image:: https://jazzband.co/static/img/jazzband.svg
+   :target: https://jazzband.co/
+   :alt: Jazzband
+
+This is a `Jazzband <https://jazzband.co>`_ project. By contributing you agree
+to abide by the `Contributor Code of Conduct <https://jazzband.co/about/conduct>`_
+and follow the `guidelines <https://jazzband.co/about/guidelines>`_.
+
+All contribution are very welcomed, propositions, problems, bugs and
+enhancement are tracked with `GitHub issues`_ system and patches are submitted
+via `pull requests`_.
+
+We use GitHub Actions as continuous integration tools.
+
+.. _`Read The Docs`: https://django-dbbackup.readthedocs.org/
+.. _`GitHub issues`: https://github.com/jazzband/django-dbbackup/issues
+.. _`pull requests`: https://github.com/jazzband/django-dbbackup/pulls
+.. _Coveralls: https://coveralls.io/github/jazzband/django-dbbackup

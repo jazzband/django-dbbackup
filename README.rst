@@ -1,15 +1,19 @@
 Django Database Backup
 ======================
 
-.. image:: https://github.com/django-dbbackup/django-dbbackup/actions/workflows/build.yml/badge.svg
-        :target: https://github.com/django-dbbackup/django-dbbackup/actions
+.. image:: https://github.com/jazzband/django-dbbackup/actions/workflows/build.yml/badge.svg
+        :target: https://github.com/jazzband/django-dbbackup/actions
 
 .. image:: https://readthedocs.org/projects/django-dbbackup/badge/?version=stable
         :target: https://django-dbbackup.readthedocs.io/
         :alt: Documentation Status
 
-.. image:: https://coveralls.io/repos/django-dbbackup/django-dbbackup/badge.svg?branch=master&service=github
-        :target: https://coveralls.io/github/django-dbbackup/django-dbbackup?branch=master
+.. image:: https://codecov.io/gh/jazzband/django-dbbackup/branch/master/graph/badge.svg?token=zaYmStcsuX
+        :target: https://codecov.io/gh/jazzband/django-dbbackup
+
+.. image:: https://jazzband.co/static/img/badge.svg
+        :target: https://jazzband.co/
+        :alt: Jazzband
 
 This Django application provides management commands to help backup and
 restore your project database and media files with various storages such as
@@ -47,7 +51,9 @@ dbbackup
 Backup your database to the specified storage. By default this will backup all
 databases specified in your settings.py file and will not delete any old
 backups. You can optionally specify a server name to be included in the backup
-filename. ::
+filename.
+
+::
 
   Usage: ./manage.py dbbackup [options]
   
@@ -150,10 +156,9 @@ via `pull requests`_.
 We use GitHub Actions as continuous integration tools.
 
 .. _`Read The Docs`: https://django-dbbackup.readthedocs.org/
-.. _`GitHub issues`: https://github.com/django-dbbackup/django-dbbackup/issues
-.. _`pull requests`: https://github.com/django-dbbackup/django-dbbackup/pulls
-.. _`GitHub Actions`: https://github.com/django-dbbackup/django-dbbackup/actions
-.. _Coveralls: https://coveralls.io/github/django-dbbackup/django-dbbackup
+.. _`GitHub issues`: https://github.com/jazzband/django-dbbackup/issues
+.. _`pull requests`: https://github.com/jazzband/django-dbbackup/pulls
+.. _Coveralls: https://coveralls.io/github/jazzband/django-dbbackup
 
 Tests
 =====

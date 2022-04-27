@@ -51,7 +51,9 @@ dbbackup
 Backup your database to the specified storage. By default this will backup all
 databases specified in your settings.py file and will not delete any old
 backups. You can optionally specify a server name to be included in the backup
-filename. ::
+filename.
+
+::
 
   Usage: ./manage.py dbbackup [options]
   

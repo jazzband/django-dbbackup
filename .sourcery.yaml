@@ -1,0 +1,2 @@
+refactor:
+  skip: ['class-extract-method']

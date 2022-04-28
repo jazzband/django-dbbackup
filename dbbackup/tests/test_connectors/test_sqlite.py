@@ -30,7 +30,7 @@ class SqliteConnectorTest(TestCase):
         self.assertTrue(dump.read())
 
     def test_create_dump_with_newline(self):
-        TextModel.objects.create(field='foo\nbar')
+        TextModel.objects.create(field=f'INSERT({"foo" * 5000}\nbar WHERE baz);\n')
         connector = SqliteConnector()
         dump = connector.create_dump()
         self.assertTrue(dump.read())

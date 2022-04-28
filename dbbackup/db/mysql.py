@@ -11,31 +11,33 @@ class MysqlDumpConnector(BaseCommandDBConnector):
     restore_cmd = 'mysql'
 
     def _create_dump(self):
-        cmd = '{} {} --quick'.format(self.dump_cmd, self.settings['NAME'])
+        cmd = f"{self.dump_cmd} {self.settings['NAME']} --quick"
         if self.settings.get('HOST'):
-            cmd += ' --host={}'.format(self.settings['HOST'])
+            cmd += f" --host={self.settings['HOST']}"
         if self.settings.get('PORT'):
-            cmd += ' --port={}'.format(self.settings['PORT'])
+            cmd += f" --port={self.settings['PORT']}"
         if self.settings.get('USER'):
-            cmd += ' --user={}'.format(self.settings['USER'])
+            cmd += f" --user={self.settings['USER']}"
         if self.settings.get('PASSWORD'):
-            cmd += ' --password={}'.format(utils.get_escaped_command_arg(self.settings['PASSWORD']))
+            cmd += f" --password={utils.get_escaped_command_arg(self.settings['PASSWORD'])}"
+
         for table in self.exclude:
-            cmd += ' --ignore-table={}.{}'.format(self.settings['NAME'], table)
-        cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
+            cmd += f" --ignore-table={self.settings['NAME']}.{table}"
+        cmd = f'{self.dump_prefix} {cmd} {self.dump_suffix}'
         stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
 
     def _restore_dump(self, dump):
-        cmd = '{} {}'.format(self.restore_cmd, self.settings['NAME'])
+        cmd = f"{self.restore_cmd} {self.settings['NAME']}"
         if self.settings.get('HOST'):
-            cmd += ' --host={}'.format(self.settings['HOST'])
+            cmd += f" --host={self.settings['HOST']}"
         if self.settings.get('PORT'):
-            cmd += ' --port={}'.format(self.settings['PORT'])
+            cmd += f" --port={self.settings['PORT']}"
         if self.settings.get('USER'):
-            cmd += ' --user={}'.format(self.settings['USER'])
+            cmd += f" --user={self.settings['USER']}"
         if self.settings.get('PASSWORD'):
-            cmd += ' --password={}'.format(utils.get_escaped_command_arg(self.settings['PASSWORD']))
-        cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
+            cmd += f" --password={utils.get_escaped_command_arg(self.settings['PASSWORD'])}"
+
+        cmd = f'{self.restore_prefix} {cmd} {self.restore_suffix}'
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr

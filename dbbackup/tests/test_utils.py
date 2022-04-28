@@ -51,7 +51,7 @@ class MailAdminsTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
         sent_mail = mail.outbox[0]
-        expected_subject = '%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject)
+        expected_subject = f'{settings.EMAIL_SUBJECT_PREFIX}{subject}'
         expected_to = settings.ADMINS[0][1]
         expected_from = settings.SERVER_EMAIL
 
@@ -208,7 +208,7 @@ class Filename_To_DatestringTest(TestCase):
     def test_func(self):
         now = datetime.now()
         datefmt = settings.DATE_FORMAT
-        filename = '%s-foo.gz.gpg' % datetime.strftime(now, datefmt)
+        filename = f'{datetime.strftime(now, datefmt)}-foo.gz.gpg'
         datestring = utils.filename_to_datestring(filename, datefmt)
         self.assertIn(datestring, filename)
 
@@ -222,7 +222,7 @@ class Filename_To_DateTest(TestCase):
     def test_func(self):
         now = datetime.now()
         datefmt = settings.DATE_FORMAT
-        filename = '%s-foo.gz.gpg' % datetime.strftime(now, datefmt)
+        filename = f'{datetime.strftime(now, datefmt)}-foo.gz.gpg'
         date = utils.filename_to_date(filename, datefmt)
         self.assertEqual(date.timetuple()[:5], now.timetuple()[:5])
 

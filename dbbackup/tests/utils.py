@@ -1,3 +1,4 @@
+import contextlib
 import os
 import subprocess
 
@@ -73,25 +74,21 @@ class FakeStorage(Storage):
 
 
 def clean_gpg_keys():
-    try:
+    with contextlib.suppress(Exception):
         cmd = ("gpg --batch --yes --delete-key '%s'" % GPG_FINGERPRINT)
         subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
-    except:
-        pass
-    try:
+    with contextlib.suppress(Exception):
         cmd = ("gpg --batch --yes --delete-secrect-key '%s'" % GPG_FINGERPRINT)
         subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
-    except:
-        pass
 
 
 def add_private_gpg():
-    cmd = ('gpg --import %s' % GPG_PRIVATE_PATH).split()
+    cmd = f'gpg --import {GPG_PRIVATE_PATH}'.split()
     subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
 
 
 def add_public_gpg():
-    cmd = ('gpg --import %s' % GPG_PUBLIC_PATH).split()
+    cmd = f'gpg --import {GPG_PUBLIC_PATH}'.split()
     subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
 
 
@@ -99,7 +96,7 @@ def add_public_gpg():
 
 
 def callable_for_filename_template(datetime, **kwargs):
-    return '%s_foo' % datetime
+    return f'{datetime}_foo'
 
 
 def get_dump(database=TEST_DATABASE):

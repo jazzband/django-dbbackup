@@ -69,9 +69,9 @@ def bytes_to_str(byteVal, decimals=1):
     for unit, byte in BYTES:
         if (byteVal >= byte):
             if decimals == 0:
-                return '%s %s' % (int(round(byteVal / byte, 0)), unit)
-            return '%s %s' % (round(byteVal / byte, decimals), unit)
-    return '%s B' % byteVal
+                return f'{int(round(byteVal / byte, 0))} {unit}'
+            return f'{round(byteVal / byte, decimals)} {unit}'
+    return f'{byteVal} B'
 
 
 def handle_size(filehandle):
@@ -93,9 +93,8 @@ def mail_admins(subject, message, fail_silently=False, connection=None,
     """Sends a message to the admins, as defined by the DBBACKUP_ADMINS setting."""
     if not settings.ADMINS:
         return
-    mail = EmailMultiAlternatives('%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
-                                  message, settings.SERVER_EMAIL, [a[1] for a in settings.ADMINS],
-                                  connection=connection)
+    mail = EmailMultiAlternatives(f'{settings.EMAIL_SUBJECT_PREFIX}{subject}', message, settings.SERVER_EMAIL, [a[1] for a in settings.ADMINS], connection=connection)
+
     if html_message:
         mail.attach_alternative(html_message, 'text/html')
     mail.send(fail_silently=fail_silently)
@@ -165,7 +164,7 @@ def encrypt_file(inputfile, filename):
     import gnupg
     tempdir = tempfile.mkdtemp(dir=settings.TMP_DIR)
     try:
-        filename = '%s.gpg' % filename
+        filename = f'{filename}.gpg'
         filepath = os.path.join(tempdir, filename)
         try:
             inputfile.seek(0)
@@ -176,7 +175,7 @@ def encrypt_file(inputfile, filename):
                                     always_trust=always_trust)
             inputfile.close()
             if not result:
-                msg = 'Encryption failed; status: %s' % result.status
+                msg = f'Encryption failed; status: {result.status}'
                 raise EncryptionError(msg)
             return create_spooled_temporary_file(filepath), filename
         finally:
@@ -243,7 +242,7 @@ def compress_file(inputfile, filename):
     :rtype: :class:`tempfile.SpooledTemporaryFile`, ``str``
     """
     outputfile = create_spooled_temporary_file()
-    new_filename = filename + '.gz'
+    new_filename = f'{filename}.gz'
     zipfile = gzip.GzipFile(filename=filename, fileobj=outputfile, mode="wb")
     try:
         inputfile.seek(0)
@@ -335,7 +334,7 @@ def datefmt_to_regex(datefmt):
     new_string = datefmt
     for pat, reg in PATTERN_MATCHNG:
         new_string = new_string.replace(pat, reg)
-    return re.compile(r'(%s)' % new_string)
+    return re.compile(f'({new_string})')
 
 
 def filename_to_datestring(filename, datefmt=None):

@@ -54,7 +54,7 @@ class Command(BaseDbBackupCommand):
                 self._cleanup_old_backups(servername=self.servername)
 
         except StorageError as err:
-            raise CommandError(err)
+            raise CommandError(err) from err
 
     def _explore_storage(self):
         """Generator of all files contained in media storage."""
@@ -89,7 +89,7 @@ class Command(BaseDbBackupCommand):
         if self.filename:
             filename = self.filename
         else:
-            extension = "tar%s" % ('.gz' if self.compress else '')
+            extension = f"tar{'.gz' if self.compress else ''}"
             filename = utils.filename_generate(extension,
                                                servername=self.servername,
                                                content_type=self.content_type)

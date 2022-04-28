@@ -51,8 +51,8 @@ class BaseDbBackupCommand(BaseCommand):
     def __init__(self, *args, **kwargs):
         self.option_list = self.base_option_list + self.option_list
         if django.VERSION < (1, 10):
-            options = tuple([optparse_make_option(*_args, **_kwargs)
-                             for _args, _kwargs in self.option_list])
+            options = tuple(optparse_make_option(*_args, **_kwargs) for _args, _kwargs in self.option_list)
+
             self.option_list = options + BaseCommand.option_list
         super(BaseDbBackupCommand, self).__init__(*args, **kwargs)
 
@@ -110,7 +110,7 @@ class BaseDbBackupCommand(BaseCommand):
                         database=database,
                         servername=servername)
                 except StorageError as err:
-                    raise CommandError(err.args[0])
+                    raise CommandError(err.args[0]) from err
             input_file = self.read_from_storage(input_filename)
         return input_filename, input_file
 

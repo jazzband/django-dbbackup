@@ -40,8 +40,7 @@ class Command(BaseDbBackupCommand):
         filters = dict([(k, v) for k, v in options.items()
                         if k in FILTER_KEYS])
         filenames = self.storage.list_backups(**filters)
-        files_attr = [
+        return [
             {'datetime': utils.filename_to_date(filename).strftime('%x %X'),
              'name': filename}
             for filename in filenames]
-        return files_attr

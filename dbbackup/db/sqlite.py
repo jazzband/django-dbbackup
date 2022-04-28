@@ -73,10 +73,8 @@ class SqliteConnector(BaseDBConnector):
         for line in dump.readlines():
             try:
                 cursor.execute(line.decode('UTF-8'))
-            except OperationalError as err:
-                warnings.warn("Error in db restore: {}".format(err))
-            except IntegrityError as err:
-                warnings.warn("Error in db restore: {}".format(err))
+            except (OperationalError, IntegrityError) as err:
+                warnings.warn(f"Error in db restore: {err}")
 
 
 class SqliteCPConnector(BaseDBConnector):

@@ -1,6 +1,8 @@
 """
 Tests for mediabackup command.
 """
+
+import contextlib
 import os
 import tempfile
 from django.test import TestCase
@@ -25,10 +27,8 @@ class MediabackupBackupMediafilesTest(TestCase):
 
     def tearDown(self):
         if self.command.path is not None:
-            try:
+            with contextlib.suppress(OSError):
                 os.remove(self.command.path)
-            except OSError:
-                pass
 
     def test_func(self):
         self.command.backup_mediafiles()

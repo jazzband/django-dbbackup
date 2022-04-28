@@ -81,8 +81,7 @@ class BaseDBConnector(object):
                                        server_name)
 
     def create_dump(self):
-        dump = self._create_dump()
-        return dump
+        return self._create_dump()
 
     def _create_dump(self):
         """
@@ -95,8 +94,7 @@ class BaseDBConnector(object):
         :param dump: Dump file
         :type dump: file
         """
-        result = self._restore_dump(dump)
-        return result
+        return self._restore_dump(dump)
 
     def _restore_dump(self, dump):
         """

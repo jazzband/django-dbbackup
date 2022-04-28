@@ -68,7 +68,7 @@ class Storage(object):
         self.name = self.storageCls.__name__
 
     def __str__(self):
-        return 'dbbackup-%s' % self.storage.__str__()
+        return f'dbbackup-{self.storage.__str__()}'
 
     def delete_file(self, filepath):
         self.logger.debug('Deleting file %s', filepath)

@@ -54,11 +54,10 @@ class Command(BaseDbBackupCommand):
 
     def _upload_file(self, name, media_file):
         if self.media_storage.exists(name):
-            if self.replace:
-                self.media_storage.delete(name)
-                self.logger.info("%s deleted", name)
-            else:
+            if not self.replace:
                 return
+            self.media_storage.delete(name)
+            self.logger.info("%s deleted", name)
         self.media_storage.save(name, media_file)
         self.logger.info("%s uploaded", name)
 

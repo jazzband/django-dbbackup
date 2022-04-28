@@ -67,7 +67,7 @@ class Command(BaseDbBackupCommand):
                 if self.clean:
                     self._cleanup_old_backups(database=database_key)
             except StorageError as err:
-                raise CommandError(err)
+                raise CommandError(err) from err
 
     def _save_new_backup(self, database):
         """
@@ -85,7 +85,7 @@ class Command(BaseDbBackupCommand):
             encrypted_file, filename = utils.encrypt_file(outputfile, filename)
             outputfile = encrypted_file
         # Set file name
-        filename = self.filename if self.filename else filename
+        filename = self.filename or filename
         self.logger.debug("Backup size: %s", utils.handle_size(outputfile))
         # Store backup
         outputfile.seek(0)

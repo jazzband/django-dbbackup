@@ -34,13 +34,11 @@ def check_settings(app_configs, **kwargs):
     if not settings.STORAGE or not isinstance(settings.STORAGE, str):
         errors.append(W002)
 
-    if not callable(settings.FILENAME_TEMPLATE):
-        if '{datetime}' not in settings.FILENAME_TEMPLATE:
-            errors.append(W003)
+    if not callable(settings.FILENAME_TEMPLATE) and '{datetime}' not in settings.FILENAME_TEMPLATE:
+        errors.append(W003)
 
-    if not callable(settings.MEDIA_FILENAME_TEMPLATE):
-        if '{datetime}' not in settings.MEDIA_FILENAME_TEMPLATE:
-            errors.append(W004)
+    if not callable(settings.MEDIA_FILENAME_TEMPLATE) and '{datetime}' not in settings.MEDIA_FILENAME_TEMPLATE:
+        errors.append(W004)
 
     if re.search(r'[^A-Za-z0-9%_-]', settings.DATE_FORMAT):
         errors.append(W005)

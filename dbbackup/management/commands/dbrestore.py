@@ -52,7 +52,7 @@ class Command(BaseDbBackupCommand):
             self.storage = get_storage()
             self._restore_backup()
         except StorageError as err:
-            raise CommandError(err)
+            raise CommandError(err) from err
 
     def _get_database(self, options):
         """Get the database to restore."""
@@ -64,7 +64,7 @@ class Command(BaseDbBackupCommand):
                 raise CommandError(errmsg)
             database_name = list(settings.DATABASES.keys())[0]
         if database_name not in settings.DATABASES:
-            raise CommandError("Database %s does not exist." % database_name)
+            raise CommandError(f"Database {database_name} does not exist.")
         return database_name, settings.DATABASES[database_name]
 
     def _restore_backup(self):
@@ -73,7 +73,7 @@ class Command(BaseDbBackupCommand):
                                                            servername=self.servername)
         self.logger.info("Restoring backup for database '%s' and server '%s'",
                          self.database_name, self.servername)
-        self.logger.info("Restoring: %s" % input_filename)
+        self.logger.info(f"Restoring: {input_filename}")
 
         if self.decrypt:
             unencrypted_file, input_filename = utils.unencrypt_file(input_file, input_filename,

@@ -6,7 +6,7 @@ from django.test import TestCase
 from mock import mock_open, patch
 
 from dbbackup.db.sqlite import SqliteConnector, SqliteCPConnector
-from dbbackup.tests.testapp.models import CharModel
+from dbbackup.tests.testapp.models import CharModel, TextModel
 
 
 class SqliteConnectorTest(TestCase):
@@ -25,6 +25,12 @@ class SqliteConnectorTest(TestCase):
 
     def test_create_dump_with_unicode(self):
         CharModel.objects.create(field='\xe9')
+        connector = SqliteConnector()
+        dump = connector.create_dump()
+        self.assertTrue(dump.read())
+
+    def test_create_dump_with_newline(self):
+        TextModel.objects.create(field='foo\nbar')
         connector = SqliteConnector()
         dump = connector.create_dump()
         self.assertTrue(dump.read())

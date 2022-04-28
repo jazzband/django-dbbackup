@@ -3,3 +3,51 @@ repos:
       rev: "v4.1.0"
       hooks:
           - id: check-merge-conflict
+          - id: end-of-file-fixer
+            exclude: >-
+                ^docs/[^/]*\.svg$
+          - id: requirements-txt-fixer
+          - id: trailing-whitespace
+            types: [python]
+          - id: check-case-conflict
+          - id: check-json
+          - id: check-xml
+          - id: check-toml
+          - id: check-xml
+          - id: check-yaml
+          - id: debug-statements
+          - id: check-added-large-files
+          - id: check-symlinks
+          - id: debug-statements
+          - id: detect-aws-credentials
+            args: ["--allow-missing-credentials"]
+          - id: detect-private-key
+            exclude: ^examples|(?:tests/ssl)/
+    - repo: https://github.com/hadialqattan/pycln
+      rev: v1.2.5
+      hooks:
+          - id: pycln
+            args: ["--all"]
+    - repo: https://github.com/asottile/yesqa
+      rev: v1.3.0
+      hooks:
+          - id: yesqa
+    - repo: https://github.com/pycqa/isort
+      rev: "5.10.1"
+      hooks:
+          - id: isort
+            args: ["--profile", "black"]
+    - repo: https://github.com/asottile/pyupgrade
+      rev: "v2.31.1"
+      hooks:
+          - id: pyupgrade
+            args: ["--py36-plus", "--keep-mock"]
+    - repo: https://github.com/pre-commit/mirrors-autopep8
+      rev: "v1.6.0"
+      hooks:
+          - id: autopep8
+    - repo: https://github.com/PyCQA/flake8
+      rev: "4.0.1"
+      hooks:
+          - id: flake8
+            exclude: "^docs/"

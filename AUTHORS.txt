@@ -1,6 +1,6 @@
 Primary Authors:
  * Mark (Archmonger)
- * John Thagen (johnthagen)
+ * John Hagen (johnthagen)
  * Michael Shepanski
  * Anthony Monthe (ZuluPro)
  * Benjamin Bach (benjaoming)

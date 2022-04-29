@@ -2,7 +2,6 @@
 
 import django
 
-
 VERSION = (4, 0, 0)
 """The X.Y.Z version. Needed for `docs/conf.py`."""
 VERSION_TAG = "a1"

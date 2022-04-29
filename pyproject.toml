@@ -1,0 +1,3 @@
+[tool.black]
+target-version = ['py39']
+extend-exclude = 'migrations'

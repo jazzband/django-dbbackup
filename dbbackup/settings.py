@@ -14,7 +14,7 @@ TMP_DIR = getattr(settings, 'DBBACKUP_TMP_DIR', tempfile.gettempdir())
 TMP_FILE_MAX_SIZE = getattr(settings, 'DBBACKUP_TMP_FILE_MAX_SIZE', 10 * 1024 * 1024)
 TMP_FILE_READ_SIZE = getattr(settings, 'DBBACKUP_TMP_FILE_READ_SIZE', 1024 * 1000)
 
-# Days to keep
+# Number of old backup files to keep
 CLEANUP_KEEP = getattr(settings, 'DBBACKUP_CLEANUP_KEEP', 10)
 CLEANUP_KEEP_MEDIA = getattr(settings, 'DBBACKUP_CLEANUP_KEEP_MEDIA', CLEANUP_KEEP)
 CLEANUP_KEEP_FILTER = getattr(settings, 'DBBACKUP_CLEANUP_KEEP_FILTER', lambda x: False)

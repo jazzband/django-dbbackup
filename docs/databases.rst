@@ -197,6 +197,25 @@ MongoDB
 MongoDB uses by default :class:`dbbackup.db.mongodb.MongoDumpConnector`. it
 uses ``mongodump`` and ``mongorestore`` for its job.
 
+For AuthEnabled MongoDB Connection, you need to add one custom option ``AUTH_SOURCE`` in your ``DBBACKUP_CONNECTORS``. ::
+
+    DBBACKUP_CONNECTORS = {
+        'default': {
+            ...
+            'AUTH_SOURCE': 'admin',
+        }
+    }
+
+Or in ``DATABASES`` one: ::
+
+    DATABASES = {
+        'default': {
+            ...
+            'AUTH_SOURCE': 'admin',
+        }
+    }
+
+
 OBJECT_CHECK
 ~~~~~~~~~~~~
 

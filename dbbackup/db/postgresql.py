@@ -1,7 +1,6 @@
 from urllib.parse import quote
 import logging
 
-from dbbackup import utils
 from .base import BaseCommandDBConnector
 from .exceptions import DumpError
 
@@ -37,13 +36,6 @@ class PgDumpConnector(BaseCommandDBConnector):
     restore_cmd = 'psql'
     single_transaction = True
     drop = True
-
-    def run_command(self, *args, **kwargs):
-        if self.settings.get('PASSWORD'):
-            env = kwargs.get('env', {})
-            env['PGPASSWORD'] = utils.get_escaped_command_arg(self.settings['PASSWORD'])
-            kwargs['env'] = env
-        return super(PgDumpConnector, self).run_command(*args, **kwargs)
 
     def _create_dump(self):
         cmd = '{} '.format(self.dump_cmd)

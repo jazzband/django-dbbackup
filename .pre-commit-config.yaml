@@ -51,3 +51,13 @@ repos:
       hooks:
           - id: flake8
             exclude: "^docs/"
+    - repo: https://github.com/Lucas-C/pre-commit-hooks-markup
+      rev: "v1.0.1"
+      hooks:
+          - id: rst-linter
+            files: >-
+                ^[^/]+[.]rst$
+    - repo: https://github.com/adrienverge/yamllint
+      rev: "v1.26.3"
+      hooks:
+          - id: yamllint

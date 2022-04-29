@@ -15,7 +15,7 @@
     "prettier.useTabs": true,
     "prettier.endOfLine": "auto",
     "files.associations": {
-        "**/requirements/*.txt": "pip-requirements",
+        "**/requirements/*.txt": "pip-requirements"
     },
     "[jsonc]": {
         "editor.defaultFormatter": "vscode.json-language-features"

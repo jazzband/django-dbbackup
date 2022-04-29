@@ -48,20 +48,18 @@ Other Resources
 ===============
 
 * `GitHub repository`_
-* `PyPi project`_
+* `PyPI project`_
 * `Read The Docs`_
 * `GitHub issues`_
 * `GitHub pull requests`_
-* `Travis CI`_
 * `Coveralls`_
 
-.. _`GitHub repository`: https://github.com/django-dbbackup/django-dbbackup
-.. _`PyPi project`: https://pypi.python.org/pypi/django-dbbackup/
+.. _`GitHub repository`: https://github.com/jazzband/django-dbbackup
+.. _`PyPI project`: https://pypi.python.org/pypi/django-dbbackup/
 .. _`Read The Docs`: http://django-dbbackup.readthedocs.org/
-.. _`GitHub issues`: https://github.com/django-dbbackup/django-dbbackup/issues
-.. _`GitHub pull requests`: https://github.com/django-dbbackup/django-dbbackup/pulls
-.. _`Travis CI`: https://travis-ci.org/django-dbbackup/django-dbbackup
-.. _`Coveralls`: https://coveralls.io/github/django-dbbackup/django-dbbackup
+.. _`GitHub issues`: https://github.com/jazzband/django-dbbackup/issues
+.. _`GitHub pull requests`: https://github.com/jazzband/django-dbbackup/pulls
+.. _`Coveralls`: https://coveralls.io/github/jazzband/django-dbbackup
 
 Indices and tables
 ==================

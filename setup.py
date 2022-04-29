@@ -4,6 +4,8 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
+import dbbackup
+
 project_dir = Path(__file__).parent
 
 
@@ -19,7 +21,7 @@ def get_test_requirements():
 
 setup(
     name="django-dbbackup",
-    version="4.0.0b0",
+    version=dbbackup.__version__,
     description="Management commands to help backup and restore a project database and media.",
     author="Archmonger",
     author_email="archiethemonger@gmail.com",
@@ -28,7 +30,7 @@ setup(
     install_requires=get_requirements(),
     tests_require=get_test_requirements(),
     license="BSD",
-    url="https://github.com/django-dbbackup/django-dbbackup",
+    url="https://github.com/jazzband/django-dbbackup",
     keywords=[
         "django",
         "database",

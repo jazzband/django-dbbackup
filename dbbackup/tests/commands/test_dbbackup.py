@@ -2,15 +2,14 @@
 Tests for dbbackup command.
 """
 import os
-from mock import patch
 
 from django.test import TestCase
+from mock import patch
 
-from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
 from dbbackup.db.base import get_connector
+from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
 from dbbackup.storage import get_storage
-from dbbackup.tests.utils import (TEST_DATABASE, add_public_gpg, clean_gpg_keys,
-                                  DEV_NULL)
+from dbbackup.tests.utils import DEV_NULL, TEST_DATABASE, add_public_gpg, clean_gpg_keys
 
 
 @patch('dbbackup.settings.GPG_RECIPIENT', 'test@test')

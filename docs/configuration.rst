@@ -188,5 +188,3 @@ You have to use a storage for your backups, see `Storage settings`_ for more.
 
 .. _`Database settings`: databases.html
 .. _`Storage settings`: storage.html
-
-

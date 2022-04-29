@@ -1,24 +1,32 @@
 """
 Tests for dbrestore command.
 """
-from mock import patch
-from tempfile import mktemp
 from shutil import copyfileobj
+from tempfile import mktemp
 
-from django.test import TestCase
-from django.core.management.base import CommandError
-from django.core.files import File
 from django.conf import settings
+from django.core.files import File
+from django.core.management.base import CommandError
+from django.test import TestCase
+from mock import patch
 
 from dbbackup import utils
 from dbbackup.db.base import get_connector
 from dbbackup.db.mongodb import MongoDumpConnector
 from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
-from dbbackup.storage import get_storage
 from dbbackup.settings import HOSTNAME
-from dbbackup.tests.utils import (TEST_DATABASE, add_private_gpg, DEV_NULL,
-                                  clean_gpg_keys, HANDLED_FILES, TEST_MONGODB, TARED_FILE,
-                                  get_dump, get_dump_name)
+from dbbackup.storage import get_storage
+from dbbackup.tests.utils import (
+    DEV_NULL,
+    HANDLED_FILES,
+    TARED_FILE,
+    TEST_DATABASE,
+    TEST_MONGODB,
+    add_private_gpg,
+    clean_gpg_keys,
+    get_dump,
+    get_dump_name,
+)
 
 
 @patch('dbbackup.management.commands._base.input', return_value='y')

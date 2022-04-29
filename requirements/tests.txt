@@ -9,5 +9,5 @@ python-dotenv
 python-gnupg
 pytz
 testfixtures
-tox-gh-actions
 tox
+tox-gh-actions

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import warnings
 from io import BytesIO
 from shutil import copyfileobj
@@ -27,6 +25,7 @@ class SqliteConnector(BaseDBConnector):
     Create a dump at SQL layer like could make ``.dumps`` in sqlite3.
     Restore by evaluate the created SQL.
     """
+
     def _write_dump(self, fileobj):
         cursor = self.connection.cursor()
         cursor.execute(DUMP_TABLES)
@@ -38,24 +37,24 @@ class SqliteConnector(BaseDBConnector):
                 # Make SQL commands in 1 line
                 sql = sql.replace('\n    ', '')
                 sql = sql.replace('\n)', ')')
-                fileobj.write("{};\n".format(sql).encode('UTF-8'))
+                fileobj.write(f"{sql};\n".encode('UTF-8'))
             else:
-                fileobj.write("{};\n".format(sql))
+                fileobj.write(f"{sql};\n")
             table_name_ident = table_name.replace('"', '""')
-            res = cursor.execute('PRAGMA table_info("{0}")'.format(table_name_ident))
+            res = cursor.execute(f'PRAGMA table_info("{table_name_ident}")')
             column_names = [str(table_info[1]) for table_info in res.fetchall()]
             q = """SELECT 'INSERT INTO "{0}" VALUES({1})' FROM "{0}";\n""".format(
                 table_name_ident,
-                ",".join("""'||quote("{0}")||'""".format(col.replace('"', '""'))
+                ",".join("""'||quote("{}")||'""".format(col.replace('"', '""'))
                          for col in column_names))
             query_res = cursor.execute(q)
             for row in query_res:
-                fileobj.write("{};\n".format(row[0]).encode('UTF-8'))
+                fileobj.write(f"{row[0]};\n".encode('UTF-8'))
             schema_res = cursor.execute(DUMP_ETC)
             for name, type, sql in schema_res.fetchall():
                 if sql.startswith("CREATE INDEX"):
                     sql = sql.replace('CREATE INDEX', 'CREATE INDEX IF NOT EXISTS')
-                fileobj.write('{};\n'.format(sql).encode('UTF-8'))
+                fileobj.write(f'{sql};\n'.encode('UTF-8'))
         cursor.close()
 
     def create_dump(self):
@@ -82,6 +81,7 @@ class SqliteCPConnector(BaseDBConnector):
     Create a dump by copy the binary data file.
     Restore by simply copy to the good location.
     """
+
     def create_dump(self):
         path = self.connection.settings_dict['NAME']
         dump = BytesIO()

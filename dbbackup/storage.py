@@ -2,8 +2,10 @@
 Utils for handle files.
 """
 import logging
+
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import get_storage_class
+
 from . import settings, utils
 
 
@@ -38,7 +40,7 @@ class FileNotFound(StorageError):
     pass
 
 
-class Storage(object):
+class Storage:
     """
     This object make high-level storage operations for upload/download or
     list and filter files. It uses a Django storage object for low-level
@@ -62,7 +64,7 @@ class Storage(object):
         self._storage_path = storage_path or settings.STORAGE
         options = options.copy()
         options.update(settings.STORAGE_OPTIONS)
-        options = dict([(key.lower(), value) for key, value in options.items()])
+        options = {key.lower(): value for key, value in options.items()}
         self.storageCls = get_storage_class(self._storage_path)
         self.storage = self.storageCls(**options)
         self.name = self.storageCls.__name__

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # django-dbbackup documentation build configuration file, created by
 # sphinx-quickstart on Sun May 18 13:35:53 2014.
@@ -11,7 +10,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import dbbackup
+import os
+import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -42,8 +43,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'django-dbbackup'
-copyright = u'2016, Michael Shepanski'
+project = 'django-dbbackup'
+copyright = '2016, Michael Shepanski'
 
 # basepath
 path = os.path.dirname(
@@ -57,7 +58,6 @@ sys.path = [os.path.join(path, 'dbbackup')] + sys.path
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'dbbackup.tests.settings'
 
-import dbbackup
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -188,21 +188,21 @@ htmlhelp_basename = 'django-dbbackupdoc'
 # -- Options for LaTeX output --------------------------------------------------
 
 latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    # 'papersize': 'letterpaper',
 
-# The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    # 'pointsize': '10pt',
 
-# Additional stuff for the LaTeX preamble.
-#'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    # 'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'django-dbbackup.tex', u'django-dbbackup Documentation',
-   u'Michael Shepanski', 'manual'),
+    ('index', 'django-dbbackup.tex', 'django-dbbackup Documentation',
+     'Michael Shepanski', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -231,8 +231,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'django-dbbackup', u'django-dbbackup Documentation',
-     [u'Michael Shepanski'], 1)
+    ('index', 'django-dbbackup', 'django-dbbackup Documentation',
+     ['Michael Shepanski'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -245,9 +245,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'django-dbbackup', u'django-dbbackup Documentation',
-   u'Michael Shepanski', 'django-dbbackup', 'One line description of project.',
-   'Miscellaneous'),
+    ('index', 'django-dbbackup', 'django-dbbackup Documentation',
+     'Michael Shepanski', 'django-dbbackup', 'One line description of project.',
+     'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.

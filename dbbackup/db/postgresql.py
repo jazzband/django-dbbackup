@@ -1,5 +1,5 @@
-from urllib.parse import quote
 import logging
+from urllib.parse import quote
 
 from .base import BaseCommandDBConnector
 from .exceptions import DumpError
@@ -15,7 +15,7 @@ def create_postgres_uri(self):
     dbname = self.settings.get('NAME') or ''
     user = quote(self.settings.get('USER') or '')
     password = self.settings.get('PASSWORD') or ''
-    password = ':{}'.format(quote(password)) if password else ''
+    password = f':{quote(password)}' if password else ''
     if not user:
         password = ''
     else:
@@ -38,20 +38,20 @@ class PgDumpConnector(BaseCommandDBConnector):
     drop = True
 
     def _create_dump(self):
-        cmd = '{} '.format(self.dump_cmd)
+        cmd = f'{self.dump_cmd} '
         cmd = cmd + create_postgres_uri(self)
 
         for table in self.exclude:
-            cmd += ' --exclude-table-data={}'.format(table)
+            cmd += f' --exclude-table-data={table}'
         if self.drop:
             cmd += ' --clean'
 
-        cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
+        cmd = f'{self.dump_prefix} {cmd} {self.dump_suffix}'
         stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
 
     def _restore_dump(self, dump):
-        cmd = '{} '.format(self.restore_cmd)
+        cmd = f'{self.restore_cmd} '
         cmd = cmd + create_postgres_uri(self)
 
         # without this, psql terminates with an exit value of 0 regardless of errors
@@ -59,7 +59,7 @@ class PgDumpConnector(BaseCommandDBConnector):
         if self.single_transaction:
             cmd += ' --single-transaction'
         cmd += ' {}'.format(self.settings['NAME'])
-        cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
+        cmd = f'{self.restore_prefix} {cmd} {self.restore_suffix}'
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr
 
@@ -85,7 +85,7 @@ class PgDumpGisConnector(PgDumpConnector):
     def _restore_dump(self, dump):
         if self.settings.get('ADMIN_USER'):
             self._enable_postgis()
-        return super(PgDumpGisConnector, self)._restore_dump(dump)
+        return super()._restore_dump(dump)
 
 
 class PgDumpBinaryConnector(PgDumpConnector):
@@ -100,24 +100,24 @@ class PgDumpBinaryConnector(PgDumpConnector):
     drop = True
 
     def _create_dump(self):
-        cmd = '{} '.format(self.dump_cmd)
+        cmd = f'{self.dump_cmd} '
         cmd = cmd + create_postgres_uri(self)
 
         cmd += ' --format=custom'
         for table in self.exclude:
-            cmd += ' --exclude-table-data={}'.format(table)
-        cmd = '{} {} {}'.format(self.dump_prefix, cmd, self.dump_suffix)
+            cmd += f' --exclude-table-data={table}'
+        cmd = f'{self.dump_prefix} {cmd} {self.dump_suffix}'
         stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
 
     def _restore_dump(self, dump):
         dbname = create_postgres_uri(self)
-        cmd = '{} {}'.format(self.restore_cmd, dbname)
+        cmd = f'{self.restore_cmd} {dbname}'
 
         if self.single_transaction:
             cmd += ' --single-transaction'
         if self.drop:
             cmd += ' --clean'
-        cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
+        cmd = f'{self.restore_prefix} {cmd} {self.restore_suffix}'
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr

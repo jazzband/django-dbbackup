@@ -5,8 +5,10 @@ Tests for mediabackup command.
 import contextlib
 import os
 import tempfile
-from django.test import TestCase
+
 from django.core.files.storage import get_storage_class
+from django.test import TestCase
+
 from dbbackup.management.commands.mediabackup import Command as DbbackupCommand
 from dbbackup.storage import get_storage
 from dbbackup.tests.utils import DEV_NULL, HANDLED_FILES, add_public_gpg
@@ -64,7 +66,7 @@ class MediabackupBackupMediafilesTest(TestCase):
         self.command.backup_mediafiles()
         self.assertTrue(os.path.exists(self.command.path))
         self.assertEqual(0, len(HANDLED_FILES['written_files']))
-    
+
     def test_output_filename(self):
         self.command.filename = "my_new_name.tar"
         self.command.backup_mediafiles()

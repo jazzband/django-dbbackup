@@ -5,9 +5,9 @@ import tarfile
 
 from django.core.files.storage import get_storage_class
 
-from ._base import BaseDbBackupCommand, make_option
-from ...storage import get_storage
 from ... import utils
+from ...storage import get_storage
+from ._base import BaseDbBackupCommand, make_option
 
 
 class Command(BaseDbBackupCommand):

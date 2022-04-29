@@ -1,4 +1,5 @@
 import logging
+
 import django
 from django.utils.log import AdminEmailHandler
 
@@ -9,7 +10,7 @@ class DbbackupAdminEmailHandler(AdminEmailHandler):
         if django.VERSION < (1, 8):
             from . import utils
             django.core.mail.mail_admins = utils.mail_admins
-        super(DbbackupAdminEmailHandler, self).emit(record)
+        super().emit(record)
 
     def send_mail(self, subject, message, *args, **kwargs):
         from . import utils

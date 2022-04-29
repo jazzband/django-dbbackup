@@ -2,8 +2,9 @@
 Configuration and launcher for dbbackup tests.
 """
 import os
-import tempfile
 import sys
+import tempfile
+
 from dotenv import load_dotenv
 
 test = len(sys.argv) <= 1 or sys.argv[1] == 'test'

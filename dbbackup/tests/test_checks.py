@@ -1,5 +1,6 @@
-from mock import patch
 from django.test import TestCase
+from mock import patch
+
 try:
     from dbbackup import checks
     from dbbackup.apps import DbbackupConfig

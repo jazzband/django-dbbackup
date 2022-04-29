@@ -1,17 +1,16 @@
 """
 Save media files.
 """
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
+
 import os
 import tarfile
 
-from django.core.management.base import CommandError
 from django.core.files.storage import get_storage_class
+from django.core.management.base import CommandError
 
-from ._base import BaseDbBackupCommand, make_option
 from ... import utils
-from ...storage import get_storage, StorageError
+from ...storage import StorageError, get_storage
+from ._base import BaseDbBackupCommand, make_option
 
 
 class Command(BaseDbBackupCommand):

@@ -1,15 +1,17 @@
 """
 Base database connectors
 """
+import logging
 import os
 import shlex
-from django.core.files.base import File
-from tempfile import SpooledTemporaryFile
-from subprocess import Popen
 from importlib import import_module
-import logging
+from subprocess import Popen
+from tempfile import SpooledTemporaryFile
+
+from django.core.files.base import File
 
 from dbbackup import settings, utils
+
 from . import exceptions
 
 logger = logging.getLogger('dbbackup.command')
@@ -38,7 +40,8 @@ def get_connector(database_name=None):
     """
     Get a connector from its database key in setttings.
     """
-    from django.db import connections, DEFAULT_DB_ALIAS
+    from django.db import DEFAULT_DB_ALIAS, connections
+
     # Get DB
     database_name = database_name or DEFAULT_DB_ALIAS
     connection = connections[database_name]
@@ -52,7 +55,7 @@ def get_connector(database_name=None):
     return connector(database_name, **connector_settings)
 
 
-class BaseDBConnector(object):
+class BaseDBConnector:
     """
     Base class for create database connector. This kind of object creates
     interaction with database and allow backup and restore operations.
@@ -61,7 +64,7 @@ class BaseDBConnector(object):
     exclude = []
 
     def __init__(self, database_name=None, **kwargs):
-        from django.db import connections, DEFAULT_DB_ALIAS
+        from django.db import DEFAULT_DB_ALIAS, connections
         self.database_name = database_name or DEFAULT_DB_ALIAS
         self.connection = connections[self.database_name]
         for attr, value in kwargs.items():
@@ -159,4 +162,4 @@ class BaseCommandDBConnector(BaseDBConnector):
             return stdout, stderr
         except OSError as err:
             raise exceptions.CommandConnectorError(
-                "Error running: {}\n{}".format(command, str(err)))
+                f"Error running: {command}\n{str(err)}")

@@ -1,10 +1,12 @@
 import logging
-from mock import patch
+
 import django
-from django.test import TestCase
 from django.core import mail
-from dbbackup import log
+from django.test import TestCase
+from mock import patch
 from testfixtures import log_capture
+
+from dbbackup import log
 
 
 class LoggerDefaultTestCase(TestCase):

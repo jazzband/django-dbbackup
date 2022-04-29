@@ -1,11 +1,10 @@
 """
 List backups.
 """
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
+
 from ... import utils
-from ._base import BaseDbBackupCommand, make_option
 from ...storage import get_storage
+from ._base import BaseDbBackupCommand, make_option
 
 ROW_TEMPLATE = '{name:40} {datetime:20}'
 FILTER_KEYS = ('encrypted', 'compressed', 'content_type', 'database')
@@ -37,8 +36,8 @@ class Command(BaseDbBackupCommand):
             self.stdout.write(row)
 
     def get_backup_attrs(self, options):
-        filters = dict([(k, v) for k, v in options.items()
-                        if k in FILTER_KEYS])
+        filters = {k: v for k, v in options.items()
+                   if k in FILTER_KEYS}
         filenames = self.storage.list_backups(**filters)
         return [
             {'datetime': utils.filename_to_date(filename).strftime('%x %X'),

@@ -1,12 +1,10 @@
-from __future__ import unicode_literals
-
 import os
 from tempfile import SpooledTemporaryFile
 
 from django.test import TestCase
 
-from dbbackup.db.base import get_connector, BaseDBConnector, BaseCommandDBConnector
 from dbbackup.db import exceptions
+from dbbackup.db.base import BaseCommandDBConnector, BaseDBConnector, get_connector
 
 
 class GetConnectorTest(TestCase):

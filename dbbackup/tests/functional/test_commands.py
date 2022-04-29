@@ -1,17 +1,19 @@
 import os
 import tempfile
+
+from django.conf import settings
+from django.core.management import execute_from_command_line
+from django.test import TransactionTestCase as TestCase
 from mock import patch
 
-from django.test import TransactionTestCase as TestCase
-from django.core.management import execute_from_command_line
-from django.conf import settings
-
-from dbbackup.tests.utils import (TEST_DATABASE, HANDLED_FILES,
-                                  clean_gpg_keys, add_public_gpg,
-                                  add_private_gpg, get_dump,
-                                  get_dump_name)
-
 from dbbackup.tests.testapp import models
+from dbbackup.tests.utils import (
+    HANDLED_FILES,
+    TEST_DATABASE,
+    add_private_gpg,
+    add_public_gpg,
+    clean_gpg_keys,
+)
 
 
 class DbBackupCommandTest(TestCase):

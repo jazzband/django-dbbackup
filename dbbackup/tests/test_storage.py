@@ -1,8 +1,9 @@
-from mock import patch
 from django.test import TestCase
-from dbbackup.storage import get_storage, Storage
-from dbbackup.tests.utils import HANDLED_FILES, FakeStorage
+from mock import patch
+
 from dbbackup import utils
+from dbbackup.storage import Storage, get_storage
+from dbbackup.tests.utils import HANDLED_FILES, FakeStorage
 
 DEFAULT_STORAGE_PATH = 'django.core.files.storage.FileSystemStorage'
 STORAGE_OPTIONS = {'location': '/tmp'}
@@ -61,7 +62,7 @@ class StorageListBackupsTest(TestCase):
 
     def test_nofilter(self):
         files = self.storage.list_backups()
-        self.assertEqual(len(HANDLED_FILES['written_files'])-1, len(files))
+        self.assertEqual(len(HANDLED_FILES['written_files']) - 1, len(files))
         for file in files:
             self.assertNotEqual('file_without_date', file)
 

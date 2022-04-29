@@ -54,14 +54,14 @@ class BaseDbBackupCommand(BaseCommand):
             options = tuple(optparse_make_option(*_args, **_kwargs) for _args, _kwargs in self.option_list)
 
             self.option_list = options + BaseCommand.option_list
-        super(BaseDbBackupCommand, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def add_arguments(self, parser):
         for args, kwargs in self.option_list:
-            kwargs = dict([
-                (k, v) for k, v in kwargs.items()
-                if not k.startswith('_') and
-                k not in USELESS_ARGS])
+            kwargs = {
+                k: v for k, v in kwargs.items()
+                if not k.startswith('_')
+                and k not in USELESS_ARGS}
             parser.add_argument(*args, **kwargs)
 
     def _set_logger_level(self):

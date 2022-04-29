@@ -1,7 +1,6 @@
 """
 Utility functions for dbbackup.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import gzip
 import logging
@@ -115,7 +114,7 @@ def email_uncaught_exception(func):
             logger = logging.getLogger('dbbackup')
             exc_type, exc_value, tb = sys.exc_info()
             tb_str = ''.join(traceback.format_tb(tb))
-            msg = '%s: %s\n%s' % (exc_type.__name__, exc_value, tb_str)
+            msg = f'{exc_type.__name__}: {exc_value}\n{tb_str}'
             logger.error(msg)
             raise
         finally:

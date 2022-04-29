@@ -30,13 +30,16 @@ class handled_files(dict):
     You should use the constant instance ``HANDLED_FILES`` and clean it
     before tests.
     """
+
     def __init__(self):
-        super(handled_files, self).__init__()
+        super().__init__()
         self.clean()
 
     def clean(self):
         self['written_files'] = []
         self['deleted_files'] = []
+
+
 HANDLED_FILES = handled_files()
 
 
@@ -90,9 +93,6 @@ def add_private_gpg():
 def add_public_gpg():
     cmd = f'gpg --import {GPG_PUBLIC_PATH}'.split()
     subprocess.call(cmd, stdout=DEV_NULL, stderr=DEV_NULL)
-
-
-
 
 
 def callable_for_filename_template(datetime, **kwargs):

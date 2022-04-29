@@ -74,7 +74,7 @@ class PgDumpGisConnector(PgDumpConnector):
     psql_cmd = "psql"
 
     def _enable_postgis(self):
-        cmd = '{} -c "CREATE EXTENSION IF NOT EXISTS postgis;"'.format(self.psql_cmd)
+        cmd = f'{self.psql_cmd} -c "CREATE EXTENSION IF NOT EXISTS postgis;"'
         cmd += " --username={}".format(self.settings["ADMIN_USER"])
         cmd += " --no-password"
         if self.settings.get("HOST"):

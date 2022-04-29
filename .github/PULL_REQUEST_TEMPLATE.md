@@ -12,5 +12,4 @@ Explain value.
 
 ## Checklist
 
-- [ ] Tests are passing
 - [ ] Documentation has been added or amended for this feature / update

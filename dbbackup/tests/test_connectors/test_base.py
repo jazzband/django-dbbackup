@@ -29,7 +29,7 @@ class BaseDBConnectorTest(TestCase):
 class BaseCommandDBConnectorTest(TestCase):
     def test_run_command(self):
         connector = BaseCommandDBConnector()
-        stdout, _stderr = connector.run_command("echo 123")
+        stdout, stderr = connector.run_command("echo 123")
         self.assertEqual(stdout.read(), b"123\n")
         self.assertEqual(stderr.read(), b"")
 
@@ -44,7 +44,7 @@ class BaseCommandDBConnectorTest(TestCase):
         stdin.write(b"foo")
         stdin.seek(0)
         # Run
-        stdout, _stderr = connector.run_command("cat", stdin=stdin)
+        stdout, stderr = connector.run_command("cat", stdin=stdin)
         self.assertEqual(stdout.read(), b"foo")
         self.assertFalse(stderr.read())
 

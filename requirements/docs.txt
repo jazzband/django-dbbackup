@@ -1,4 +1,4 @@
-Sphinx
+sphinx
 docutils
 sphinx-django-command
 python-dotenv

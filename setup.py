@@ -1,51 +1,63 @@
 #!/usr/bin/env python
+
+from pathlib import Path
+
 from setuptools import setup, find_packages
-import dbbackup
+
+
+project_dir = Path(__file__).parent
 
 
 def get_requirements():
-    return open('requirements.txt').read().splitlines()
+    with (project_dir / "requirements.txt").open() as f:
+        return f.read().splitlines()
 
 
 def get_test_requirements():
-    return open('requirements-tests.txt').read().splitlines()
+    with (project_dir / "requirements" / "tests.txt").open() as f:
+        return f.read().splitlines()
 
-
-keywords = [
-    'django', 'database', 'media', 'backup',
-    'amazon', 's3' 'dropbox',
-]
 
 setup(
     name='django-dbbackup',
-    version=dbbackup.__version__,
-    description=dbbackup.__doc__,
-    author=dbbackup.__author__,
-    author_email=dbbackup.__email__,
+    version="4.0.0b0",
+    description="Management commands to help backup and restore a project database and media.",
+    author="Archmonger",
+    author_email="archiethemonger@gmail.com",
+    long_description=project_dir.joinpath("README.rst").read_text(encoding="utf-8"),
+    python_requires=">=3.6",
     install_requires=get_requirements(),
     tests_require=get_test_requirements(),
     license='BSD',
-    url=dbbackup.__url__,
-    keywords=keywords,
+    url='https://github.com/django-dbbackup/django-dbbackup',
+    keywords=[
+        "django",
+        "database",
+        "media",
+        "backup",
+        "amazon",
+        "s3",
+        "dropbox",
+    ],
     packages=find_packages(),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Environment :: Console',
-        'Framework :: Django',
+        'Framework :: Django :: 2.2',
+        'Framework :: Django :: 3.2',
+        'Framework :: Django :: 4.0',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Topic :: Database',
         'Topic :: System :: Archiving',
         'Topic :: System :: Archiving :: Backup',

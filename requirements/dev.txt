@@ -2,4 +2,3 @@ black
 flake8
 pylint
 rope
-twine

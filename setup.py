@@ -30,7 +30,7 @@ setup(
     install_requires=get_requirements(),
     tests_require=get_test_requirements(),
     license='BSD',
-    url='https://github.com/django-dbbackup/django-dbbackup',
+    url='https://github.com/jazzband/django-dbbackup',
     keywords=[
         "django",
         "database",

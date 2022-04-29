@@ -5,35 +5,40 @@ from pathlib import Path
 from setuptools import setup, find_packages
 
 
-def get_requirements():
-    return open('requirements.txt').read().splitlines()
-
-
-def get_test_requirements():
-    return open('requirements-tests.txt').read().splitlines()
-
-
 project_dir = Path(__file__).parent
 
 
-keywords = [
-    'django', 'database', 'media', 'backup',
-    'amazon', 's3' 'dropbox',
-]
+def get_requirements():
+    with (project_dir / "requirements.txt").open() as f:
+        return f.read().splitlines()
+
+
+def get_test_requirements():
+    with (project_dir / "requirements" / "tests.txt").open() as f:
+        return f.read().splitlines()
+
 
 setup(
     name='django-dbbackup',
     version="4.0.0b0",
-    description='Management commands to help backup and restore a project database and media',
-    author='Michael Shepanski',
-    author_email='mjs7231@gmail.com',
+    description="Management commands to help backup and restore a project database and media.",
+    author="Archmonger",
+    author_email="archiethemonger@gmail.com",
     long_description=project_dir.joinpath("README.rst").read_text(encoding="utf-8"),
     python_requires=">=3.6",
     install_requires=get_requirements(),
     tests_require=get_test_requirements(),
     license='BSD',
     url='https://github.com/django-dbbackup/django-dbbackup',
-    keywords=keywords,
+    keywords=[
+        "django",
+        "database",
+        "media",
+        "backup",
+        "amazon",
+        "s3",
+        "dropbox",
+    ],
     packages=find_packages(),
     classifiers=[
         'Development Status :: 4 - Beta',

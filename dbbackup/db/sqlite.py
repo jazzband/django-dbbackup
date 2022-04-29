@@ -37,7 +37,7 @@ class SqliteConnector(BaseDBConnector):
                 # Make SQL commands in 1 line
                 sql = sql.replace('\n    ', '')
                 sql = sql.replace('\n)', ')')
-                fileobj.write(f"{sql};\n".encode('UTF-8'))
+                fileobj.write(f"{sql};\n".encode())
             else:
                 fileobj.write(f"{sql};\n")
             table_name_ident = table_name.replace('"', '""')
@@ -49,12 +49,12 @@ class SqliteConnector(BaseDBConnector):
                          for col in column_names))
             query_res = cursor.execute(q)
             for row in query_res:
-                fileobj.write(f"{row[0]};\n".encode('UTF-8'))
+                fileobj.write(f"{row[0]};\n".encode())
             schema_res = cursor.execute(DUMP_ETC)
             for name, type, sql in schema_res.fetchall():
                 if sql.startswith("CREATE INDEX"):
                     sql = sql.replace('CREATE INDEX', 'CREATE INDEX IF NOT EXISTS')
-                fileobj.write(f'{sql};\n'.encode('UTF-8'))
+                fileobj.write(f'{sql};\n'.encode())
         cursor.close()
 
     def create_dump(self):

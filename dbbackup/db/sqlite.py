@@ -30,13 +30,13 @@ class SqliteConnector(BaseDBConnector):
         cursor = self.connection.cursor()
         cursor.execute(DUMP_TABLES)
         for table_name, type, sql in cursor.fetchall():
-            if table_name.startswith('sqlite_') or table_name in self.exclude:
+            if table_name.startswith("sqlite_") or table_name in self.exclude:
                 continue
-            elif sql.startswith('CREATE TABLE'):
-                sql = sql.replace('CREATE TABLE', 'CREATE TABLE IF NOT EXISTS')
+            elif sql.startswith("CREATE TABLE"):
+                sql = sql.replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS")
                 # Make SQL commands in 1 line
-                sql = sql.replace('\n    ', '')
-                sql = sql.replace('\n)', ')')
+                sql = sql.replace("\n    ", "")
+                sql = sql.replace("\n)", ")")
                 fileobj.write(f"{sql};\n".encode())
             else:
                 fileobj.write(f"{sql};\n")
@@ -45,16 +45,19 @@ class SqliteConnector(BaseDBConnector):
             column_names = [str(table_info[1]) for table_info in res.fetchall()]
             q = """SELECT 'INSERT INTO "{0}" VALUES({1})' FROM "{0}";\n""".format(
                 table_name_ident,
-                ",".join("""'||quote("{}")||'""".format(col.replace('"', '""'))
-                         for col in column_names))
+                ",".join(
+                    """'||quote("{}")||'""".format(col.replace('"', '""'))
+                    for col in column_names
+                ),
+            )
             query_res = cursor.execute(q)
             for row in query_res:
                 fileobj.write(f"{row[0]};\n".encode())
             schema_res = cursor.execute(DUMP_ETC)
             for name, type, sql in schema_res.fetchall():
                 if sql.startswith("CREATE INDEX"):
-                    sql = sql.replace('CREATE INDEX', 'CREATE INDEX IF NOT EXISTS')
-                fileobj.write(f'{sql};\n'.encode())
+                    sql = sql.replace("CREATE INDEX", "CREATE INDEX IF NOT EXISTS")
+                fileobj.write(f"{sql};\n".encode())
         cursor.close()
 
     def create_dump(self):
@@ -71,7 +74,7 @@ class SqliteConnector(BaseDBConnector):
         cursor = self.connection.cursor()
         for line in dump.readlines():
             try:
-                cursor.execute(line.decode('UTF-8'))
+                cursor.execute(line.decode("UTF-8"))
             except (OperationalError, IntegrityError) as err:
                 warnings.warn(f"Error in db restore: {err}")
 
@@ -83,14 +86,14 @@ class SqliteCPConnector(BaseDBConnector):
     """
 
     def create_dump(self):
-        path = self.connection.settings_dict['NAME']
+        path = self.connection.settings_dict["NAME"]
         dump = BytesIO()
-        with open(path, 'rb') as db_file:
+        with open(path, "rb") as db_file:
             copyfileobj(db_file, dump)
         dump.seek(0)
         return dump
 
     def restore_dump(self, dump):
-        path = self.connection.settings_dict['NAME']
-        with open(path, 'wb') as db_file:
+        path = self.connection.settings_dict["NAME"]
+        with open(path, "wb") as db_file:
             copyfileobj(dump, db_file)

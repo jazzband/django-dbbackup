@@ -19,7 +19,7 @@ class BaseDBConnectorTest(TestCase):
 
     def test_settings(self):
         connector = BaseDBConnector()
-        connector.settings  # pylint: disable=pointless-statement
+        connector.settings
 
     def test_generate_filename(self):
         connector = BaseDBConnector()
@@ -51,40 +51,40 @@ class BaseCommandDBConnectorTest(TestCase):
     def test_run_command_with_env(self):
         connector = BaseCommandDBConnector()
         # Empty env
-        stdout, _stderr = connector.run_command("env")
+        stdout, stderr = connector.run_command("env")
         self.assertTrue(stdout.read())
         # env from self.env
         connector.env = {"foo": "bar"}
-        stdout, _stderr = connector.run_command("env")
+        stdout, stderr = connector.run_command("env")
         self.assertIn(b"foo=bar\n", stdout.read())
         # method overide gloabal env
-        stdout, _stderr = connector.run_command("env", env={"foo": "ham"})
+        stdout, stderr = connector.run_command("env", env={"foo": "ham"})
         self.assertIn(b"foo=ham\n", stdout.read())
         # get a var from parent env
         os.environ["bar"] = "foo"
-        stdout, _stderr = connector.run_command("env")
+        stdout, stderr = connector.run_command("env")
         self.assertIn(b"bar=foo\n", stdout.read())
         # Conf overides parendt env
         connector.env = {"bar": "bar"}
-        stdout, _stderr = connector.run_command("env")
+        stdout, stderr = connector.run_command("env")
         self.assertIn(b"bar=bar\n", stdout.read())
         # method overides all
-        stdout, _stderr = connector.run_command("env", env={"bar": "ham"})
+        stdout, stderr = connector.run_command("env", env={"bar": "ham"})
         self.assertIn(b"bar=ham\n", stdout.read())
 
     def test_run_command_with_parent_env(self):
         connector = BaseCommandDBConnector(use_parent_env=False)
         # Empty env
-        stdout, _stderr = connector.run_command("env")
+        stdout, stderr = connector.run_command("env")
         self.assertFalse(stdout.read())
         # env from self.env
         connector.env = {"foo": "bar"}
-        stdout, _stderr = connector.run_command("env")
+        stdout, stderr = connector.run_command("env")
         self.assertEqual(stdout.read(), b"foo=bar\n")
         # method overide gloabal env
-        stdout, _stderr = connector.run_command("env", env={"foo": "ham"})
+        stdout, stderr = connector.run_command("env", env={"foo": "ham"})
         self.assertEqual(stdout.read(), b"foo=ham\n")
         # no var from parent env
         os.environ["bar"] = "foo"
-        stdout, _stderr = connector.run_command("env")
+        stdout, stderr = connector.run_command("env")
         self.assertNotIn(b"bar=foo\n", stdout.read())

@@ -10,9 +10,11 @@ class DbbackupConfig(AppConfig):
     """
     Config for DBBackup application.
     """
-    name = 'dbbackup'
-    label = 'dbbackup'
-    verbose_name = gettext_lazy('Backup and restore')
+
+    name = "dbbackup"
+    label = "dbbackup"
+    verbose_name = gettext_lazy("Backup and restore")
+    default_auto_field = "django.db.models.AutoField"
 
     def ready(self):
         log.load()

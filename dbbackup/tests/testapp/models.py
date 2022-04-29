@@ -1,8 +1,16 @@
 from django.db import models
 
-___all__ = ('CharModel', 'IntegerModel', 'TextModel', 'BooleanModel'
-            'DateModel', 'DateTimeModel', 'ForeignKeyModel', 'ManyToManyModel',
-            'FileModel', 'TestModel',)
+___all__ = (
+    "CharModel",
+    "IntegerModel",
+    "TextModel",
+    "BooleanModel" "DateModel",
+    "DateTimeModel",
+    "ForeignKeyModel",
+    "ManyToManyModel",
+    "FileModel",
+    "TestModel",
+)
 
 
 class CharModel(models.Model):
@@ -18,4 +26,4 @@ class ManyToManyModel(models.Model):
 
 
 class FileModel(models.Model):
-    field = models.FileField(upload_to='.')
+    field = models.FileField(upload_to=".")

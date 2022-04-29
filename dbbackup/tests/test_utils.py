@@ -95,9 +95,9 @@ class Email_Uncaught_ExceptionTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         error_mail = mail.outbox[0]
         self.assertEqual(["foo@bar"], error_mail.to)
-        self.assertIn("Exception('Foo')", error_mail.subject)
+        self.assertIn('Exception("Foo")', error_mail.subject)
         if django.VERSION >= (1, 7):
-            self.assertIn("Exception('Foo')", error_mail.body)
+            self.assertIn('Exception("Foo")', error_mail.body)
 
 
 class Encrypt_FileTest(TestCase):

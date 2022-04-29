@@ -7,5 +7,5 @@ class Command(BaseCommand):
     help = "Count things"
 
     def handle(self, **options):
-        for st in 'abcde':
+        for st in "abcde":
             CharModel.objects.create(field=st)

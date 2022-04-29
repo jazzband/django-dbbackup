@@ -19,7 +19,7 @@ def create_postgres_uri(self):
     if not user:
         password = ""
     else:
-        host = f"@{host}"
+        host = "@" + host
 
     port = ":{}".format(self.settings.get("PORT")) if self.settings.get("PORT") else ""
     dbname = f"--dbname=postgresql://{user}{password}{host}{port}/{dbname}"
@@ -48,7 +48,7 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += " --clean"
 
         cmd = f"{self.dump_prefix} {cmd} {self.dump_suffix}"
-        stdout, _stderr = self.run_command(cmd, env=self.dump_env)
+        stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
 
     def _restore_dump(self, dump):
@@ -109,7 +109,7 @@ class PgDumpBinaryConnector(PgDumpConnector):
         for table in self.exclude:
             cmd += f" --exclude-table-data={table}"
         cmd = f"{self.dump_prefix} {cmd} {self.dump_suffix}"
-        stdout, _stderr = self.run_command(cmd, env=self.dump_env)
+        stdout, stderr = self.run_command(cmd, env=self.dump_env)
         return stdout
 
     def _restore_dump(self, dump):

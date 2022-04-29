@@ -14,7 +14,7 @@ class SqliteConnectorTest(TestCase):
         connector._write_dump(dump_file)
         dump_file.seek(0)
         for line in dump_file:
-            self.assertTrue(line.strip().endswith(b';'))
+            self.assertTrue(line.strip().endswith(b";"))
 
     def test_create_dump(self):
         connector = SqliteConnector()
@@ -22,7 +22,7 @@ class SqliteConnectorTest(TestCase):
         self.assertTrue(dump.read())
 
     def test_create_dump_with_unicode(self):
-        CharModel.objects.create(field='\xe9')
+        CharModel.objects.create(field="\xe9")
         connector = SqliteConnector()
         dump = connector.create_dump()
         self.assertTrue(dump.read())
@@ -33,14 +33,14 @@ class SqliteConnectorTest(TestCase):
         connector.restore_dump(dump)
 
 
-@patch('dbbackup.db.sqlite.open', mock_open(read_data=b'foo'), create=True)
+@patch("dbbackup.db.sqlite.open", mock_open(read_data=b"foo"), create=True)
 class SqliteCPConnectorTest(TestCase):
     def test_create_dump(self):
         connector = SqliteCPConnector()
         dump = connector.create_dump()
         dump_content = dump.read()
         self.assertTrue(dump_content)
-        self.assertEqual(dump_content, b'foo')
+        self.assertEqual(dump_content, b"foo")
 
     def test_restore_dump(self):
         connector = SqliteCPConnector()

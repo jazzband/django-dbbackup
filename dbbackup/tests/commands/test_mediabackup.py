@@ -18,7 +18,7 @@ class MediabackupBackupMediafilesTest(TestCase):
     def setUp(self):
         HANDLED_FILES.clean()
         self.command = DbbackupCommand()
-        self.command.servername = 'foo-server'
+        self.command.servername = "foo-server"
         self.command.storage = get_storage()
         self.command.stdout = DEV_NULL
         self.command.compress = False
@@ -34,40 +34,40 @@ class MediabackupBackupMediafilesTest(TestCase):
 
     def test_func(self):
         self.command.backup_mediafiles()
-        self.assertEqual(1, len(HANDLED_FILES['written_files']))
+        self.assertEqual(1, len(HANDLED_FILES["written_files"]))
 
     def test_compress(self):
         self.command.compress = True
         self.command.backup_mediafiles()
-        self.assertEqual(1, len(HANDLED_FILES['written_files']))
-        self.assertTrue(HANDLED_FILES['written_files'][0][0].endswith('.gz'))
+        self.assertEqual(1, len(HANDLED_FILES["written_files"]))
+        self.assertTrue(HANDLED_FILES["written_files"][0][0].endswith(".gz"))
 
     def test_encrypt(self):
         self.command.encrypt = True
         add_public_gpg()
         self.command.backup_mediafiles()
-        self.assertEqual(1, len(HANDLED_FILES['written_files']))
-        outputfile = HANDLED_FILES['written_files'][0][1]
+        self.assertEqual(1, len(HANDLED_FILES["written_files"]))
+        outputfile = HANDLED_FILES["written_files"][0][1]
         outputfile.seek(0)
-        self.assertTrue(outputfile.read().startswith(b'-----BEGIN PGP MESSAGE-----'))
+        self.assertTrue(outputfile.read().startswith(b"-----BEGIN PGP MESSAGE-----"))
 
     def test_compress_and_encrypt(self):
         self.command.compress = True
         self.command.encrypt = True
         add_public_gpg()
         self.command.backup_mediafiles()
-        self.assertEqual(1, len(HANDLED_FILES['written_files']))
-        outputfile = HANDLED_FILES['written_files'][0][1]
+        self.assertEqual(1, len(HANDLED_FILES["written_files"]))
+        outputfile = HANDLED_FILES["written_files"][0][1]
         outputfile.seek(0)
-        self.assertTrue(outputfile.read().startswith(b'-----BEGIN PGP MESSAGE-----'))
+        self.assertTrue(outputfile.read().startswith(b"-----BEGIN PGP MESSAGE-----"))
 
     def test_write_local_file(self):
         self.command.path = tempfile.mktemp()
         self.command.backup_mediafiles()
         self.assertTrue(os.path.exists(self.command.path))
-        self.assertEqual(0, len(HANDLED_FILES['written_files']))
+        self.assertEqual(0, len(HANDLED_FILES["written_files"]))
 
     def test_output_filename(self):
         self.command.filename = "my_new_name.tar"
         self.command.backup_mediafiles()
-        self.assertEqual(HANDLED_FILES['written_files'][0][0], self.command.filename)
+        self.assertEqual(HANDLED_FILES["written_files"][0][0], self.command.filename)

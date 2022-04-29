@@ -27,8 +27,9 @@ def get_storage(path=None, options=None):
     path = path or settings.STORAGE
     options = options or settings.STORAGE_OPTIONS
     if not path:
-        raise ImproperlyConfigured('You must specify a storage class using '
-                                   'DBBACKUP_STORAGE settings.')
+        raise ImproperlyConfigured(
+            "You must specify a storage class using " "DBBACKUP_STORAGE settings."
+        )
     return Storage(path, **options)
 
 
@@ -46,10 +47,11 @@ class Storage:
     list and filter files. It uses a Django storage object for low-level
     operations.
     """
+
     @property
     def logger(self):
-        if not hasattr(self, '_logger'):
-            self._logger = logging.getLogger('dbbackup.storage')
+        if not hasattr(self, "_logger"):
+            self._logger = logging.getLogger("dbbackup.storage")
         return self._logger
 
     def __init__(self, storage_path=None, **options):
@@ -70,28 +72,34 @@ class Storage:
         self.name = self.storageCls.__name__
 
     def __str__(self):
-        return f'dbbackup-{self.storage.__str__()}'
+        return f"dbbackup-{self.storage.__str__()}"
 
     def delete_file(self, filepath):
-        self.logger.debug('Deleting file %s', filepath)
+        self.logger.debug("Deleting file %s", filepath)
         self.storage.delete(name=filepath)
 
-    def list_directory(self, path=''):
+    def list_directory(self, path=""):
         return self.storage.listdir(path)[1]
 
     def write_file(self, filehandle, filename):
-        self.logger.debug('Writing file %s', filename)
+        self.logger.debug("Writing file %s", filename)
         self.storage.save(name=filename, content=filehandle)
 
     def read_file(self, filepath):
-        self.logger.debug('Reading file %s', filepath)
-        file_ = self.storage.open(name=filepath, mode='rb')
-        if not getattr(file_, 'name', None):
+        self.logger.debug("Reading file %s", filepath)
+        file_ = self.storage.open(name=filepath, mode="rb")
+        if not getattr(file_, "name", None):
             file_.name = filepath
         return file_
 
-    def list_backups(self, encrypted=None, compressed=None, content_type=None,
-                     database=None, servername=None):
+    def list_backups(
+        self,
+        encrypted=None,
+        compressed=None,
+        content_type=None,
+        database=None,
+        servername=None,
+    ):
         """
         List stored files except given filter. If filter is None, it won't be
         used. ``content_type`` must be ``'db'`` for database backups or
@@ -117,28 +125,33 @@ class Storage:
         :returns: List of files
         :rtype: ``list`` of ``str``
         """
-        if content_type not in ('db', 'media', None):
-            msg = "Bad content_type %s, must be 'db', 'media', or None" % (
-                content_type)
+        if content_type not in ("db", "media", None):
+            msg = "Bad content_type %s, must be 'db', 'media', or None" % (content_type)
             raise TypeError(msg)
         # TODO: Make better filter for include only backups
         files = [f for f in self.list_directory() if utils.filename_to_datestring(f)]
         if encrypted is not None:
-            files = [f for f in files if ('.gpg' in f) == encrypted]
+            files = [f for f in files if (".gpg" in f) == encrypted]
         if compressed is not None:
-            files = [f for f in files if ('.gz' in f) == compressed]
-        if content_type == 'media':
-            files = [f for f in files if '.tar' in f]
-        elif content_type == 'db':
-            files = [f for f in files if '.tar' not in f]
+            files = [f for f in files if (".gz" in f) == compressed]
+        if content_type == "media":
+            files = [f for f in files if ".tar" in f]
+        elif content_type == "db":
+            files = [f for f in files if ".tar" not in f]
         if database:
             files = [f for f in files if database in f]
         if servername:
             files = [f for f in files if servername in f]
         return files
 
-    def get_latest_backup(self, encrypted=None, compressed=None,
-                          content_type=None, database=None, servername=None):
+    def get_latest_backup(
+        self,
+        encrypted=None,
+        compressed=None,
+        content_type=None,
+        database=None,
+        servername=None,
+    ):
         """
         Return the latest backup file name.
 
@@ -164,15 +177,25 @@ class Storage:
 
         :raises: FileNotFound: If no backup file is found
         """
-        files = self.list_backups(encrypted=encrypted, compressed=compressed,
-                                  content_type=content_type, database=database,
-                                  servername=servername)
+        files = self.list_backups(
+            encrypted=encrypted,
+            compressed=compressed,
+            content_type=content_type,
+            database=database,
+            servername=servername,
+        )
         if not files:
             raise FileNotFound("There's no backup file available.")
         return max(files, key=utils.filename_to_date)
 
-    def get_older_backup(self, encrypted=None, compressed=None,
-                         content_type=None, database=None, servername=None):
+    def get_older_backup(
+        self,
+        encrypted=None,
+        compressed=None,
+        content_type=None,
+        database=None,
+        servername=None,
+    ):
         """
         Return the older backup's file name.
 
@@ -198,16 +221,26 @@ class Storage:
 
         :raises: FileNotFound: If no backup file is found
         """
-        files = self.list_backups(encrypted=encrypted, compressed=compressed,
-                                  content_type=content_type, database=database,
-                                  servername=servername)
+        files = self.list_backups(
+            encrypted=encrypted,
+            compressed=compressed,
+            content_type=content_type,
+            database=database,
+            servername=servername,
+        )
         if not files:
             raise FileNotFound("There's no backup file available.")
         return min(files, key=utils.filename_to_date)
 
-    def clean_old_backups(self, encrypted=None, compressed=None,
-                          content_type=None, database=None, servername=None,
-                          keep_number=None):
+    def clean_old_backups(
+        self,
+        encrypted=None,
+        compressed=None,
+        content_type=None,
+        database=None,
+        servername=None,
+        keep_number=None,
+    ):
         """
         Delete olders backups and hold the number defined.
 
@@ -232,12 +265,19 @@ class Storage:
         :type keep_number: ``int`` or ``None``
         """
         if keep_number is None:
-            keep_number = settings.CLEANUP_KEEP if content_type == 'db' \
+            keep_number = (
+                settings.CLEANUP_KEEP
+                if content_type == "db"
                 else settings.CLEANUP_KEEP_MEDIA
+            )
         keep_filter = settings.CLEANUP_KEEP_FILTER
-        files = self.list_backups(encrypted=encrypted, compressed=compressed,
-                                  content_type=content_type, database=database,
-                                  servername=servername)
+        files = self.list_backups(
+            encrypted=encrypted,
+            compressed=compressed,
+            content_type=content_type,
+            database=database,
+            servername=servername,
+        )
         files = sorted(files, key=utils.filename_to_date, reverse=True)
         files_to_delete = [fi for i, fi in enumerate(files) if i >= keep_number]
         for filename in files_to_delete:

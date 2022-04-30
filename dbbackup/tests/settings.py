@@ -29,6 +29,7 @@ INSTALLED_APPS = (
     'dbbackup',
     'dbbackup.tests.testapp',
 )
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 DATABASES = {
     'default': {

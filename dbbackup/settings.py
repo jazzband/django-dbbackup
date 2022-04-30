@@ -44,6 +44,8 @@ CONNECTORS = getattr(settings, "DBBACKUP_CONNECTORS", {})
 
 CUSTOM_CONNECTOR_MAPPING = getattr(settings, "DBBACKUP_CONNECTOR_MAPPING", {})
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 # Mail
 SEND_EMAIL = getattr(settings, "DBBACKUP_SEND_EMAIL", True)
 SERVER_EMAIL = getattr(settings, "DBBACKUP_SERVER_EMAIL", settings.SERVER_EMAIL)

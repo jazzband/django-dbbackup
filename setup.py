@@ -4,7 +4,6 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
-
 project_dir = Path(__file__).parent
 with (project_dir / "VERSION").open() as f:
     version = f.read().strip()

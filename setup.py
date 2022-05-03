@@ -4,9 +4,10 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
-import dbbackup
 
 project_dir = Path(__file__).parent
+with (project_dir / "VERSION").open() as f:
+    version = f.read().strip()
 
 
 def get_requirements():
@@ -21,7 +22,7 @@ def get_test_requirements():
 
 setup(
     name="django-dbbackup",
-    version=dbbackup.__version__,
+    version=version,
     description="Management commands to help backup and restore a project database and media.",
     author="Archmonger",
     author_email="archiethemonger@gmail.com",

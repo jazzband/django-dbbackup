@@ -61,7 +61,7 @@ os.environ["DJANGO_SETTINGS_MODULE"] = "dbbackup.tests.settings"
 # built documents.
 #
 # The short X.Y version.
-version = ".".join([str(i) for i in dbbackup.VERSION[:-1]])
+version = dbbackup.VERSION
 # The full version, including alpha/beta/rc tags.
 release = dbbackup.__version__
 

@@ -188,7 +188,7 @@ Django3.2 you would run:
 
 ::
 
-    tox -e py3.9-django3.2
+    tox -e py39-django32
 
 The available test environments can be found in ``tox.ini``.
 

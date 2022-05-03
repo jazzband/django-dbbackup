@@ -18,19 +18,23 @@ class Command(BaseDbBackupCommand):
     help = """Restore a database backup from storage, encrypted and/or
     compressed."""
     content_type = 'db'
+    nodrop = False
 
     option_list = BaseDbBackupCommand.option_list + (
         make_option("-d", "--database", help="Database to restore"),
         make_option("-i", "--input-filename", help="Specify filename to backup from"),
         make_option("-I", "--input-path", help="Specify path on local filesystem to backup from"),
         make_option("-s", "--servername",
-                    help="If backup file is not specified, filter the "
-                         "existing ones with the given servername"),
+            help="If backup file is not specified, filter the "
+                    "existing ones with the given servername"),
         make_option("-c", "--decrypt", default=False, action='store_true',
                     help="Decrypt data before restoring"),
-        make_option("-p", "--passphrase", help="Passphrase for decrypt file", default=None),
+        make_option("-p", "--passphrase",
+                    help="Passphrase for decrypt file", default=None),
         make_option("-z", "--uncompress", action='store_true', default=False,
-                    help="Uncompress gzip data before restoring")
+                    help="Uncompress gzip data before restoring"),
+        make_option("-r", "--nodrop", action="store_true",
+                    default=False, help="Don't clean (drop) database",)
     )
 
     def handle(self, *args, **options):
@@ -50,6 +54,7 @@ class Command(BaseDbBackupCommand):
             self.interactive = options.get('interactive')
             self.database_name, self.database = self._get_database(options)
             self.storage = get_storage()
+            self.nodrop = options.get("nodrop")
             self._restore_backup()
         except StorageError as err:
             raise CommandError(err)
@@ -91,4 +96,5 @@ class Command(BaseDbBackupCommand):
 
         input_file.seek(0)
         self.connector = get_connector(self.database_name)
+        self.connector.drop = not self.nodrop
         self.connector.restore_dump(input_file)

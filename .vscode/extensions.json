@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "eamodio.gitlens",
+        "github.vscode-pull-request-github",
+        "knisterpeter.vscode-github",
+        "esbenp.prettier-vscode",
+        "ms-python.vscode-pylance",
+        "ms-python.python",
+        "gruntfuggly.todo-tree",
+        "sourcery.sourcery"
+    ]
+}

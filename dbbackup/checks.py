@@ -23,6 +23,7 @@ W006 = Warning('FAILURE_RECIPIENTS has been deprecated',
                hint='settings.DBBACKUP_FAILURE_RECIPIENTS is replaced by '
                     'settings.DBBACKUP_ADMINS',
                id='dbbackup.W006')
+W007 = Warning('"SINGLE_TRANSACTION" not supported', id='dbbackup.W007')
 
 
 @register(Tags.compatibility)
@@ -47,5 +48,17 @@ def check_settings(app_configs, **kwargs):
 
     if getattr(settings, 'FAILURE_RECIPIENTS', None) is not None:
         errors.append(W006)
+
+    for alias, connector_settings in settings.CONNECTORS.items():
+        if (
+                connector_settings.get("CONNECTOR")
+                != "dbbackup.db.mysql.MysqlDumpConnector"
+                and connector_settings.get("SINGLE_TRANSACTION") is True
+        ):
+            hint = '"SINGLE_TRANSACTION" in "settings.DBBACKUP_CONNECTORS" has no ' \
+                   'effect on "%s" class' % connector_settings.get("CONNECTOR")
+            W007.hint = hint
+            errors.append(W007)
+            break
 
     return errors

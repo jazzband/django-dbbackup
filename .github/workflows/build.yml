@@ -28,7 +28,7 @@ jobs:
               run: flake8
             # Environments are selected using tox-gh-actions configuration in tox.ini.
             - name: Test with tox
-              run: tox
+              run: tox -r
             - name: Upload coverage
               uses: codecov/codecov-action@v1
               with:

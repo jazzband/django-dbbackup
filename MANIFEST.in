@@ -3,4 +3,4 @@ include requirements.txt
 include README.rst
 include LICENSE.txt
 include VERSION
-recursive-include dbbackup/tests/testapp/blobs/ *.gpg *.txt *.gz *.tar
+recursive-include dbbackup/tests/testapp/blobs *

@@ -4,18 +4,19 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
-project_dir = Path(__file__).parent
-with (project_dir / "VERSION").open() as f:
+root_dir = Path(__file__).parent
+src_dir = root_dir / "dbbackup"
+with (src_dir / "VERSION").open() as f:
     version = f.read().strip()
 
 
 def get_requirements():
-    with (project_dir / "requirements.txt").open() as f:
+    with (root_dir / "requirements.txt").open() as f:
         return f.read().splitlines()
 
 
 def get_test_requirements():
-    with (project_dir / "requirements" / "tests.txt").open() as f:
+    with (root_dir / "requirements" / "tests.txt").open() as f:
         return f.read().splitlines()
 
 
@@ -25,7 +26,7 @@ setup(
     description="Management commands to help backup and restore a project database and media.",
     author="Archmonger",
     author_email="archiethemonger@gmail.com",
-    long_description=project_dir.joinpath("README.rst").read_text(encoding="utf-8"),
+    long_description=(root_dir / "README.rst").read_text(encoding="utf-8"),
     python_requires=">=3.6",
     install_requires=get_requirements(),
     tests_require=get_test_requirements(),

@@ -4,8 +4,8 @@ from pathlib import Path
 
 import django
 
-project_dir = Path(__file__).parent
-with (project_dir.parent / "VERSION").open() as f:
+src_dir = Path(__file__).parent
+with (src_dir / "VERSION").open() as f:
     __version__ = f.read().strip()
     """The full version, including alpha/beta/rc tags."""
 

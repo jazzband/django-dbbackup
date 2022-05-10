@@ -27,6 +27,7 @@ setup(
     author="Archmonger",
     author_email="archiethemonger@gmail.com",
     long_description=(root_dir / "README.rst").read_text(encoding="utf-8"),
+    long_description_content_type="text/x-rst",
     python_requires=">=3.6",
     install_requires=get_requirements(),
     tests_require=get_test_requirements(),

@@ -33,7 +33,7 @@ class Command(BaseDbBackupCommand):
                     help="Uncompress gzip data before restoring"),
         make_option("-n", "--schema", default=None,
                     help="Restore backup to given schema only"),
-        make_option("-o", "--no-owner", default=None,
+        make_option("--no-owner", action='store_true', default=False,
                     help="Don't try to set the ownership of the objects to the original owner")
     )
 
@@ -102,5 +102,5 @@ class Command(BaseDbBackupCommand):
         if self.schema:
             self.connector.schema = self.schema
         if self.no_owner:
-            self.connector.no_owner = self.no_owner
+            self.connector.no_owner = True
         self.connector.restore_dump(input_file)

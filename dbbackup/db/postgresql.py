@@ -37,6 +37,7 @@ class PgDumpConnector(BaseCommandDBConnector):
     single_transaction = True
     drop = True
     schema = None
+    no_owner = False
 
     def _create_dump(self):
         cmd = '{} '.format(self.dump_cmd)
@@ -128,6 +129,8 @@ class PgDumpBinaryConnector(PgDumpConnector):
             cmd += ' --single-transaction'
         if self.drop:
             cmd += ' --clean'
+        if self.no_owner:
+            cmd += ' --no-owner'
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr

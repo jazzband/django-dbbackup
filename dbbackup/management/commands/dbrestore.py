@@ -32,7 +32,9 @@ class Command(BaseDbBackupCommand):
         make_option("-z", "--uncompress", action='store_true', default=False,
                     help="Uncompress gzip data before restoring"),
         make_option("-n", "--schema", default=None,
-                    help="Restore backup to given schema only")
+                    help="Restore backup to given schema only"),
+        make_option("-o", "--no-owner", default=None,
+                    help="Don't try to set the ownership of the objects to the original owner")
     )
 
     def handle(self, *args, **options):
@@ -51,6 +53,7 @@ class Command(BaseDbBackupCommand):
             self.passphrase = options.get('passphrase')
             self.interactive = options.get('interactive')
             self.schema = options.get("schema")
+            self.no_owner = options.get("no-owner")
             self.database_name, self.database = self._get_database(options)
             self.storage = get_storage()
             self._restore_backup()
@@ -98,4 +101,6 @@ class Command(BaseDbBackupCommand):
         self.connector = get_connector(self.database_name)
         if self.schema:
             self.connector.schema = self.schema
+        if self.no_owner:
+            self.connector.no_owner = self.no_owner
         self.connector.restore_dump(input_file)

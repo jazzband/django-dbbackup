@@ -62,6 +62,8 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += ' -n {}'.format(self.schema)
         if self.single_transaction:
             cmd += ' --single-transaction'
+        if self.no_owner:
+            cmd += ' --no-owner'
         cmd += ' {}'.format(self.settings['NAME'])
         cmd = '{} {} {}'.format(self.restore_prefix, cmd, self.restore_suffix)
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)

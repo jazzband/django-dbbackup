@@ -1,4 +1,4 @@
-name: Lint and Unit Test
+name: Test
 
 on:
   push:
@@ -22,10 +22,14 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements-tests.txt
+        pip install -r requirements/tests.txt
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Linting
       run: flake8
     # Environments are selected using tox-gh-actions configuration in tox.ini.
     - name: Test with tox
       run: tox
+    - name: Upload coverage
+      uses: codecov/codecov-action@v1
+      with:
+        name: Python ${{ matrix.python-version }} Codecov

@@ -33,7 +33,7 @@ class Command(BaseDbBackupCommand):
                     help="Uncompress gzip data before restoring"),
         make_option("-n", "--schema", default=None,
                     help="Restore backup to given schema only"),
-        make_option("--no-owner", action='store_true', default=False,
+        make_option("--no-owner", action='store_true', dest="no-owner",
                     help="Don't try to set the ownership of the objects to the original owner")
     )
 

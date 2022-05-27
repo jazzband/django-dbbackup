@@ -38,7 +38,7 @@ if settings.CUSTOM_CONNECTOR_MAPPING:
 
 def get_connector(database_name=None):
     """
-    Get a connector from its database key in setttings.
+    Get a connector from its database key in settings.
     """
     from django.db import DEFAULT_DB_ALIAS, connections
 

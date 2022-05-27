@@ -86,7 +86,7 @@ class PgDumpConnectorTest(TestCase):
         self.connector.exclude = ("foo",)
         self.connector.create_dump()
         self.assertIn(" --exclude-table-data=foo", mock_dump_cmd.call_args[0][0])
-        # With serveral
+        # With several
         self.connector.exclude = ("foo", "bar")
         self.connector.create_dump()
         self.assertIn(" --exclude-table-data=foo", mock_dump_cmd.call_args[0][0])
@@ -162,7 +162,7 @@ class PgDumpBinaryConnectorTest(TestCase):
         self.connector.exclude = ("foo",)
         self.connector.create_dump()
         self.assertIn(" --exclude-table-data=foo", mock_dump_cmd.call_args[0][0])
-        # With serveral
+        # With several
         self.connector.exclude = ("foo", "bar")
         self.connector.create_dump()
         self.assertIn(" --exclude-table-data=foo", mock_dump_cmd.call_args[0][0])

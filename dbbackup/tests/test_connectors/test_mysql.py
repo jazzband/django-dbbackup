@@ -75,7 +75,7 @@ class MysqlDumpConnectorTest(TestCase):
         connector.exclude = ("foo",)
         connector.create_dump()
         self.assertIn(" --ignore-table=db.foo", mock_dump_cmd.call_args[0][0])
-        # With serveral
+        # With several
         connector.exclude = ("foo", "bar")
         connector.create_dump()
         self.assertIn(" --ignore-table=db.foo", mock_dump_cmd.call_args[0][0])

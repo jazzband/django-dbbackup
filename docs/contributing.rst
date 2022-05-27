@@ -14,7 +14,7 @@ issue if:
 - You have an improvement idea
 - You found a bug
 - You've got a question
-- More generaly something seems wrong for you
+- More generally something seems wrong for you
 
 .. _`GitHub issues`: https://github.com/jazzband/django-dbbackup/issues
 
@@ -118,7 +118,7 @@ Storage used for backups
 
 **STORAGE_OPTIONS**
 
-Options for instanciate the chosen storage. It must be in format
+Options for instantiate the chosen storage. It must be in format
 ``"key1=foo,key2=bar"`` and will be convert into a ``dict``.
 
 Online CI

@@ -23,7 +23,7 @@ want to use different parameters for backup. That's why we included a
     }
 
 This configuration will allow you to use a replica with a different host and user,
-which is a great pratice if you don't want to overload your main database.
+which is a great practice if you don't want to overload your main database.
 
 DBBackup uses ``Connectors`` for creating and restoring backups; below you'll see
 specific parameters for the built-in ones.
@@ -110,7 +110,7 @@ SQLite uses by default :class:`dbbackup.db.sqlite.SqliteConnector`.
 SqliteConnector
 ~~~~~~~~~~~~~~~
 
-It is in pure Python and copys the behavior of ``.dump`` command for creating a
+It is in pure Python and copies the behavior of ``.dump`` command for creating a
 SQL dump.
 
 SqliteCPConnector

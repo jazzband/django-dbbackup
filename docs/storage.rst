@@ -29,7 +29,7 @@ of them at `Django Packages`_.
 .. note::
 
     Storing backups to local disk may also be useful for Dropbox if you
-    already have the offical Dropbox client installed on your system.
+    already have the official Dropbox client installed on your system.
 
 File system storage
 -------------------
@@ -239,7 +239,7 @@ Setup
 
 .. warning::
 
-    This storage doesn't use private connection for communcation, don't use it
+    This storage doesn't use private connection for communication, don't use it
     if you're not sure about the link between client and server.
 
 ::
@@ -296,7 +296,7 @@ Available settings
 
 **host** - Required
 
-Hostname or adress of the SSH server
+Hostname or address of the SSH server
 
 **root_path** - Default ``~/``
 

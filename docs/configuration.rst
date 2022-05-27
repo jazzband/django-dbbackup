@@ -31,7 +31,7 @@ Default: ``10*1024*1024``
 DBBACKUP_CLEANUP_KEEP and DBBACKUP_CLEANUP_KEEP_MEDIA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When issueing ``dbbackup`` and ``mediabackup`` with ``--clean`` option, the
+When issuing ``dbbackup`` and ``mediabackup`` with ``--clean`` option, the
 number of old backup files are looked for and removed.
 
 Default: ``10`` (backups)
@@ -179,7 +179,7 @@ Database configuration
 ----------------------
 
 By default, DBBackup uses parameters from ``settings.DATABASES`` but you can
-make an independant configuration, see `Database settings`_
+make an independent configuration, see `Database settings`_
 
 Storage configuration
 ---------------------

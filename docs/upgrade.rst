@@ -34,7 +34,7 @@ Commands
 dbrestore
 ~~~~~~~~~
 
-``--backup-extension`` has been removed, DBBackup should automaticaly
+``--backup-extension`` has been removed, DBBackup should automatically
 know the appropriate file.
 
 Listing from this command, ``--list``, has been removed in favor of
@@ -65,7 +65,7 @@ All database configuration for backups are defined in settings
 ``DBBACKUP_CONNECTORS``. By default, the ``DATABASES``
 parameters are used but can be overrided in this new constant.
 
-This dictionnary stores configuration about how backups are made,
+This dictionary stores configuration about how backups are made,
 what is the path of backup command (``/bin/mysqldump``), add suffix or prefix
 to the command line, environment variable, etc.
 
@@ -77,7 +77,7 @@ SQLite
 ~~~~~~
 
 Previously backup was made by copy the database file, now you have the choice
-between make a raw snaphot or make a real SQL dump. It can be useful to exclude
+between make a raw snapshot or make a real SQL dump. It can be useful to exclude
 tables or don't overwrite data.
 
 If you want to restore your old backups choose

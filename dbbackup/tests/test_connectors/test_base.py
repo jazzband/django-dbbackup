@@ -57,18 +57,18 @@ class BaseCommandDBConnectorTest(TestCase):
         connector.env = {"foo": "bar"}
         stdout, stderr = connector.run_command("env")
         self.assertIn(b"foo=bar\n", stdout.read())
-        # method overide gloabal env
+        # method override global env
         stdout, stderr = connector.run_command("env", env={"foo": "ham"})
         self.assertIn(b"foo=ham\n", stdout.read())
         # get a var from parent env
         os.environ["bar"] = "foo"
         stdout, stderr = connector.run_command("env")
         self.assertIn(b"bar=foo\n", stdout.read())
-        # Conf overides parendt env
+        # Conf overrides parendt env
         connector.env = {"bar": "bar"}
         stdout, stderr = connector.run_command("env")
         self.assertIn(b"bar=bar\n", stdout.read())
-        # method overides all
+        # method overrides all
         stdout, stderr = connector.run_command("env", env={"bar": "ham"})
         self.assertIn(b"bar=ham\n", stdout.read())
 
@@ -81,7 +81,7 @@ class BaseCommandDBConnectorTest(TestCase):
         connector.env = {"foo": "bar"}
         stdout, stderr = connector.run_command("env")
         self.assertEqual(stdout.read(), b"foo=bar\n")
-        # method overide gloabal env
+        # method override global env
         stdout, stderr = connector.run_command("env", env={"foo": "ham"})
         self.assertEqual(stdout.read(), b"foo=ham\n")
         # no var from parent env

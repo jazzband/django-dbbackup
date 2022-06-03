@@ -122,7 +122,7 @@ Options for instantiating the chosen storage. It must be formatted as
 Online CI
 ---------
 
-We use `Travis`_ which tests Dbbackup with a matrix of components' versionsgit@github.com:millerthegorilla/django-dbbackup.git: Several versions of Django and several versions of Python including 2, 3 and PyPy.
+We use `Travis`_ which tests Dbbackup with a matrix of components' versions: Several versions of Django and several versions of Python including 2, 3 and PyPy.
 
 .. image:: https://api.travis-ci.org/jazzband/django-dbbackup.svg
         :target: https://travis-ci.org/jazzband/django-dbbackup

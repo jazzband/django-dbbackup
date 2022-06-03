@@ -7,18 +7,18 @@ This Django application provides management commands to help backup and
 restore your project database and media files with various storages such as
 Amazon S3, DropBox or local file system.
 
-It is made for:
+It is made to:
 
-- Ensure yours backup with GPG signature and encryption
+- Allow you to secure your backup with GPG signature and encryption
 - Archive with compression
 - Deal easily with remote archiving
-- Use Crontab or Celery to setup automated backups.
-- Great to keep your development database up to date.
+- Keep your development database up to date
+- Use Crontab or Celery to setup automated backups
 
 .. warning::
 
-    Django DBBackup version 3 make great changements see
-    `Upgrade documentation`_ to help to up to date.
+    Django DBBackup version 3 is very different to its predecessors.
+    See `Upgrade documentation`_ to help to get up to date.
 
 .. _`Upgrade documentation`: upgrade.html
 

@@ -15,7 +15,7 @@ Getting the latest release from trunk
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In general, you should not be downloading and installing stuff
-directly off repositories -- especially not if you are backing
+directly from repositories -- especially not if you are backing
 up sensitive data.
 
 Security is important, bypassing PyPi repositories is a bad habit,
@@ -47,7 +47,9 @@ Create the backup directory: ::
 .. note::
 
     This configuration uses filesystem storage, but you can use any storage
-    supported by Django API. See `storage` for more information about it.
+    supported by Django API. See `Storage settings`_ for more information about it.
+
+.. _`Storage settings`: storage.html
 
 
 Testing that everything worked

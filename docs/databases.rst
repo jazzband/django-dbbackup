@@ -7,12 +7,12 @@ The following databases are supported by this application:
 - MySQL
 - PostgreSQL
 - MongoDB
-- And the ones you will implement
+- ...and any other that you might implement
 
 By default, DBBackup will try to use your database settings in ``DATABASES``
-for handle database, but some databases require custom options so you could
-want to use different parameters for backup. That's why we included a
-``DBBACKUP_CONNECTORS`` setting; it acts like the ``DATABASES`` one: ::
+to handle the database, but some databases require custom options so you might
+want to use different parameters for backups. That's why we included a
+``DBBACKUP_CONNECTORS`` setting; it follows the form of the django ``DATABASES`` setting: ::
 
     DBBACKUP_CONNECTORS = {
         'default': {
@@ -44,13 +44,13 @@ Absolute path to a connector class by default is:
 - :class:`dbbackup.db.postgresql.PgDumpGisConnector` for ``django.contrib.gis.db.backends.postgis``
 - :class:`dbbackup.db.mongodb.MongoDumpConnector` for ``django_mongodb_engine``
 
-All supported built-in connectors are listed below.
+All supported built-in connectors are described in more detail below.
 
 EXCLUDE
 ~~~~~~~
 
-Tables to exclude from backup as list. This option can be unavailable for
-connectors making snapshots.
+Tables to exclude from backup as list. This option may be unavailable for
+connectors when making snapshots.
 
 EXTENSION
 ~~~~~~~~~
@@ -60,7 +60,7 @@ Extension of backup file name, default ``'dump'``.
 Command connectors
 ------------------
 
-Some connectors use command line tools as dump engine, ``mysqldump`` for
+Some connectors use a command line tool as a dump engine, ``mysqldump`` for
 example. These kinds of tools have common attributes:
 
 DUMP_CMD
@@ -75,19 +75,19 @@ of :class:`dbbackup.db.base.BaseCommandDBConnector`)
 RESTORE_CMD
 ~~~~~~~~~~~
 
-Same as ``DUMP_CMD`` but for restoring action.
+Same as ``DUMP_CMD`` but used when restoring.
 
 DUMP_PREFIX and RESTORE_PREFIX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-String to include as prefix of dump or restore command. It will be add with
-a space between launched command and its prefix.
+String to include as prefix of dump or restore command. It will be added with
+a space between the launched command and its prefix.
 
 DUMP_SUFFIX and RESTORE_PREFIX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-String to include as suffix of dump or restore command. It will be add with
-a space between launched command and its suffix.
+String to include as suffix of dump or restore command. It will be added with
+a space between the launched command and its suffix.
 
 ENV, DUMP_ENV and RESTORE_ENV
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,7 +136,7 @@ first one uses ``pg_dump`` and ``pqsl`` for its job, creating RAW SQL files.
 
 The second uses ``pg_restore`` with binary dump files.
 
-They can also use ``psql`` for launch administration command.
+They can also use ``psql`` for launching administration command.
 
 SINGLE_TRANSACTION
 ~~~~~~~~~~~~~~~~~~
@@ -163,7 +163,7 @@ PostGIS
 -------
 
 Set in :class:`dbbackup.db.postgresql.PgDumpGisConnector`, it does the same as
-PostgreSQL but launchs ``CREATE EXTENSION IF NOT EXISTS postgis;`` before
+PostgreSQL but launches ``CREATE EXTENSION IF NOT EXISTS postgis;`` before
 restore database.
 
 PSQL_CMD

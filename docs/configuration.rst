@@ -61,7 +61,7 @@ Default: ``'%Y-%m-%d-%H%M%S'``
 DBBACKUP_HOSTNAME
 ~~~~~~~~~~~~~~~~~
 
-Used to identify a backup by a server name in their file name..
+Used to identify a backup by a server name in the file name.
 
 Default: ``socket.gethostname()``
 
@@ -120,7 +120,7 @@ Requirements:
 
 -  Install the python package python-gnupg:
    ``pip install python-gnupg``.
--  You need a GPG key. (`GPG manual`)
+-  You need a GPG key. (`GPG manual`_)
 -  Set the setting ``DBBACKUP_GPG_RECIPIENT`` to the name of the GPG key.
 
 .. _`GPG manual`: https://www.gnupg.org/gph/en/manual/c14.html

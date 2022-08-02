@@ -39,7 +39,7 @@ class SqliteConnector(BaseDBConnector):
                 sql = sql.replace("\n)", ")")
                 fileobj.write(f"{sql};\n".encode())
             else:
-                fileobj.write(f"{sql};\n")
+                fileobj.write(bytes(f"{sql};\n", encoding='utf8'))
             table_name_ident = table_name.replace('"', '""')
             res = cursor.execute(f'PRAGMA table_info("{table_name_ident}")')
             column_names = [str(table_info[1]) for table_info in res.fetchall()]

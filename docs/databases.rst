@@ -46,12 +46,12 @@ Absolute path to a connector class by default is:
 
 All supported built-in connectors are described in more detail below.
 
-Following database wrappers from `django-prometheus https://github.com/korfuri/django-prometheus`_ module are supported:
+Following database wrappers from ``django-prometheus`` module are supported:
 
-- `django_prometheus.db.backends.postgresql` for `dbbackup.db.postgresql.PgDumpBinaryConnector`
-- `django_prometheus.db.backends.sqlite3` for `dbbackup.db.sqlite.SqliteConnector`
-- `django_prometheus.db.backends.mysql` for `dbbackup.db.mysql.MysqlDumpConnector`
-- `django_prometheus.db.backends.postgis` for `dbbackup.db.postgresql.PgDumpGisConnector`
+- ``django_prometheus.db.backends.postgresql`` for ``dbbackup.db.postgresql.PgDumpBinaryConnector``
+- ``django_prometheus.db.backends.sqlite3`` for ``dbbackup.db.sqlite.SqliteConnector``
+- ``django_prometheus.db.backends.mysql`` for ``dbbackup.db.mysql.MysqlDumpConnector``
+- ``django_prometheus.db.backends.postgis`` for ``dbbackup.db.postgresql.PgDumpGisConnector``
 
 EXCLUDE
 ~~~~~~~

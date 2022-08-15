@@ -29,17 +29,16 @@ class SqliteConnector(BaseDBConnector):
     def _write_dump(self, fileobj):
         cursor = self.connection.cursor()
         cursor.execute(DUMP_TABLES)
-        for table_name, type, sql in cursor.fetchall():
+        for table_name, _, sql in cursor.fetchall():
             if table_name.startswith("sqlite_") or table_name in self.exclude:
                 continue
-            elif sql.startswith("CREATE TABLE"):
+            if sql.startswith("CREATE TABLE"):
                 sql = sql.replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS")
                 # Make SQL commands in 1 line
                 sql = sql.replace("\n    ", "")
                 sql = sql.replace("\n)", ")")
-                fileobj.write(f"{sql};\n".encode())
-            else:
-                fileobj.write(f"{sql};\n")
+            fileobj.write(f"{sql};\n".encode())
+
             table_name_ident = table_name.replace('"', '""')
             res = cursor.execute(f'PRAGMA table_info("{table_name_ident}")')
             column_names = [str(table_info[1]) for table_info in res.fetchall()]
@@ -54,7 +53,7 @@ class SqliteConnector(BaseDBConnector):
             for row in query_res:
                 fileobj.write(f"{row[0]};\n".encode())
             schema_res = cursor.execute(DUMP_ETC)
-            for name, type, sql in schema_res.fetchall():
+            for name, _, sql in schema_res.fetchall():
                 if sql.startswith("CREATE INDEX"):
                     sql = sql.replace("CREATE INDEX", "CREATE INDEX IF NOT EXISTS")
                 fileobj.write(f"{sql};\n".encode())

@@ -1,5 +1,6 @@
 from io import BytesIO
 
+from django.db import connection
 from django.test import TestCase
 from mock import mock_open, patch
 
@@ -31,6 +32,14 @@ class SqliteConnectorTest(TestCase):
         connector = SqliteConnector()
         dump = connector.create_dump()
         connector.restore_dump(dump)
+
+    def test_create_dump_with_virtual_tables(self):
+        with connection.cursor() as c:
+            c.execute("CREATE VIRTUAL TABLE lookup USING fts5(field)")
+
+        connector = SqliteConnector()
+        dump = connector.create_dump()
+        self.assertTrue(dump.read())
 
 
 @patch("dbbackup.db.sqlite.open", mock_open(read_data=b"foo"), create=True)

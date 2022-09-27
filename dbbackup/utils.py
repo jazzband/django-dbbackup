@@ -228,7 +228,9 @@ def unencrypt_file(inputfile, filename, passphrase=None):
             inputfile.seek(0)
             g = gnupg.GPG()
             result = g.decrypt_file(
-                file=inputfile, passphrase=get_passphrase(), output=temp_filename
+                fileobj_or_path=inputfile,
+                passphrase=get_passphrase(),
+                output=temp_filename,
             )
             if not result:
                 raise DecryptionError("Decryption failed; status: %s" % result.status)

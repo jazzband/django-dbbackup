@@ -6,7 +6,7 @@ pep8
 psycopg2
 pylint
 python-dotenv
-python-gnupg
+python-gnupg>=0.5.0
 pytz
 testfixtures
 tox

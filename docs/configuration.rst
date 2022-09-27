@@ -119,7 +119,7 @@ using GPG. ::
 Requirements:
 
 -  Install the python package python-gnupg:
-   ``pip install python-gnupg``.
+   ``pip install python-gnupg>=0.5.0``.
 -  You need a GPG key. (`GPG manual`_)
 -  Set the setting ``DBBACKUP_GPG_RECIPIENT`` to the name of the GPG key.
 

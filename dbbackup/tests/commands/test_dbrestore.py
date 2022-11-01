@@ -43,6 +43,7 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.interactive = True
         self.command.storage = get_storage()
         self.command.servername = HOSTNAME
+        self.command.input_database_name = None
         self.command.database_name = "default"
         self.command.connector = get_connector("default")
         HANDLED_FILES.clean()
@@ -107,12 +108,12 @@ class DbrestoreCommandGetDatabaseTest(TestCase):
         self.command = DbrestoreCommand()
 
     def test_give_db_name(self):
-        name, db = self.command._get_database({"database": "default"})
+        name, db = self.command._get_database("default")
         self.assertEqual(name, "default")
         self.assertEqual(db, settings.DATABASES["default"])
 
     def test_no_given_db(self):
-        name, db = self.command._get_database({})
+        name, db = self.command._get_database(None)
         self.assertEqual(name, "default")
         self.assertEqual(db, settings.DATABASES["default"])
 
@@ -143,6 +144,7 @@ class DbMongoRestoreCommandRestoreBackupTest(TestCase):
         self.command.storage = get_storage()
         self.command.connector = MongoDumpConnector()
         self.command.database_name = "mongo"
+        self.command.input_database_name = None
         self.command.servername = HOSTNAME
         HANDLED_FILES.clean()
         add_private_gpg()

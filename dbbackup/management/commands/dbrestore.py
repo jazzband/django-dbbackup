@@ -64,7 +64,9 @@ class Command(BaseDbBackupCommand):
             self.passphrase = options.get("passphrase")
             self.interactive = options.get("interactive")
             self.input_database_name = options.get("database")
-            self.database_name, self.database = self._get_database(self.input_database_name)
+            self.database_name, self.database = self._get_database(
+                self.input_database_name
+            )
             self.storage = get_storage()
             self._restore_backup()
         except StorageError as err:

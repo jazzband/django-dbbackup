@@ -90,7 +90,7 @@ DUMP_PREFIX and RESTORE_PREFIX
 String to include as prefix of dump or restore command. It will be added with
 a space between the launched command and its prefix.
 
-DUMP_SUFFIX and RESTORE_PREFIX
+DUMP_SUFFIX and RESTORE_SUFFIX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 String to include as suffix of dump or restore command. It will be added with

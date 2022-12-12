@@ -56,7 +56,7 @@ Other Resources
 
 .. _`GitHub repository`: https://github.com/jazzband/django-dbbackup
 .. _`PyPI project`: https://pypi.python.org/pypi/django-dbbackup/
-.. _`Read The Docs`: http://django-dbbackup.readthedocs.org/
+.. _`Read The Docs`: https://django-dbbackup.readthedocs.org/
 .. _`GitHub issues`: https://github.com/jazzband/django-dbbackup/issues
 .. _`GitHub pull requests`: https://github.com/jazzband/django-dbbackup/pulls
 .. _`Coveralls`: https://coveralls.io/github/jazzband/django-dbbackup

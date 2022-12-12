@@ -30,6 +30,6 @@ If applicable, add screenshots (errors, example of the behavior, etc.) to help e
 
 ### External tools
 
-- Python: [e.g. 3.6]
+- Python: [e.g. 3.7]
 - Django: [e.g. 2.2.0]
 - OS: [Linux, MacOS, Windows]

@@ -26,3 +26,29 @@ Example of cron job with `django-cron`_  with file system storage: ::
           management.call_command('dbbackup')
 
 .. _`django-cron`: https://github.com/Tivix/django-cron
+
+Django-crontab
+--------------
+
+Example of cron job with `django-crontab`_ with file system storage:
+
+In `settings.py`: ::
+
+  CRONTAB_COMMAND_SUFFIX = '2>&1'
+  CRONJOBS = [
+      ('0 5 * * *', 'core.backup.backup_job', '>> ' + os.path.join(CORE_DIR, 'backup/backup.log'))
+  ]
+
+In `backup.py`: ::
+
+  from datetime import datetime
+  from django.core import management
+  
+  def backup_job():
+      print("[{}] Backing up database and media files...".format(datetime.now()))
+      management.call_command('dbbackup', '--clean')
+      management.call_command('mediabackup', '--clean')
+      print("[{}] Backup done!".format(datetime.now()))
+
+
+.. _`django-crontab`: https://github.com/kraiz/django-crontab

@@ -51,4 +51,8 @@ In `backup.py`: ::
       print("[{}] Backup done!".format(datetime.now()))
 
 
+To add the cron job: ::
+
+  python manage.py crontab add
+
 .. _`django-crontab`: https://github.com/kraiz/django-crontab

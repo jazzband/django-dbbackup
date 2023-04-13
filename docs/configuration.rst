@@ -31,9 +31,9 @@ Default: ``10*1024*1024``
 DBBACKUP_CLEANUP_KEEP and DBBACKUP_CLEANUP_KEEP_MEDIA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When issuing ``dbbackup`` and ``mediabackup`` with ``--clean`` option, the 
-number of newest backup files that are kept, older ones are removed except 
-those occuring on the first day of the month.
+When issuing ``dbbackup`` and ``mediabackup`` with ``--clean <amount>`` option,
+the backup keeps this amount of the most recent files. Older files are removed, 
+except those occuring on the first day of the month. 
 
 Default: ``10`` (backups)
 

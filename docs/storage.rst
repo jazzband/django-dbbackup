@@ -205,6 +205,8 @@ Setup your Django project
     DBBACKUP_STORAGE = 'storages.backends.dropbox.DropBoxStorage'
     DBBACKUP_STORAGE_OPTIONS = {
         'oauth2_access_token': 'my_token',
+        'app_key': 'my_key',
+        'app_secret': 'my_secret',
     }
 
 Available settings

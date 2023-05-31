@@ -8,6 +8,7 @@ from dbbackup.tests.utils import HANDLED_FILES, FakeStorage
 DEFAULT_STORAGE_PATH = "django.core.files.storage.FileSystemStorage"
 STORAGE_OPTIONS = {"location": "/tmp"}
 
+
 class Get_StorageTest(TestCase):
     @patch("dbbackup.settings.STORAGE", DEFAULT_STORAGE_PATH)
     @patch("dbbackup.settings.STORAGE_OPTIONS", STORAGE_OPTIONS)
@@ -25,7 +26,7 @@ class Get_StorageTest(TestCase):
         self.assertIn(
             storage.storage.__module__,
             # TODO: Remove "django.core.files.storage" case when dropping support for Django < 4.2.
-            ("django.core.files.storage", "django.core.files.storage.filesystem")
+            ("django.core.files.storage", "django.core.files.storage.filesystem"),
         )
 
 

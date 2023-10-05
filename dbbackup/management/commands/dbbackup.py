@@ -80,7 +80,7 @@ class Command(BaseDbBackupCommand):
         self.storage = get_storage()
 
         self.database = options.get("database") or ""
-        database_keys = self.database.split(",") or settings.DATABASES
+        database_keys = self.database.split(",") if self.database else settings.DATABASES
 
         for database_key in database_keys:
             self.connector = get_connector(database_key)

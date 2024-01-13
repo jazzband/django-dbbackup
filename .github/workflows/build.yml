@@ -24,7 +24,10 @@ jobs:
                   python -m pip install --upgrade pip
                   python -m pip install -r requirements/tests.txt
                   python -m pip install -r requirements.txt
-            - name: Linting
+            # TODO: Remove this conditional when Python 3.7 is dropped and Flake8 executes on
+            # all Python versions in matrix.
+            - if: matrix.python-version == '3.8'
+              name: Linting
               run: flake8
             # Environments are selected using tox-gh-actions configuration in tox.ini.
             - name: Test with tox

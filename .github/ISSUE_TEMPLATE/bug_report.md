@@ -26,10 +26,10 @@ If applicable, add screenshots (errors, example of the behavior, etc.) to help e
 ## Versions
 
 ### Django-dbbackup
-- pypi: [e.g. 3.3.0]
+- pypi: [e.g. 4.1.0]
 
 ### External tools
 
-- Python: [e.g. 3.7]
-- Django: [e.g. 2.2.0]
+- Python: [e.g. 3.8]
+- Django: [e.g. 4.2.0]
 - OS: [Linux, MacOS, Windows]

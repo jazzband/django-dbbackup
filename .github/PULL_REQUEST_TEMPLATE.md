@@ -1,15 +1,14 @@
-# Type of PR (feature, enhancement, bug fix, etc.)
-
 ## Description
 
-Please include a summary of the change and which issue is fixed.
+A summary of the changes.
 
-Fixes # (issue)
+## Checklist:
 
-## Why should this be added
+Please update this checklist as you complete each item:
 
-Explain value.
+-   [ ] Tests have been developed for bug fixes or new functionality.
+-   [ ] The changelog has been updated, if necessary.
+-   [ ] Documentation has been updated, if necessary.
+-   [ ] GitHub Issues closed by this PR have been linked.
 
-## Checklist
-
-- [ ] Documentation has been added or amended for this feature / update
+<sub>By submitting this pull request you agree that all contributions comply with this project's open source license(s).</sub>

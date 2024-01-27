@@ -282,6 +282,7 @@ def uncompress_file(inputfile, filename):
     """
     zipfile = gzip.GzipFile(fileobj=inputfile, mode="rb")
     try:
+        inputfile.seek(0)
         outputfile = create_spooled_temporary_file(fileobj=zipfile)
     finally:
         zipfile.close()

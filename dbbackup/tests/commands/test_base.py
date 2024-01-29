@@ -1,6 +1,7 @@
 """
 Tests for base command class.
 """
+
 import logging
 import os
 from io import BytesIO

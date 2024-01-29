@@ -20,7 +20,7 @@ from django.http import HttpRequest
 from django.utils import timezone
 
 try:
-    from pipes import quote
+    from shlex import quote
 except ImportError:
     from shlex import quote
 

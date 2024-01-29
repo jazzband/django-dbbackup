@@ -63,15 +63,17 @@ class Command(BaseDbBackupCommand):
             self.uncompress = options.get("uncompress")
             self.passphrase = options.get("passphrase")
             self.interactive = options.get("interactive")
-            self.database_name, self.database = self._get_database(options)
+            self.input_database_name = options.get("database")
+            self.database_name, self.database = self._get_database(
+                self.input_database_name
+            )
             self.storage = get_storage()
             self._restore_backup()
         except StorageError as err:
             raise CommandError(err) from err
 
-    def _get_database(self, options):
+    def _get_database(self, database_name: str):
         """Get the database to restore."""
-        database_name = options.get("database")
         if not database_name:
             if len(settings.DATABASES) > 1:
                 errmsg = (
@@ -87,7 +89,7 @@ class Command(BaseDbBackupCommand):
     def _restore_backup(self):
         """Restore the specified database."""
         input_filename, input_file = self._get_backup_file(
-            database=self.database_name, servername=self.servername
+            database=self.input_database_name, servername=self.servername
         )
         self.logger.info(
             "Restoring backup for database '%s' and server '%s'",

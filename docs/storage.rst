@@ -281,7 +281,7 @@ This backend is from Django-Storages with the `paramiko`_ backend. ::
 
     pip install paramiko django-storages
 
-.. _`paramiko`: http://www.paramiko.org/
+.. _`paramiko`: https://www.paramiko.org/
 
 The following configuration grants SSH server access to the local user: ::
 
@@ -289,7 +289,7 @@ The following configuration grants SSH server access to the local user: ::
     DBBACKUP_STORAGE_OPTIONS = {'host': 'myserver'}
 
 
-.. _`paramiko SSHClient.connect() documentation`: http://docs.paramiko.org/en/latest/api/client.html#paramiko.client.SSHClient.connect
+.. _`paramiko SSHClient.connect() documentation`: https://docs.paramiko.org/en/latest/api/client.html#paramiko.client.SSHClient.connect
 
 Available settings
 ~~~~~~~~~~~~~~~~~~

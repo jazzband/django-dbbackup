@@ -37,7 +37,7 @@ the backup keeps this amount of most recent files. Older files are removed.
 Default: ``10`` (backups)
 
 
-DBBACKUP_CLEANUP_FILTER
+DBBACKUP_CLEANUP_KEEP_FILTER
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 A callable that takes a filename (of an old backup, to be cleaned) and returns

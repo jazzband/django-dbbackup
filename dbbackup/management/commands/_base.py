@@ -1,6 +1,7 @@
 """
 Abstract Command.
 """
+
 import logging
 import sys
 from optparse import make_option as optparse_make_option

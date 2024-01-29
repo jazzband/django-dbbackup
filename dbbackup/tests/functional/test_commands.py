@@ -102,6 +102,8 @@ class DbRestoreCommandTest(TestCase):
         self.instance.delete()
         # Restore
         execute_from_command_line(["", "dbrestore", "--uncompress"])
+        restored = models.CharModel.objects.all().exists()
+        self.assertTrue(restored)
 
     def test_no_backup_available(self, *args):
         with self.assertRaises(SystemExit):
@@ -130,6 +132,16 @@ class DbRestoreCommandTest(TestCase):
             execute_from_command_line(["", "dbrestore", "--database", "foo"])
         # Restore
         execute_from_command_line(["", "dbrestore", "--database", "default"])
+
+    @patch("dbbackup.utils.getpass", return_value=None)
+    def test_compressed_and_encrypted(self, *args):
+        # Create backup
+        execute_from_command_line(["", "dbbackup", "--compress", "--encrypt"])
+        self.instance.delete()
+        # Restore
+        execute_from_command_line(["", "dbrestore", "--uncompress", "--decrypt"])
+        restored = models.CharModel.objects.all().exists()
+        self.assertTrue(restored)
 
 
 class MediaBackupCommandTest(TestCase):

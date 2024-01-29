@@ -37,7 +37,7 @@ number of old backup files that are looked for and removed.
 Default: ``10`` (backups)
 
 
-DBBACKUP_CLEANUP_FILTER
+DBBACKUP_CLEANUP_KEEP_FILTER
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 A callable that takes a filename (of an old backup, to be cleaned) and returns

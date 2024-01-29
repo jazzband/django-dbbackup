@@ -4,7 +4,7 @@ Changelog
 Unreleased
 ----------
 
-* Nothing (yet)!
+* Fix restore of database from S3 storage by reintroducing inputfile.seek(0) to utils.uncompress_file
 
 4.1.0 (2024-01-14)
 ------------------

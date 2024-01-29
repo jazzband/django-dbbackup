@@ -23,7 +23,11 @@ class Get_StorageTest(TestCase):
     @patch("dbbackup.settings.STORAGE", DEFAULT_STORAGE_PATH)
     def test_set_options(self, *args):
         storage = get_storage(options=STORAGE_OPTIONS)
-        self.assertEqual(storage.storage.__module__, "django.core.files.storage")
+        self.assertIn(
+            storage.storage.__module__,
+            # TODO: Remove "django.core.files.storage" case when dropping support for Django < 4.2.
+            ("django.core.files.storage", "django.core.files.storage.filesystem"),
+        )
 
 
 class StorageTest(TestCase):

@@ -1,5 +1,5 @@
 build
 setuptools
-tox
+tox>=4.0.0
 twine
 wheel

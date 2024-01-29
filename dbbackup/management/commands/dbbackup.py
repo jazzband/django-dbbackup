@@ -11,7 +11,7 @@ from ._base import BaseDbBackupCommand, make_option
 
 
 class Command(BaseDbBackupCommand):
-    help = "Backup a database, encrypt and/or compress and write to " "storage." ""
+    help = "Backup a database, encrypt and/or compress and write to 'storage.'"
     content_type = "db"
 
     option_list = BaseDbBackupCommand.option_list + (
@@ -49,7 +49,10 @@ class Command(BaseDbBackupCommand):
             help="Encrypt the backup files",
         ),
         make_option(
-            "-o", "--output-filename", default=None, help="Specify filename on storage"
+            "-o",
+            "--output-filename",
+            default=None,
+            help="Specify filename on storage",
         ),
         make_option(
             "-O",
@@ -58,7 +61,17 @@ class Command(BaseDbBackupCommand):
             help="Specify where to store on local filesystem",
         ),
         make_option(
-            "-x", "--exclude-tables", default=None, help="Exclude tables from backup"
+            "-x",
+            "--exclude-tables",
+            default=None,
+            help="Exclude tables from backup",
+        ),
+        make_option(
+            "-n",
+            "--schema",
+            action="append",
+            default=[],
+            help="Specify schema(s) to backup. Can be used multiple times.",
         ),
     )
 
@@ -78,6 +91,7 @@ class Command(BaseDbBackupCommand):
         self.path = options.get("output_path")
         self.exclude_tables = options.get("exclude_tables")
         self.storage = get_storage()
+        self.schemas = options.get("schema")
 
         self.database = options.get("database") or ""
         database_keys = self.database.split(",") or settings.DATABASES
@@ -100,23 +114,33 @@ class Command(BaseDbBackupCommand):
         """
         Save a new backup file.
         """
-        self.logger.info("Backing Up Database: %s", database["NAME"])
-        # Get backup and name
+        self.logger.info(f"Backing Up Database: {database['NAME']}")
+        # Get backup, schema and name
         filename = self.connector.generate_filename(self.servername)
+
+        if self.schemas:
+            self.connector.schemas = self.schemas
+
         outputfile = self.connector.create_dump()
+
         # Apply trans
         if self.compress:
             compressed_file, filename = utils.compress_file(outputfile, filename)
             outputfile = compressed_file
+
         if self.encrypt:
             encrypted_file, filename = utils.encrypt_file(outputfile, filename)
             outputfile = encrypted_file
+
         # Set file name
         filename = self.filename or filename
-        self.logger.debug("Backup size: %s", utils.handle_size(outputfile))
+        self.logger.info(f"Backup tempfile created: {utils.handle_size(outputfile)}")
+
         # Store backup
         outputfile.seek(0)
+
         if self.path is None:
             self.write_to_storage(outputfile, filename)
+
         else:
             self.write_local_file(outputfile, self.path)

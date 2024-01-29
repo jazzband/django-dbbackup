@@ -13,15 +13,24 @@ from ._base import BaseDbBackupCommand, make_option
 
 
 class Command(BaseDbBackupCommand):
-    help = """Restore a database backup from storage, encrypted and/or
-    compressed."""
+    help = "Restore a database backup from storage, encrypted and/or compressed."
     content_type = "db"
 
     option_list = BaseDbBackupCommand.option_list + (
-        make_option("-d", "--database", help="Database to restore"),
-        make_option("-i", "--input-filename", help="Specify filename to backup from"),
         make_option(
-            "-I", "--input-path", help="Specify path on local filesystem to backup from"
+            "-d",
+            "--database",
+            help="Database to restore",
+        ),
+        make_option(
+            "-i",
+            "--input-filename",
+            help="Specify filename to backup from",
+        ),
+        make_option(
+            "-I",
+            "--input-path",
+            help="Specify path on local filesystem to backup from",
         ),
         make_option(
             "-s",
@@ -46,6 +55,13 @@ class Command(BaseDbBackupCommand):
             default=False,
             help="Uncompress gzip data before restoring",
         ),
+        make_option(
+            "-n",
+            "--schema",
+            action="append",
+            default=[],
+            help="Specify schema(s) to restore. Can be used multiple times.",
+        ),
     )
 
     def handle(self, *args, **options):
@@ -68,6 +84,7 @@ class Command(BaseDbBackupCommand):
                 self.input_database_name
             )
             self.storage = get_storage()
+            self.schemas = options.get("schema")
             self._restore_backup()
         except StorageError as err:
             raise CommandError(err) from err
@@ -91,11 +108,14 @@ class Command(BaseDbBackupCommand):
         input_filename, input_file = self._get_backup_file(
             database=self.input_database_name, servername=self.servername
         )
+
         self.logger.info(
-            "Restoring backup for database '%s' and server '%s'",
-            self.database_name,
-            self.servername,
+            f"Restoring backup for database '{self.database_name}' and server '{self.servername}'"
         )
+
+        if self.schemas:
+            self.logger.info(f"Restoring schemas: {self.schemas}")
+
         self.logger.info(f"Restoring: {input_filename}")
 
         if self.decrypt:
@@ -111,10 +131,14 @@ class Command(BaseDbBackupCommand):
             input_file.close()
             input_file = uncompressed_file
 
-        self.logger.info("Restore tempfile created: %s", utils.handle_size(input_file))
+        self.logger.info(f"Restore tempfile created: {utils.handle_size(input_file)}")
         if self.interactive:
             self._ask_confirmation()
 
         input_file.seek(0)
         self.connector = get_connector(self.database_name)
+
+        if self.schemas:
+            self.connector.schemas = self.schemas
+
         self.connector.restore_dump(input_file)

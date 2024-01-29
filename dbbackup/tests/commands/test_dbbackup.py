@@ -2,9 +2,9 @@
 Tests for dbbackup command.
 """
 import os
+from unittest.mock import patch
 
 from django.test import TestCase
-from mock import patch
 
 from dbbackup.db.base import get_connector
 from dbbackup.management.commands.dbbackup import Command as DbbackupCommand
@@ -26,6 +26,7 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         self.command.stdout = DEV_NULL
         self.command.filename = None
         self.command.path = None
+        self.command.schemas = []
 
     def tearDown(self):
         clean_gpg_keys()
@@ -49,6 +50,12 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         # tearDown
         os.remove(self.command.path)
 
+    def test_schema(self):
+        self.command.schemas = ["public"]
+        result = self.command._save_new_backup(TEST_DATABASE)
+
+        self.assertIsNone(result)
+
 
 @patch("dbbackup.settings.GPG_RECIPIENT", "test@test")
 @patch("sys.stdout", DEV_NULL)
@@ -65,6 +72,7 @@ class DbbackupCommandSaveNewMongoBackupTest(TestCase):
         self.command.filename = None
         self.command.path = None
         self.command.connector = get_connector("default")
+        self.command.schemas = []
 
     def tearDown(self):
         clean_gpg_keys()

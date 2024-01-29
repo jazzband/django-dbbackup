@@ -198,6 +198,15 @@ ADMIN_PASSWORD
 Password used for launch action with privileges, extension creation for
 example.
 
+SCHEMAS
+~~~~~~~
+
+Schemas to specify when dumping database.
+Dump only schemas matching pattern; this selects both the schema itself, and all its contained objects.
+When this option is not specified, all non-system schemas in the target database will be dumped.
+Multiple schemas can be selected.
+This option only available for postgresql connectors.
+
 MongoDB
 -------
 

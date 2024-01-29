@@ -3,12 +3,12 @@ Tests for dbrestore command.
 """
 from shutil import copyfileobj
 from tempfile import mktemp
+from unittest.mock import patch
 
 from django.conf import settings
 from django.core.files import File
 from django.core.management.base import CommandError
 from django.test import TestCase
-from mock import patch
 
 from dbbackup import utils
 from dbbackup.db.base import get_connector
@@ -46,6 +46,8 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.input_database_name = None
         self.command.database_name = "default"
         self.command.connector = get_connector("default")
+        self.command.schemas = []
+        self.command.no_owner = False
         HANDLED_FILES.clean()
 
     def tearDown(self):
@@ -146,6 +148,8 @@ class DbMongoRestoreCommandRestoreBackupTest(TestCase):
         self.command.database_name = "mongo"
         self.command.input_database_name = None
         self.command.servername = HOSTNAME
+        self.command.schemas = []
+        self.command.no_owner = False
         HANDLED_FILES.clean()
         add_private_gpg()
 

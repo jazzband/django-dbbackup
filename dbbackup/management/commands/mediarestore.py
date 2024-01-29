@@ -1,6 +1,7 @@
 """
 Restore media files.
 """
+
 import tarfile
 
 from django.core.files.storage import get_storage_class

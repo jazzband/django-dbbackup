@@ -80,11 +80,8 @@ class Command(BaseDbBackupCommand):
         self.storage = get_storage()
 
         self.database = options.get("database") or ""
-        database_keys = (
-            self.database.split(",") if self.database else settings.DATABASES
-        )
 
-        for database_key in database_keys:
+        for database_key in self._get_database_keys():
             self.connector = get_connector(database_key)
             if self.connector and self.exclude_tables:
                 self.connector.exclude.extend(
@@ -97,6 +94,9 @@ class Command(BaseDbBackupCommand):
                     self._cleanup_old_backups(database=database_key)
             except StorageError as err:
                 raise CommandError(err) from err
+
+    def _get_database_keys(self):
+        return self.database.split(",") if self.database else settings.DATABASES
 
     def _save_new_backup(self, database):
         """

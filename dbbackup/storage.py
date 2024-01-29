@@ -34,7 +34,6 @@ def get_storage(path=None, options=None):
     return Storage(path, **options)
 
 
-
 def get_media_storage():
     """
     Get the configured media storage.

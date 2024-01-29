@@ -102,6 +102,8 @@ class DbRestoreCommandTest(TestCase):
         self.instance.delete()
         # Restore
         execute_from_command_line(["", "dbrestore", "--uncompress"])
+        restored = models.CharModel.objects.all().exists()
+        self.assertTrue(restored)
 
     def test_no_backup_available(self, *args):
         with self.assertRaises(SystemExit):

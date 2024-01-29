@@ -31,8 +31,8 @@ Default: ``10*1024*1024``
 DBBACKUP_CLEANUP_KEEP and DBBACKUP_CLEANUP_KEEP_MEDIA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When issuing ``dbbackup`` and ``mediabackup`` with ``--clean`` option, the
-number of old backup files that are looked for and removed.
+When issuing ``dbbackup`` and ``mediabackup`` with ``--clean <amount>`` option,
+the backup keeps this amount of most recent files. Older files are removed. 
 
 Default: ``10`` (backups)
 

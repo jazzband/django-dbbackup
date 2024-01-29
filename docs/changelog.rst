@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+* reintroduced inputfile.seek(0) to utils.uncompress_file `#503`_
+
+
 4.0.0b0 (2021-12-19)
 --------------------
 

@@ -5,11 +5,10 @@ Save media files.
 import os
 import tarfile
 
-from django.core.files.storage import storages
 from django.core.management.base import CommandError
 
 from ... import utils
-from ...storage import StorageError, get_storage
+from ...storage import StorageError, get_media_storage, get_storage
 from ._base import BaseDbBackupCommand, make_option
 
 
@@ -69,7 +68,7 @@ class Command(BaseDbBackupCommand):
         self.filename = options.get("output_filename")
         self.path = options.get("output_path")
         try:
-            self.media_storage = storages['default']
+            self.media_storage = get_media_storage()
             self.storage = get_storage()
             self.backup_mediafiles()
             if options.get("clean"):

@@ -49,10 +49,7 @@ class Command(BaseDbBackupCommand):
             help="Encrypt the backup files",
         ),
         make_option(
-            "-o",
-            "--output-filename",
-            default=None,
-            help="Specify filename on storage",
+            "-o", "--output-filename", default=None, help="Specify filename on storage"
         ),
         make_option(
             "-O",
@@ -61,10 +58,7 @@ class Command(BaseDbBackupCommand):
             help="Specify where to store on local filesystem",
         ),
         make_option(
-            "-x",
-            "--exclude-tables",
-            default=None,
-            help="Exclude tables from backup",
+            "-x", "--exclude-tables", default=None, help="Exclude tables from backup"
         ),
         make_option(
             "-n",

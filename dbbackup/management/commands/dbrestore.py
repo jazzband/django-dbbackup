@@ -17,20 +17,10 @@ class Command(BaseDbBackupCommand):
     content_type = "db"
 
     option_list = BaseDbBackupCommand.option_list + (
+        make_option("-d", "--database", help="Database to restore"),
+        make_option("-i", "--input-filename", help="Specify filename to backup from"),
         make_option(
-            "-d",
-            "--database",
-            help="Database to restore",
-        ),
-        make_option(
-            "-i",
-            "--input-filename",
-            help="Specify filename to backup from",
-        ),
-        make_option(
-            "-I",
-            "--input-path",
-            help="Specify path on local filesystem to backup from",
+            "-I", "--input-path", help="Specify path on local filesystem to backup from"
         ),
         make_option(
             "-s",

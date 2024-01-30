@@ -1,6 +1,7 @@
 """
 Configuration and launcher for dbbackup tests.
 """
+
 import os
 import sys
 import tempfile

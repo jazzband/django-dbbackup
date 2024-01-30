@@ -1,6 +1,7 @@
 """
 Abstract Command.
 """
+
 import logging
 import sys
 from optparse import make_option as optparse_make_option
@@ -133,7 +134,7 @@ class BaseDbBackupCommand(BaseCommand):
     def _cleanup_old_backups(self, database=None, servername=None):
         """
         Cleanup old backups, keeping the number of backups specified by
-        DBBACKUP_CLEANUP_KEEP and any backups that occur on first of the month.
+        DBBACKUP_CLEANUP_KEEP.
         """
         self.storage.clean_old_backups(
             encrypted=self.encrypt,

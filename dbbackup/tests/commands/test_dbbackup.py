@@ -1,6 +1,7 @@
 """
 Tests for dbbackup command.
 """
+
 import os
 from unittest.mock import patch
 
@@ -55,6 +56,16 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         result = self.command._save_new_backup(TEST_DATABASE)
 
         self.assertIsNone(result)
+        
+    @patch("dbbackup.settings.DATABASES", ["db-from-settings"])
+    def test_get_database_keys(self):
+        with self.subTest("use --database from CLI"):
+            self.command.database = "db-from-cli"
+            self.assertEqual(self.command._get_database_keys(), ["db-from-cli"])
+
+        with self.subTest("fallback to DBBACKUP_DATABASES"):
+            self.command.database = ""
+            self.assertEqual(self.command._get_database_keys(), ["db-from-settings"])
 
 
 @patch("dbbackup.settings.GPG_RECIPIENT", "test@test")

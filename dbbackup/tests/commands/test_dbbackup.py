@@ -50,6 +50,16 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         # tearDown
         os.remove(self.command.path)
 
+    @patch("dbbackup.settings.DATABASES", ["db-from-settings"])
+    def test_get_database_keys(self):
+        with self.subTest("use --database from CLI"):
+            self.command.database = "db-from-cli"
+            self.assertEqual(self.command._get_database_keys(), ["db-from-cli"])
+
+        with self.subTest("fallback to DBBACKUP_DATABASES"):
+            self.command.database = ""
+            self.assertEqual(self.command._get_database_keys(), ["db-from-settings"])
+
 
 @patch("dbbackup.settings.GPG_RECIPIENT", "test@test")
 @patch("sys.stdout", DEV_NULL)

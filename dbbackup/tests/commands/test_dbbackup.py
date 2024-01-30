@@ -56,7 +56,7 @@ class DbbackupCommandSaveNewBackupTest(TestCase):
         result = self.command._save_new_backup(TEST_DATABASE)
 
         self.assertIsNone(result)
-        
+
     @patch("dbbackup.settings.DATABASES", ["db-from-settings"])
     def test_get_database_keys(self):
         with self.subTest("use --database from CLI"):

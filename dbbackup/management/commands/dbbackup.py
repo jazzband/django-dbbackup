@@ -11,7 +11,7 @@ from ._base import BaseDbBackupCommand, make_option
 
 
 class Command(BaseDbBackupCommand):
-    help = "Backup a database, encrypt and/or compress and write to 'storage.'"
+    help = "Backup a database, encrypt and/or compress."
     content_type = "db"
 
     option_list = BaseDbBackupCommand.option_list + (
@@ -110,7 +110,7 @@ class Command(BaseDbBackupCommand):
         """
         Save a new backup file.
         """
-        self.logger.info(f"Backing Up Database: {database['NAME']}")
+        self.logger.info("Backing Up Database: %s", database["NAME"])
         # Get backup, schema and name
         filename = self.connector.generate_filename(self.servername)
 
@@ -130,7 +130,7 @@ class Command(BaseDbBackupCommand):
 
         # Set file name
         filename = self.filename or filename
-        self.logger.info(f"Backup tempfile created: {utils.handle_size(outputfile)}")
+        self.logger.info("Backup tempfile created: %s", utils.handle_size(outputfile))
 
         # Store backup
         outputfile.seek(0)

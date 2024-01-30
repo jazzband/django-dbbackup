@@ -100,7 +100,9 @@ class Command(BaseDbBackupCommand):
         )
 
         self.logger.info(
-            f"Restoring backup for database '{self.database_name}' and server '{self.servername}'"
+            "Restoring backup for database '%s' and server '%s'",
+            self.database_name,
+            self.servername,
         )
 
         if self.schemas:
@@ -121,7 +123,7 @@ class Command(BaseDbBackupCommand):
             input_file.close()
             input_file = uncompressed_file
 
-        self.logger.info(f"Restore tempfile created: {utils.handle_size(input_file)}")
+        self.logger.info("Restore tempfile created: %s", utils.handle_size(input_file))
         if self.interactive:
             self._ask_confirmation()
 

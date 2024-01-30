@@ -22,7 +22,7 @@ def create_postgres_uri(self):
     else:
         host = "@" + host
 
-    port = f":{self.settings.get('PORT')}" if self.settings.get("PORT") else ""
+    port = ":{}".format(self.settings.get("PORT")) if self.settings.get("PORT") else ""
     dbname = f"--dbname=postgresql://{user}{password}{host}{port}/{dbname}"
     return dbname
 
@@ -72,7 +72,7 @@ class PgDumpConnector(BaseCommandDBConnector):
         if self.single_transaction:
             cmd += " --single-transaction"
 
-        cmd += f" {self.settings['NAME']}"
+        cmd += " {}".format(self.settings["NAME"])
         cmd = f"{self.restore_prefix} {cmd} {self.restore_suffix}"
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr
@@ -88,14 +88,14 @@ class PgDumpGisConnector(PgDumpConnector):
 
     def _enable_postgis(self):
         cmd = f'{self.psql_cmd} -c "CREATE EXTENSION IF NOT EXISTS postgis;"'
-        cmd += f" --username={self.settings['ADMIN_USER']}"
+        cmd += " --username={}".format(self.settings["ADMIN_USER"])
         cmd += " --no-password"
 
         if self.settings.get("HOST"):
-            cmd += f" --host={self.settings['HOST']}"
+            cmd += " --host={}".format(self.settings["HOST"])
 
         if self.settings.get("PORT"):
-            cmd += f" --port={self.settings['PORT']}"
+            cmd += " --port={}".format(self.settings["PORT"])
 
         return self.run_command(cmd)
 

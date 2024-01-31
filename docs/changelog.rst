@@ -4,12 +4,9 @@ Changelog
 Unreleased
 ----------
 
+* Add PostgreSQL Schema support by @angryfoxx in https://github.com/jazzband/django-dbbackup/pull/507
 * Fix restore of database from S3 storage by reintroducing inputfile.seek(0) to utils.uncompress_file
 * Fix bug where dbbackup management command would not respect settings.py:DBBACKUP_DATABASES
-
-4.2.0 (2022-01-30)
-------------------
-* Add PostgreSQL Schema support by @angryfoxx in https://github.com/jazzband/django-dbbackup/pull/507
 
 4.1.0 (2024-01-14)
 ------------------

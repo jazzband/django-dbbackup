@@ -130,7 +130,7 @@ class Command(BaseDbBackupCommand):
 
         # Set file name
         filename = self.filename or filename
-        self.logger.info("Backup tempfile created: %s", utils.handle_size(outputfile))
+        self.logger.debug("Backup size: %s", utils.handle_size(outputfile))
 
         # Store backup
         outputfile.seek(0)

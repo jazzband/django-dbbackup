@@ -10,7 +10,6 @@ from django.conf import settings
 from django.core.files import File
 from django.core.management.base import CommandError
 from django.test import TestCase
-from testfixtures import log_capture
 
 from dbbackup import utils
 from dbbackup.db.base import get_connector
@@ -106,10 +105,9 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         HANDLED_FILES["written_files"].append((self.command.filepath, get_dump()))
         self.command._restore_backup()
 
-    @log_capture()
     @patch("dbbackup.management.commands.dbrestore.get_connector")
     @patch("dbbackup.db.base.BaseDBConnector.restore_dump")
-    def test_schema(self, mock_restore_dump, mock_get_connector, captures, *args):
+    def test_schema(self, mock_restore_dump, mock_get_connector, *args):
         """Schema is only used for postgresql."""
         mock_get_connector.return_value = PgDumpConnector()
         mock_restore_dump.return_value = True

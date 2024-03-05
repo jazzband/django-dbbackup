@@ -100,6 +100,7 @@ class PgDumpBinaryConnector(PgDumpConnector):
     restore_cmd = "pg_restore"
     single_transaction = True
     drop = True
+    if_exists = False
 
     def _create_dump(self):
         cmd = f"{self.dump_cmd} "
@@ -120,6 +121,8 @@ class PgDumpBinaryConnector(PgDumpConnector):
             cmd += " --single-transaction"
         if self.drop:
             cmd += " --clean"
+        if self.if_exists:
+            cmd += " --if-exists"
         cmd = f"{self.restore_prefix} {cmd} {self.restore_suffix}"
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr

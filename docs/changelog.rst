@@ -6,6 +6,7 @@ Unreleased
 
 * Fix restore of database from S3 storage by reintroducing inputfile.seek(0) to utils.uncompress_file
 * Fix bug where dbbackup management command would not respect settings.py:DBBACKUP_DATABASES
+* Add option `--if-exists` for pg_dump command
 
 4.1.0 (2024-01-14)
 ------------------

@@ -38,11 +38,11 @@ repos:
           - id: isort
             args: ["--profile", "black"]
     - repo: https://github.com/psf/black
-      rev: "24.1.1"
+      rev: "24.2.0"
       hooks:
           - id: black
     - repo: https://github.com/asottile/pyupgrade
-      rev: "v3.15.0"
+      rev: "v3.15.1"
       hooks:
           - id: pyupgrade
             args: ["--py37-plus", "--keep-mock"]
@@ -61,6 +61,6 @@ repos:
           - id: rst-linter
             files: ^[^/]+[.]rst$
     - repo: https://github.com/adrienverge/yamllint
-      rev: "v1.33.0"
+      rev: "v1.35.1"
       hooks:
           - id: yamllint

@@ -13,8 +13,7 @@ from ._base import BaseDbBackupCommand, make_option
 
 
 class Command(BaseDbBackupCommand):
-    help = """Restore a database backup from storage, encrypted and/or
-    compressed."""
+    help = "Restore a database backup from storage, encrypted and/or compressed."
     content_type = "db"
 
     option_list = BaseDbBackupCommand.option_list + (
@@ -46,6 +45,13 @@ class Command(BaseDbBackupCommand):
             default=False,
             help="Uncompress gzip data before restoring",
         ),
+        make_option(
+            "-n",
+            "--schema",
+            action="append",
+            default=[],
+            help="Specify schema(s) to restore. Can be used multiple times.",
+        ),
     )
 
     def handle(self, *args, **options):
@@ -68,6 +74,7 @@ class Command(BaseDbBackupCommand):
                 self.input_database_name
             )
             self.storage = get_storage()
+            self.schemas = options.get("schema")
             self._restore_backup()
         except StorageError as err:
             raise CommandError(err) from err
@@ -91,11 +98,16 @@ class Command(BaseDbBackupCommand):
         input_filename, input_file = self._get_backup_file(
             database=self.input_database_name, servername=self.servername
         )
+
         self.logger.info(
             "Restoring backup for database '%s' and server '%s'",
             self.database_name,
             self.servername,
         )
+
+        if self.schemas:
+            self.logger.info(f"Restoring schemas: {self.schemas}")
+
         self.logger.info(f"Restoring: {input_filename}")
 
         if self.decrypt:
@@ -117,4 +129,8 @@ class Command(BaseDbBackupCommand):
 
         input_file.seek(0)
         self.connector = get_connector(self.database_name)
+
+        if self.schemas:
+            self.connector.schemas = self.schemas
+
         self.connector.restore_dump(input_file)

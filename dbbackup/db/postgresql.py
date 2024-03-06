@@ -1,4 +1,5 @@
 import logging
+from typing import List, Optional
 from urllib.parse import quote
 
 from .base import BaseCommandDBConnector
@@ -37,6 +38,7 @@ class PgDumpConnector(BaseCommandDBConnector):
     restore_cmd = "psql"
     single_transaction = True
     drop = True
+    schemas: Optional[List[str]] = []
 
     def _create_dump(self):
         cmd = f"{self.dump_cmd} "
@@ -44,8 +46,14 @@ class PgDumpConnector(BaseCommandDBConnector):
 
         for table in self.exclude:
             cmd += f" --exclude-table-data={table}"
+
         if self.drop:
             cmd += " --clean"
+
+        if self.schemas:
+            # First schema is not prefixed with -n
+            # when using join function so add it manually.
+            cmd += " -n " + " -n ".join(self.schemas)
 
         cmd = f"{self.dump_prefix} {cmd} {self.dump_suffix}"
         stdout, stderr = self.run_command(cmd, env=self.dump_env)
@@ -57,8 +65,13 @@ class PgDumpConnector(BaseCommandDBConnector):
 
         # without this, psql terminates with an exit value of 0 regardless of errors
         cmd += " --set ON_ERROR_STOP=on"
+
+        if self.schemas:
+            cmd += " -n " + " -n ".join(self.schemas)
+
         if self.single_transaction:
             cmd += " --single-transaction"
+
         cmd += " {}".format(self.settings["NAME"])
         cmd = f"{self.restore_prefix} {cmd} {self.restore_suffix}"
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
@@ -77,10 +90,13 @@ class PgDumpGisConnector(PgDumpConnector):
         cmd = f'{self.psql_cmd} -c "CREATE EXTENSION IF NOT EXISTS postgis;"'
         cmd += " --username={}".format(self.settings["ADMIN_USER"])
         cmd += " --no-password"
+
         if self.settings.get("HOST"):
             cmd += " --host={}".format(self.settings["HOST"])
+
         if self.settings.get("PORT"):
             cmd += " --port={}".format(self.settings["PORT"])
+
         return self.run_command(cmd)
 
     def _restore_dump(self, dump):
@@ -108,8 +124,12 @@ class PgDumpBinaryConnector(PgDumpConnector):
         cmd += " --format=custom"
         for table in self.exclude:
             cmd += f" --exclude-table-data={table}"
+
+        if self.schemas:
+            cmd += " -n " + " -n ".join(self.schemas)
+
         cmd = f"{self.dump_prefix} {cmd} {self.dump_suffix}"
-        stdout, stderr = self.run_command(cmd, env=self.dump_env)
+        stdout, _ = self.run_command(cmd, env=self.dump_env)
         return stdout
 
     def _restore_dump(self, dump):
@@ -118,8 +138,13 @@ class PgDumpBinaryConnector(PgDumpConnector):
 
         if self.single_transaction:
             cmd += " --single-transaction"
+
         if self.drop:
             cmd += " --clean"
+
+        if self.schemas:
+            cmd += " -n " + " -n ".join(self.schemas)
+
         cmd = f"{self.restore_prefix} {cmd} {self.restore_suffix}"
         stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
         return stdout, stderr

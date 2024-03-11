@@ -116,12 +116,16 @@ class Command(BaseDbBackupCommand):
             )
             input_file.close()
             input_file = unencrypted_file
+            input_file.seek(0)
         if self.uncompress:
             uncompressed_file, input_filename = utils.uncompress_file(
                 input_file, input_filename
             )
             input_file.close()
             input_file = uncompressed_file
+        if not self.decrypt and not self.uncompress:
+            tmp_file = utils.create_spooled_temporary_file(fileobj=input_file)
+            input_file = tmp_file
 
         self.logger.info("Restore tempfile created: %s", utils.handle_size(input_file))
         if self.interactive:

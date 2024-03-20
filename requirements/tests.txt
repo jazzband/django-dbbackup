@@ -1,7 +1,6 @@
 coverage
 django-storages
 flake8
-mock
 pep8
 psycopg2
 pylint

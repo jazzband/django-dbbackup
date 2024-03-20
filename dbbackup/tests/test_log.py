@@ -1,9 +1,9 @@
 import logging
+from unittest.mock import patch
 
 import django
 from django.core import mail
 from django.test import TestCase
-from mock import patch
 from testfixtures import log_capture
 
 from dbbackup import log

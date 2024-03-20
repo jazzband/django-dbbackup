@@ -5,10 +5,10 @@ Tests for base command class.
 import logging
 import os
 from io import BytesIO
+from unittest.mock import patch
 
 from django.core.files import File
 from django.test import TestCase
-from mock import patch
 
 from dbbackup.management.commands._base import BaseDbBackupCommand
 from dbbackup.storage import get_storage

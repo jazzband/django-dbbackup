@@ -1,10 +1,10 @@
 import os
 import tempfile
+from unittest.mock import patch
 
 from django.conf import settings
 from django.core.management import execute_from_command_line
 from django.test import TransactionTestCase as TestCase
-from mock import patch
 
 from dbbackup.tests.testapp import models
 from dbbackup.tests.utils import (

@@ -2,12 +2,12 @@ import os
 import tempfile
 from datetime import datetime
 from io import StringIO
+from unittest.mock import patch
 
 import django
 import pytz
 from django.core import mail
 from django.test import TestCase
-from mock import patch
 
 from dbbackup import settings, utils
 from dbbackup.tests.utils import (

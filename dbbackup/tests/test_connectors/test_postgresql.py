@@ -1,7 +1,7 @@
 from io import BytesIO
+from unittest.mock import patch
 
 from django.test import TestCase
-from mock import patch
 
 from dbbackup.db.exceptions import DumpError
 from dbbackup.db.postgresql import (
@@ -132,6 +132,41 @@ class PgDumpConnectorTest(TestCase):
             "postgresql://foo@hostname/dbname", mock_restore_cmd.call_args[0][0]
         )
 
+    def test_create_dump_schema(self, mock_dump_cmd):
+        # Without
+        self.connector.create_dump()
+        self.assertNotIn(" -n ", mock_dump_cmd.call_args[0][0])
+        # With
+        self.connector.schemas = ["public"]
+        self.connector.create_dump()
+        self.assertIn(" -n public", mock_dump_cmd.call_args[0][0])
+        # With several
+        self.connector.schemas = ["public", "foo"]
+        self.connector.create_dump()
+        self.assertIn(" -n public", mock_dump_cmd.call_args[0][0])
+        self.assertIn(" -n foo", mock_dump_cmd.call_args[0][0])
+
+    @patch(
+        "dbbackup.db.postgresql.PgDumpConnector.run_command",
+        return_value=(BytesIO(), BytesIO()),
+    )
+    def test_restore_dump_schema(self, mock_dump_cmd, mock_restore_cmd):
+        # Without
+        dump = self.connector.create_dump()
+        self.connector.restore_dump(dump)
+        self.assertNotIn(" -n ", mock_restore_cmd.call_args[0][0])
+        # With
+        self.connector.schemas = ["public"]
+        dump = self.connector.create_dump()
+        self.connector.restore_dump(dump)
+        self.assertIn(" -n public", mock_restore_cmd.call_args[0][0])
+        # With several
+        self.connector.schemas = ["public", "foo"]
+        dump = self.connector.create_dump()
+        self.connector.restore_dump(dump)
+        self.assertIn(" -n public", mock_restore_cmd.call_args[0][0])
+        self.assertIn(" -n foo", mock_restore_cmd.call_args[0][0])
+
 
 @patch(
     "dbbackup.db.postgresql.PgDumpBinaryConnector.run_command",
@@ -197,6 +232,41 @@ class PgDumpBinaryConnectorTest(TestCase):
         self.connector.restore_dump(dump)
         # Test cmd
         self.assertTrue(mock_restore_cmd.called)
+
+    def test_create_dump_schema(self, mock_dump_cmd):
+        # Without
+        self.connector.create_dump()
+        self.assertNotIn(" -n ", mock_dump_cmd.call_args[0][0])
+        # With
+        self.connector.schemas = ["public"]
+        self.connector.create_dump()
+        self.assertIn(" -n public", mock_dump_cmd.call_args[0][0])
+        # With several
+        self.connector.schemas = ["public", "foo"]
+        self.connector.create_dump()
+        self.assertIn(" -n public", mock_dump_cmd.call_args[0][0])
+        self.assertIn(" -n foo", mock_dump_cmd.call_args[0][0])
+
+    @patch(
+        "dbbackup.db.postgresql.PgDumpBinaryConnector.run_command",
+        return_value=(BytesIO(), BytesIO()),
+    )
+    def test_restore_dump_schema(self, mock_dump_cmd, mock_restore_cmd):
+        # Without
+        dump = self.connector.create_dump()
+        self.connector.restore_dump(dump)
+        self.assertNotIn(" -n ", mock_restore_cmd.call_args[0][0])
+        # With
+        self.connector.schemas = ["public"]
+        dump = self.connector.create_dump()
+        self.connector.restore_dump(dump)
+        self.assertIn(" -n public", mock_restore_cmd.call_args[0][0])
+        # With several
+        self.connector.schemas = ["public", "foo"]
+        dump = self.connector.create_dump()
+        self.connector.restore_dump(dump)
+        self.assertIn(" -n public", mock_restore_cmd.call_args[0][0])
+        self.assertIn(" -n foo", mock_restore_cmd.call_args[0][0])
 
 
 @patch(

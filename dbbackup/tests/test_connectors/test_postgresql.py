@@ -178,6 +178,16 @@ class PgDumpBinaryConnectorTest(TestCase):
         self.connector.create_dump()
         self.assertNotIn(" --clean", mock_dump_cmd.call_args[0][0])
 
+    def test_create_dump_if_exists(self, mock_dump_cmd):
+        # Without
+        self.connector.if_exists = False
+        self.connector.create_dump()
+        self.assertNotIn(" --if-exists", mock_dump_cmd.call_args[0][0])
+        # With
+        self.connector.if_exists = True
+        self.connector.create_dump()
+        self.assertIn(" --if-exists", mock_dump_cmd.call_args[0][0])
+
     @patch(
         "dbbackup.db.postgresql.PgDumpBinaryConnector.run_command",
         return_value=(BytesIO(), BytesIO()),

@@ -79,6 +79,9 @@ def handle_size(filehandle):
     :returns: File's size with the best unit of measure
     :rtype: str
     """
+    if hasattr(filehandle, "size"):
+        return bytes_to_str(filehandle.size)
+
     filehandle.seek(0, 2)
     return bytes_to_str(filehandle.tell())
 

@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
-from dbbackup.db.exceptions import DumpError
 from dbbackup.db.postgresql import (
     PgDumpBinaryConnector,
     PgDumpConnector,

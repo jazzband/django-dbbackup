@@ -3,7 +3,6 @@ from typing import List, Optional
 from urllib.parse import quote
 
 from .base import BaseCommandDBConnector
-from .exceptions import DumpError
 
 logger = logging.getLogger("dbbackup.command")
 

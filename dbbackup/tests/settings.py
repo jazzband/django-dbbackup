@@ -91,4 +91,4 @@ LOGGING = {
 }
 
 # let there be silence
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

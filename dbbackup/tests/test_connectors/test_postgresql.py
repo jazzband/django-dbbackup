@@ -42,9 +42,9 @@ class PgDumpConnectorTest(TestCase):
         self.assertTrue(mock_dump_cmd.called)
 
     def test_create_dump_without_host_raises_error(self, mock_dump_cmd):
+        # this is allowed now: https://github.com/jazzband/django-dbbackup/issues/520
         self.connector.settings.pop("HOST", None)
-        with self.assertRaises(DumpError):
-            self.connector.create_dump()
+        self.connector.create_dump()
 
     def test_password_but_no_user(self, mock_dump_cmd):
         self.connector.settings.pop("USER", None)

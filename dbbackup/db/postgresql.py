@@ -3,16 +3,12 @@ from typing import List, Optional
 from urllib.parse import quote
 
 from .base import BaseCommandDBConnector
-from .exceptions import DumpError
 
 logger = logging.getLogger("dbbackup.command")
 
 
 def create_postgres_uri(self):
-    host = self.settings.get("HOST")
-    if not host:
-        raise DumpError("A host name is required")
-
+    host = self.settings.get("HOST") or "localhost"
     dbname = self.settings.get("NAME") or ""
     user = quote(self.settings.get("USER") or "")
     password = self.settings.get("PASSWORD") or ""

@@ -5,7 +5,7 @@ Utils for handle files.
 import logging
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.files.storage import get_storage_class
+from django.core.files.storage import DefaultStorage
 
 from . import settings, utils
 
@@ -285,3 +285,29 @@ class Storage:
             if keep_filter(filename):
                 continue
             self.delete_file(filename)
+
+
+def get_storage_class(path: str | None = None):
+    """
+    Return the configured storage class.
+    
+    :param path: Path in Python dot style to module containing the storage
+                    class. If empty settings.DBBACKUP_STORAGE will be used.
+    :type path: str
+        
+    :returns: Storage class
+    :rtype: :class:`django.core.files.storage.Storage`
+    """
+    from django.utils.module_loading import import_string
+    
+    if path:
+        # this is a workaround to keep compatibility with Django >= 5.1 (django.core.files.storage.get_storage_class is removed)
+        return import_string(path)
+    
+    # TODO: Use django.core.files.storage.storages dict on Django >= 5.1
+    # This would require a change in the dbbackup settings to make use of the the new STORAGES dict settings
+    # like so: STORAGES = { "dbbackup": { "BACKEND": "django.core.files.storage.FileSystemStorage", "OPTIONS": {...} } }
+    # and then returning storages['dbbackup'] here
+    
+    return DefaultStorage
+    

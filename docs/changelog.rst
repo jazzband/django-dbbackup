@@ -8,6 +8,8 @@ Unreleased
 * Add PostgreSQL Schema support by @angryfoxx in https://github.com/jazzband/django-dbbackup/pull/507
 * Fix restore of database from S3 storage by reintroducing inputfile.seek(0) to utils.uncompress_file
 * Fix bug where dbbackup management command would not respect settings.py:DBBACKUP_DATABASES
+* Remove usage of deprecated 'get_storage_class' function in newer Django versions
+* Add support for new STORAGES (Django 4.2+) setting under the 'dbbackup' alias
 
 4.1.0 (2024-01-14)
 ------------------

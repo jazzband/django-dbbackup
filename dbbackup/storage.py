@@ -289,23 +289,25 @@ class Storage:
 def get_storage_class(path=None):
     """
     Return the configured storage class.
-    
+
     :param path: Path in Python dot style to module containing the storage
                     class. If empty, the default storage class will be used.
     :type path: str or None
-        
+
     :returns: Storage class
     :rtype: :class:`django.core.files.storage.Storage`
     """
     from django.utils.module_loading import import_string
-    
+
     if path:
         # this is a workaround to keep compatibility with Django >= 5.1 (django.core.files.storage.get_storage_class is removed)
         return import_string(path)
-    
+
     try:
         from django.core.files.storage import DefaultStorage
+
         return DefaultStorage
     except Exception:
         from django.core.files.storage import get_storage_class
+
         return get_storage_class()

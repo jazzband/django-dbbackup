@@ -38,7 +38,7 @@ GPG_RECIPIENT = GPG_ALWAYS_TRUST = getattr(settings, "DBBACKUP_GPG_RECIPIENT", N
 STORAGE = getattr(settings, "DBBACKUP_STORAGE", None)
 STORAGE_OPTIONS = getattr(settings, "DBBACKUP_STORAGE_OPTIONS", {})
 # https://docs.djangoproject.com/en/5.1/ref/settings/#std-setting-STORAGES
-STORAGES_DBBACKUP_ALIAS = 'dbbackup'
+STORAGES_DBBACKUP_ALIAS = "dbbackup"
 DJANGO_STORAGES = getattr(settings, "STORAGES", {})
 django_dbbackup_storage = DJANGO_STORAGES.get(STORAGES_DBBACKUP_ALIAS, {})
 
@@ -48,10 +48,7 @@ if not STORAGE:
         or "django.core.files.storage.FileSystemStorage"
     )
 if not STORAGE_OPTIONS:
-    STORAGE_OPTIONS = (
-        django_dbbackup_storage.get("OPTIONS")
-        or STORAGE_OPTIONS
-    )
+    STORAGE_OPTIONS = django_dbbackup_storage.get("OPTIONS") or STORAGE_OPTIONS
 
 CONNECTORS = getattr(settings, "DBBACKUP_CONNECTORS", {})
 

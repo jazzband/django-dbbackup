@@ -3,7 +3,7 @@ from unittest.mock import patch
 from django.test import TestCase
 
 from dbbackup import utils
-from dbbackup.storage import Storage, get_storage
+from dbbackup.storage import Storage, get_storage, get_storage_class
 from dbbackup.tests.utils import HANDLED_FILES, FakeStorage
 
 DEFAULT_STORAGE_PATH = "django.core.files.storage.FileSystemStorage"
@@ -29,6 +29,49 @@ class Get_StorageTest(TestCase):
             # TODO: Remove "django.core.files.storage" case when dropping support for Django < 4.2.
             ("django.core.files.storage", "django.core.files.storage.filesystem"),
         )
+        
+    def test_get_storage_class(self):
+        storage_class = get_storage_class(DEFAULT_STORAGE_PATH)
+        self.assertIn(storage_class.__module__,
+            ("django.core.files.storage", "django.core.files.storage.filesystem"),
+        )
+        self.assertIn(storage_class.__name__, ("FileSystemStorage", "DefaultStorage"))
+        
+        storage_class = get_storage_class("dbbackup.tests.utils.FakeStorage")
+        self.assertEqual(storage_class.__module__, "dbbackup.tests.utils")
+        self.assertEqual(storage_class.__name__, "FakeStorage")
+                
+    def test_default_storage_class(self):
+        storage_class = get_storage_class()
+        self.assertIn(storage_class.__module__,
+            ("django.core.files.storage", "django.core.files.storage.filesystem"),
+        )
+        self.assertIn(storage_class.__name__, ("FileSystemStorage", "DefaultStorage"))
+
+    def test_invalid_storage_class_path(self):
+        with self.assertRaises(ImportError):
+            get_storage_class("invalid.path.to.StorageClass")
+
+    def test_storages_settings(self):
+        from .settings import STORAGES
+        self.assertIsInstance(STORAGES, dict)
+        self.assertEqual(STORAGES["dbbackup"]["BACKEND"], "dbbackup.tests.utils.FakeStorage")
+        
+        from dbbackup.settings import DJANGO_STORAGES, STORAGE
+        self.assertIsInstance(DJANGO_STORAGES, dict)
+        self.assertEqual(DJANGO_STORAGES, STORAGES)
+        self.assertEqual(STORAGES["dbbackup"]["BACKEND"], STORAGE)
+        
+        storage = get_storage()
+        self.assertEqual(storage.storage.__class__.__module__, "dbbackup.tests.utils")
+        self.assertEqual(storage.storage.__class__.__name__, "FakeStorage")
+        
+    def test_storages_settings_options(self):
+        from .settings import STORAGES
+        from dbbackup.settings import STORAGE_OPTIONS
+        self.assertEqual(STORAGES["dbbackup"]["OPTIONS"], STORAGE_OPTIONS)
+        
+        
 
 
 class StorageTest(TestCase):

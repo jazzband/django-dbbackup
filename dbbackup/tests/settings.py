@@ -64,22 +64,16 @@ DBBACKUP_STORAGE_OPTIONS = dict(
 )
 
 # For testing the new storages setting introduced in Django 4.2
-# STORAGES = {
-#     "default": {
-#         "BACKEND": "django.core.files.storage.FileSystemStorage",
-#         "OPTIONS": {},
-#     },
-#     "dbbackup": {
-#         "BACKEND": os.environ.get("STORAGE", "dbbackup.tests.utils.FakeStorage"),
-#         "OPTIONS": dict(
-#             [
-#                 keyvalue.split("=")
-#                 for keyvalue in os.environ.get("STORAGE_OPTIONS", "").split(",")
-#                 if keyvalue
-#             ]
-#         )
-#     }
-# }
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {},
+    },
+    "dbbackup": {
+        "BACKEND": DBBACKUP_STORAGE,
+        "OPTIONS": DBBACKUP_STORAGE_OPTIONS,
+    }
+}
 
 LOGGING = {
     "version": 1,

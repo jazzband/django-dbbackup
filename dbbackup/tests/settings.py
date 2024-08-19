@@ -72,7 +72,7 @@ STORAGES = {
     "dbbackup": {
         "BACKEND": DBBACKUP_STORAGE,
         "OPTIONS": DBBACKUP_STORAGE_OPTIONS,
-    }
+    },
 }
 
 LOGGING = {

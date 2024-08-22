@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 from django.core.checks import Tags, Warning, register
 
@@ -35,6 +36,46 @@ W006 = Warning(
     "settings.DBBACKUP_ADMINS",
     id="dbbackup.W006",
 )
+W007 = Warning(
+    "Invalid FILENAME_TEMPLATE parameter",
+    hint="settings.DBBACKUP_FILENAME_TEMPLATE must not contain slashes ('/'). "
+    "Did you mean to change the value for 'location'?",
+    id="dbbackup.W007",
+)
+W008 = Warning(
+    "Invalid MEDIA_FILENAME_TEMPLATE parameter",
+    hint="settings.DBBACKUP_MEDIA_FILENAME_TEMPLATE must not contain slashes ('/')"
+    "Did you mean to change the value for 'location'?",
+    id="dbbackup.W007",
+)
+
+
+def check_filename_templates():
+    return _check_filename_template(
+        settings.FILENAME_TEMPLATE,
+        W007,
+        "db",
+    ) + _check_filename_template(
+        settings.MEDIA_FILENAME_TEMPLATE,
+        W008,
+        "media",
+    )
+
+
+def _check_filename_template(filename_template, check_code, content_type) -> list:
+    if callable(filename_template):
+        params = {
+            "servername": "localhost",
+            "datetime": datetime.now().strftime(settings.DATE_FORMAT),
+            "databasename": "default",
+            "extension": "dump",
+            "content_type": content_type,
+        }
+        filename_template = filename_template(params)
+
+    if "/" in filename_template:
+        return [check_code]
+    return []
 
 
 @register(Tags.compatibility)
@@ -63,5 +104,7 @@ def check_settings(app_configs, **kwargs):
 
     if getattr(settings, "FAILURE_RECIPIENTS", None) is not None:
         errors.append(W006)
+
+    errors += check_filename_templates()
 
     return errors

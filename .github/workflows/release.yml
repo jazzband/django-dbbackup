@@ -10,10 +10,10 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
 
             - name: Set up Python
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v5
               with:
                   python-version: "3.x"
 
@@ -29,8 +29,8 @@ jobs:
                   twine check dist/*
 
             - name: Upload packages to Jazzband
-              uses: pypa/gh-action-pypi-publish@master
+              uses: pypa/gh-action-pypi-publish@release/v1
               with:
                   user: jazzband
                   password: ${{ secrets.JAZZBAND_RELEASE_KEY }}
-                  repository_url: https://jazzband.co/projects/django-dbbackup/upload
+                  repository-url: https://jazzband.co/projects/django-dbbackup/upload

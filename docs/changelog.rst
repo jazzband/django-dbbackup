@@ -4,6 +4,11 @@ Changelog
 Unreleased
 ----------
 
+* Nothing (yet)!
+
+4.2.0 (2024-08-22)
+------------------
+
 * Default HOST to localhost for postgres databases. https://github.com/jazzband/django-dbbackup/issues/520
 * Add PostgreSQL Schema support by @angryfoxx in https://github.com/jazzband/django-dbbackup/pull/507
 * Fix restore of database from S3 storage by reintroducing inputfile.seek(0) to utils.uncompress_file

@@ -1,32 +1,16 @@
-# This workflopw is disabled due to the following error:
-#
-# ERROR    HTTPError: 500 Internal Server Error from
-#          https://jazzband.co/projects/django-dbbackup/upload
-#          INTERNAL SERVER ERROR
+---
+name: Publish PyPI Release (BROKEN)
 
-# Until we are transfered out of Jazzband, the workaround is releasing manually via personal PyPI accounts.
-# The following steps are required to release a new version of the package:
-# python -m pip install -U pip
-# python -m pip install -U -r requirements/build.txt
-# python -m pip install -U -r requirements.txt
-# python -m build --sdist --wheel --outdir dist .
-# twine check dist/*
-# twine upload dist/*
+on:
+    release:
+        types: [published]
 
-# ---
-# name: Publish PyPI Release
+jobs:
+    release-package:
+        runs-on: ubuntu-latest
 
-# on:
-#     release:
-#         types: [published]
-
-# jobs:
-#     release-package:
-#         runs-on: ubuntu-latest
-
-#         steps:
-#             - uses: actions/checkout@v4
-
+        steps:
+            - uses: actions/checkout@v4
 #             - name: Set up Python
 #               uses: actions/setup-python@v5
 #               with:
@@ -50,3 +34,17 @@
 #                   password: ${{ secrets.JAZZBAND_RELEASE_KEY }}
 #                   repository-url: https://jazzband.co/projects/django-dbbackup/upload
 
+# This workflopw is disabled due to the following error:
+#
+# ERROR    HTTPError: 500 Internal Server Error from
+#          https://jazzband.co/projects/django-dbbackup/upload
+#          INTERNAL SERVER ERROR
+
+# Until we are transfered out of Jazzband, the workaround is releasing manually via personal PyPI accounts.
+# The following steps are required to release a new version of the package:
+# python -m pip install -U pip
+# python -m pip install -U -r requirements/build.txt
+# python -m pip install -U -r requirements.txt
+# python -m build --sdist --wheel --outdir dist .
+# twine check dist/*
+# twine upload dist/*

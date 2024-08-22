@@ -1,5 +1,5 @@
 ---
-name: Publish PyPI Release
+name: Publish PyPI Release (BROKEN)
 
 on:
     release:
@@ -11,26 +11,40 @@ jobs:
 
         steps:
             - uses: actions/checkout@v4
+#             - name: Set up Python
+#               uses: actions/setup-python@v5
+#               with:
+#                   python-version: "3.x"
 
-            - name: Set up Python
-              uses: actions/setup-python@v5
-              with:
-                  python-version: "3.x"
+#             - name: Install dependencies
+#               run: |
+#                   python -m pip install -U pip
+#                   python -m pip install -U -r requirements/build.txt
+#                   python -m pip install -U -r requirements.txt
 
-            - name: Install dependencies
-              run: |
-                  python -m pip install -U pip
-                  python -m pip install -r requirements/build.txt
-                  python -m pip install -r requirements.txt
+#             - name: Build package
+#               run: |
+#                   python -m build --sdist --wheel --outdir dist .
+#                   twine check dist/*
 
-            - name: Build package
-              run: |
-                  python -m build --sdist --wheel --outdir dist .
-                  twine check dist/*
+#             - name: Upload packages to Jazzband
+#               uses: pypa/gh-action-pypi-publish@release/v1
+#               with:
+#                   user: jazzband
+#                   password: ${{ secrets.JAZZBAND_RELEASE_KEY }}
+#                   repository-url: https://jazzband.co/projects/django-dbbackup/upload
 
-            - name: Upload packages to Jazzband
-              uses: pypa/gh-action-pypi-publish@release/v1
-              with:
-                  user: jazzband
-                  password: ${{ secrets.JAZZBAND_RELEASE_KEY }}
-                  repository-url: https://jazzband.co/projects/django-dbbackup/upload
+# This workflopw is disabled due to the following error:
+#
+# ERROR    HTTPError: 500 Internal Server Error from
+#          https://jazzband.co/projects/django-dbbackup/upload
+#          INTERNAL SERVER ERROR
+
+# Until we are transfered out of Jazzband, the workaround is releasing manually via personal PyPI accounts.
+# The following steps are required to release a new version of the package:
+# python -m pip install -U pip
+# python -m pip install -U -r requirements/build.txt
+# python -m pip install -U -r requirements.txt
+# python -m build --sdist --wheel --outdir dist .
+# twine check dist/*
+# twine upload dist/*

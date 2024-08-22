@@ -5,6 +5,7 @@ Unreleased
 ----------
 
 * Fix restore of database from S3 storage by reintroducing inputfile.seek(0) to utils.uncompress_file
+* Add warning for filenames with slashes in them
 
 4.1.0 (2024-01-14)
 ------------------

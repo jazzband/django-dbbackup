@@ -45,7 +45,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "django-dbbackup"
-copyright = "2016, Michael Shepanski"
+copyright = "Mark Bakhit"
 
 # basepath
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

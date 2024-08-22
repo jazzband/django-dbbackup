@@ -38,13 +38,14 @@ W006 = Warning(
 )
 W007 = Warning(
     "Invalid FILENAME_TEMPLATE parameter",
-    hint="settings.DBBACKUP_FILENAME_TEMPLATE must not contain slashes ('/')",
+    hint="settings.DBBACKUP_FILENAME_TEMPLATE must not contain slashes ('/'). "
+    "Did you mean to change the value for 'location'?",
     id="dbbackup.W007",
 )
-
 W008 = Warning(
     "Invalid MEDIA_FILENAME_TEMPLATE parameter",
-    hint="settings.DBBACKUP_MEDIA_FILENAME_TEMPLATE must not contain slashes ('/')",
+    hint="settings.DBBACKUP_MEDIA_FILENAME_TEMPLATE must not contain slashes ('/')"
+    "Did you mean to change the value for 'location'?",
     id="dbbackup.W007",
 )
 

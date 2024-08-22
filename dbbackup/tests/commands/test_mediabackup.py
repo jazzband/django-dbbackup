@@ -6,11 +6,10 @@ import contextlib
 import os
 import tempfile
 
-from django.core.files.storage import get_storage_class
 from django.test import TestCase
 
 from dbbackup.management.commands.mediabackup import Command as DbbackupCommand
-from dbbackup.storage import get_storage
+from dbbackup.storage import get_storage, get_storage_class
 from dbbackup.tests.utils import DEV_NULL, HANDLED_FILES, add_public_gpg
 
 

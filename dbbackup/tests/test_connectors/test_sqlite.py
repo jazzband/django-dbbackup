@@ -1,8 +1,8 @@
 from io import BytesIO
+from unittest.mock import mock_open, patch
 
 from django.db import connection
 from django.test import TestCase
-from mock import mock_open, patch
 
 from dbbackup.db.sqlite import SqliteConnector, SqliteCPConnector
 from dbbackup.tests.testapp.models import CharModel

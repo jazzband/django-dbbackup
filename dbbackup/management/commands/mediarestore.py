@@ -4,10 +4,8 @@ Restore media files.
 
 import tarfile
 
-from django.core.files.storage import get_storage_class
-
 from ... import utils
-from ...storage import get_storage
+from ...storage import get_storage, get_storage_class
 from ._base import BaseDbBackupCommand, make_option
 
 

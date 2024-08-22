@@ -1,3 +1,4 @@
+.
 docutils
 python-dotenv
 sphinx

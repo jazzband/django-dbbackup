@@ -7,11 +7,31 @@ mainly based on Django Storage API and extends its possibilities.
 
 You can choose your backup storage backend by setting ``settings.DBBACKUP_STORAGE``,
 it must be the full path of a storage class. For example:
-``django.core.files.storage.FileSystemStorage`` to use file system storage.
+``django.core.files.storage.FileSystemStorage`` to use file system storage. 
 Below, we'll list some of the available solutions and their options.
+
 
 The storage's option are gathered in ``settings.DBBACKUP_STORAGE_OPTIONS`` which
 is a dictionary of keywords representing how to configure it.
+
+Since Django 4.2 there is a new way to configure storages using the STORAGES setting. E.g.:::
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "OPTIONS": {
+            ...your_options_here
+            },
+        },
+        "staticfiles": {
+            ...
+        },
+    }
+
+instead of the previous DEFAULT_FILE_STORAGE and STATICFILES_STORAGE settings. 
+If ``settings.DBBACKUP_STORAGE`` is not set, django-dbbackup will look for the ``dbbackup`` key in the ``STORAGES`` dictionary setting.
+Otherwise, the default storage will be used.
+
 
 .. warning::
 
@@ -43,6 +63,16 @@ settings below. ::
     DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
     DBBACKUP_STORAGE_OPTIONS = {'location': '/my/backup/dir/'}
 
+Alternatively, starting from Django 4.2, you can use the STORAGES setting: ::
+
+    STORAGES = {
+        "dbbackup": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "OPTIONS": {
+                "location": "/my/backup/dir/",
+            },
+        },
+    }
 
 Available settings
 ~~~~~~~~~~~~~~~~~~
@@ -281,7 +311,7 @@ This backend is from Django-Storages with the `paramiko`_ backend. ::
 
     pip install paramiko django-storages
 
-.. _`paramiko`: http://www.paramiko.org/
+.. _`paramiko`: https://www.paramiko.org/
 
 The following configuration grants SSH server access to the local user: ::
 
@@ -289,7 +319,7 @@ The following configuration grants SSH server access to the local user: ::
     DBBACKUP_STORAGE_OPTIONS = {'host': 'myserver'}
 
 
-.. _`paramiko SSHClient.connect() documentation`: http://docs.paramiko.org/en/latest/api/client.html#paramiko.client.SSHClient.connect
+.. _`paramiko SSHClient.connect() documentation`: https://docs.paramiko.org/en/latest/api/client.html#paramiko.client.SSHClient.connect
 
 Available settings
 ~~~~~~~~~~~~~~~~~~

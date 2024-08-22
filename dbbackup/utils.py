@@ -12,17 +12,13 @@ import traceback
 from datetime import datetime
 from functools import wraps
 from getpass import getpass
+from shlex import quote
 from shutil import copyfileobj
 
 from django.core.mail import EmailMultiAlternatives
 from django.db import connection
 from django.http import HttpRequest
 from django.utils import timezone
-
-try:
-    from pipes import quote
-except ImportError:
-    from shlex import quote
 
 from . import settings
 
@@ -83,6 +79,9 @@ def handle_size(filehandle):
     :returns: File's size with the best unit of measure
     :rtype: str
     """
+    if hasattr(filehandle, "size"):
+        return bytes_to_str(filehandle.size)
+
     filehandle.seek(0, 2)
     return bytes_to_str(filehandle.tell())
 
@@ -282,6 +281,7 @@ def uncompress_file(inputfile, filename):
     """
     zipfile = gzip.GzipFile(fileobj=inputfile, mode="rb")
     try:
+        inputfile.seek(0)
         outputfile = create_spooled_temporary_file(fileobj=zipfile)
     finally:
         zipfile.close()

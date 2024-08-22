@@ -1,5 +1,6 @@
+from unittest.mock import patch
+
 from django.test import TestCase
-from mock import patch
 
 try:
     from dbbackup import checks
@@ -69,5 +70,29 @@ class ChecksTest(TestCase):
     @patch("dbbackup.checks.settings.FAILURE_RECIPIENTS", "foo@net.pt")
     def test_Failure_recipients_warning(self):
         expected_errors = [checks.W006]
+        errors = checks.check_settings(DbbackupConfig)
+        self.assertEqual(expected_errors, errors)
+
+    @patch("dbbackup.checks.settings.FILENAME_TEMPLATE", "foo/bar-{datetime}.ext")
+    def test_db_filename_template_with_slash(self):
+        expected_errors = [checks.W007]
+        errors = checks.check_settings(DbbackupConfig)
+        self.assertEqual(expected_errors, errors)
+
+    @patch("dbbackup.checks.settings.FILENAME_TEMPLATE", lambda _: "foo/bar")
+    def test_db_filename_template_callable_with_slash(self):
+        expected_errors = [checks.W007]
+        errors = checks.check_settings(DbbackupConfig)
+        self.assertEqual(expected_errors, errors)
+
+    @patch("dbbackup.checks.settings.MEDIA_FILENAME_TEMPLATE", "foo/bar-{datetime}.ext")
+    def test_media_filename_template_with_slash(self):
+        expected_errors = [checks.W008]
+        errors = checks.check_settings(DbbackupConfig)
+        self.assertEqual(expected_errors, errors)
+
+    @patch("dbbackup.checks.settings.MEDIA_FILENAME_TEMPLATE", lambda _: "foo/bar")
+    def test_media_filename_template_callable_with_slash(self):
+        expected_errors = [checks.W008]
         errors = checks.check_settings(DbbackupConfig)
         self.assertEqual(expected_errors, errors)

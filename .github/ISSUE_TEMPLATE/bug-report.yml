@@ -1,0 +1,22 @@
+name: Bug Report
+description: Create a report to help us improve.
+labels: ["bug"]
+body:
+    - type: textarea
+      attributes:
+          label: Current Situation
+          description: Discuss what the current issue is, how to reproduce, and link to any relevant prior discussion/context.
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: Proposed Actions
+          description: Describe what ought to be done, and why that will address the reasons for action mentioned above.
+      validations:
+          required: false
+    - type: textarea
+      attributes:
+          label: System Information
+          description: Versions for things such as... Django-dbbackup, Python, Django, Operating System, etc.
+      validations:
+          required: false

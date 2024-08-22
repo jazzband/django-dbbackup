@@ -42,7 +42,7 @@ In your ``settings.py``, make sure you have the following things: ::
 
 Create the backup directory: ::
 
-    mkdir /var/backups
+    mkdir /my/backup/dir/
 
 .. note::
 

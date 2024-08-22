@@ -1,6 +1,7 @@
 """
 Configuration and launcher for dbbackup tests.
 """
+
 import os
 import sys
 import tempfile
@@ -62,6 +63,18 @@ DBBACKUP_STORAGE_OPTIONS = dict(
     ]
 )
 
+# For testing the new storages setting introduced in Django 4.2
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {},
+    },
+    "dbbackup": {
+        "BACKEND": DBBACKUP_STORAGE,
+        "OPTIONS": DBBACKUP_STORAGE_OPTIONS,
+    },
+}
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -88,3 +101,6 @@ LOGGING = {
         }
     },
 }
+
+# let there be silence
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

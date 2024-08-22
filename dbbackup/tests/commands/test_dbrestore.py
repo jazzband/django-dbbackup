@@ -1,18 +1,20 @@
 """
 Tests for dbrestore command.
 """
+
 from shutil import copyfileobj
 from tempfile import mktemp
+from unittest.mock import patch
 
 from django.conf import settings
 from django.core.files import File
 from django.core.management.base import CommandError
 from django.test import TestCase
-from mock import patch
 
 from dbbackup import utils
 from dbbackup.db.base import get_connector
 from dbbackup.db.mongodb import MongoDumpConnector
+from dbbackup.db.postgresql import PgDumpConnector
 from dbbackup.management.commands.dbrestore import Command as DbrestoreCommand
 from dbbackup.settings import HOSTNAME
 from dbbackup.storage import get_storage
@@ -43,8 +45,10 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         self.command.interactive = True
         self.command.storage = get_storage()
         self.command.servername = HOSTNAME
+        self.command.input_database_name = None
         self.command.database_name = "default"
         self.command.connector = get_connector("default")
+        self.command.schemas = []
         HANDLED_FILES.clean()
 
     def tearDown(self):
@@ -101,18 +105,57 @@ class DbrestoreCommandRestoreBackupTest(TestCase):
         HANDLED_FILES["written_files"].append((self.command.filepath, get_dump()))
         self.command._restore_backup()
 
+    @patch("dbbackup.management.commands.dbrestore.get_connector")
+    @patch("dbbackup.db.base.BaseDBConnector.restore_dump")
+    def test_schema(self, mock_restore_dump, mock_get_connector, *args):
+        """Schema is only used for postgresql."""
+        mock_get_connector.return_value = PgDumpConnector()
+        mock_restore_dump.return_value = True
+
+        mock_file = File(get_dump())
+        HANDLED_FILES["written_files"].append((self.command.filename, mock_file))
+
+        with self.assertLogs("dbbackup.command", "INFO") as cm:
+            # Without
+            self.command.path = None
+            self.command._restore_backup()
+            self.assertEqual(self.command.connector.schemas, [])
+
+            # With
+            self.command.path = None
+            self.command.schemas = ["public"]
+            self.command._restore_backup()
+            self.assertEqual(self.command.connector.schemas, ["public"])
+            self.assertIn(
+                "INFO:dbbackup.command:Restoring schemas: ['public']",
+                cm.output,
+            )
+
+            # With multiple
+            self.command.path = None
+            self.command.schemas = ["public", "other"]
+            self.command._restore_backup()
+            self.assertEqual(self.command.connector.schemas, ["public", "other"])
+            self.assertIn(
+                "INFO:dbbackup.command:Restoring schemas: ['public', 'other']",
+                cm.output,
+            )
+
+        mock_get_connector.assert_called_with("default")
+        mock_restore_dump.assert_called_with(mock_file)
+
 
 class DbrestoreCommandGetDatabaseTest(TestCase):
     def setUp(self):
         self.command = DbrestoreCommand()
 
     def test_give_db_name(self):
-        name, db = self.command._get_database({"database": "default"})
+        name, db = self.command._get_database("default")
         self.assertEqual(name, "default")
         self.assertEqual(db, settings.DATABASES["default"])
 
     def test_no_given_db(self):
-        name, db = self.command._get_database({})
+        name, db = self.command._get_database(None)
         self.assertEqual(name, "default")
         self.assertEqual(db, settings.DATABASES["default"])
 
@@ -143,7 +186,9 @@ class DbMongoRestoreCommandRestoreBackupTest(TestCase):
         self.command.storage = get_storage()
         self.command.connector = MongoDumpConnector()
         self.command.database_name = "mongo"
+        self.command.input_database_name = None
         self.command.servername = HOSTNAME
+        self.command.schemas = []
         HANDLED_FILES.clean()
         add_private_gpg()
 

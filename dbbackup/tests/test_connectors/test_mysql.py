@@ -1,7 +1,7 @@
 from io import BytesIO
+from unittest.mock import patch
 
 from django.test import TestCase
-from mock import patch
 
 from dbbackup.db.mysql import MysqlDumpConnector
 

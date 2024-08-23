@@ -71,11 +71,23 @@ class SqliteConnector(BaseDBConnector):
         if not self.connection.is_usable():
             self.connection.connect()
         cursor = self.connection.cursor()
+        sql_command = b""
+        sql_is_complete = True
         for line in dump.readlines():
-            try:
-                cursor.execute(line.decode("UTF-8"))
-            except (OperationalError, IntegrityError) as err:
-                warnings.warn(f"Error in db restore: {err}")
+            sql_command = sql_command + line
+            line_str = line.decode("UTF-8")
+            if line_str.startswith("INSERT") and not line_str.endswith(");\n"):
+                sql_is_complete = False
+                continue
+            if not sql_is_complete and line_str.endswith(");\n"):
+                sql_is_complete = True
+
+            if sql_is_complete:
+                try:
+                    cursor.execute(sql_command.decode("UTF-8"))
+                except (OperationalError, IntegrityError) as err:
+                    warnings.warn(f"Error in db restore: {err}")
+                sql_command = b""
 
 
 class SqliteCPConnector(BaseDBConnector):

@@ -32,11 +32,15 @@ class SqliteConnectorTest(TestCase):
         TextModel.objects.create(
             field=f'INSERT ({"foo" * 5000}\nbar\n WHERE \nbaz IS\n "great" );\n'
         )
+        
         connector = SqliteConnector()
         dump = connector.create_dump()
         self.assertTrue(dump.read())
 
     def test_restore_dump(self):
+        TextModel.objects.create(
+            field='T\nf\nw\nnl'
+        )
         connector = SqliteConnector()
         dump = connector.create_dump()
         connector.restore_dump(dump)

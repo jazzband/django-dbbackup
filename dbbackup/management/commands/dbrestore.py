@@ -58,7 +58,7 @@ class Command(BaseDbBackupCommand):
             "--no-drop",
             action="store_true",
             default=False,
-            help="Don't clean (drop) the database",
+            help="Don't clean (drop) the database. This only works with mongodb and postgresql.",
         ),
     )
 

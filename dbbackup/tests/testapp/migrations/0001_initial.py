@@ -1,43 +1,73 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-from django.db import models, migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
 
     initial = True
-
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='CharModel',
+            name="CharModel",
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('field', models.CharField(max_length=10)),
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                ("field", models.CharField(max_length=10)),
             ],
         ),
         migrations.CreateModel(
-            name='FileModel',
+            name="FileModel",
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('field', models.FileField(upload_to='.')),
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                ("field", models.FileField(upload_to=".")),
             ],
         ),
         migrations.CreateModel(
-            name='ForeignKeyModel',
+            name="ForeignKeyModel",
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True,)),
-                ('field', models.ForeignKey(to='testapp.CharModel', on_delete=models.CASCADE)),
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                (
+                    "field",
+                    models.ForeignKey(to="testapp.CharModel", on_delete=models.CASCADE),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ManyToManyModel',
+            name="ManyToManyModel",
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('field', models.ManyToManyField(to='testapp.CharModel')),
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                ("field", models.ManyToManyField(to="testapp.CharModel")),
             ],
         ),
     ]

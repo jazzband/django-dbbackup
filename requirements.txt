@@ -1,2 +1,2 @@
+django>=3.2
 pytz
-Django>=2.2

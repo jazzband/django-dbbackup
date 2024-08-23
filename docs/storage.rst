@@ -1,24 +1,44 @@
 Storage settings
 ================
 
-One of the most helpful feature of django-dbbackup is the avaibility to store
-and retrieve backups from a local or remote storage. This functionality is
-mainly based on Django Storage API and extend its possibilities.
+One of the most helpful features of django-dbbackup is the ability to store
+and retrieve backups from a local or a remote storage. This functionality is
+mainly based on Django Storage API and extends its possibilities.
 
-You can choose your backup storage backend by set ``settings.DBBACKUP_STORAGE``,
-it must be a full path of a storage class. For example:
-``django.core.files.storage.FileSystemStorage`` for use file system storage.
+You can choose your backup storage backend by setting ``settings.DBBACKUP_STORAGE``,
+it must be the full path of a storage class. For example:
+``django.core.files.storage.FileSystemStorage`` to use file system storage. 
 Below, we'll list some of the available solutions and their options.
 
-Storage's option are gathered in ``settings.DBBACKUP_STORAGE_OPTIONS`` which
+
+The storage's option are gathered in ``settings.DBBACKUP_STORAGE_OPTIONS`` which
 is a dictionary of keywords representing how to configure it.
+
+Since Django 4.2 there is a new way to configure storages using the STORAGES setting. E.g.:::
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "OPTIONS": {
+            ...your_options_here
+            },
+        },
+        "staticfiles": {
+            ...
+        },
+    }
+
+instead of the previous DEFAULT_FILE_STORAGE and STATICFILES_STORAGE settings. 
+If ``settings.DBBACKUP_STORAGE`` is not set, django-dbbackup will look for the ``dbbackup`` key in the ``STORAGES`` dictionary setting.
+Otherwise, the default storage will be used.
+
 
 .. warning::
 
-    Do not configure backup storage with the same configuration than your media
-    files, you'll risk to share backups inside public directories.
+    Do not configure backup storage with the same configuration as your media
+    files as you'll risk sharing backups inside public directories.
 
-DBBackup uses by default the `built-in file system storage`_ to manage files on
+By default DBBackup uses the `built-in file system storage`_ to manage files on
 a local directory. Feel free to use any Django storage, you can find a variety
 of them at `Django Packages`_.
 
@@ -29,7 +49,7 @@ of them at `Django Packages`_.
 .. note::
 
     Storing backups to local disk may also be useful for Dropbox if you
-    already have the offical Dropbox client installed on your system.
+    already have the official Dropbox client installed on your system.
 
 File system storage
 -------------------
@@ -43,6 +63,16 @@ settings below. ::
     DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
     DBBACKUP_STORAGE_OPTIONS = {'location': '/my/backup/dir/'}
 
+Alternatively, starting from Django 4.2, you can use the STORAGES setting: ::
+
+    STORAGES = {
+        "dbbackup": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "OPTIONS": {
+                "location": "/my/backup/dir/",
+            },
+        },
+    }
 
 Available settings
 ~~~~~~~~~~~~~~~~~~
@@ -186,7 +216,7 @@ Setup your Dropbox account
    https://www.dropbox.com/developers/apps
 
 2. Click the button to create a new app and name it whatever you like.
-   For reference, I named mine 'Website Backups'.
+   As an example, I named mine 'Website Backups'.
 
 3. After your app is created, note the options button and more
    importantly the 'App Key' and 'App Secret' values inside. You'll need
@@ -212,7 +242,7 @@ Available settings
 
 .. note::
 
-    See `django-storages dropbox official documentation`_ for get more details about.
+    See `django-storages dropbox official documentation`_ for more details.
 
 .. _`django-storages dropbox official documentation`: https://django-storages.readthedocs.io/en/latest/backends/dropbox.html
 
@@ -239,8 +269,8 @@ Setup
 
 .. warning::
 
-    This storage doesn't use private connection for communcation, don't use it
-    if you're not sure about the link between client and server.
+    This storage doesn't use a private connection for communication so don't use it
+    if you're not certain about the security of the link between the client and the server.
 
 ::
 
@@ -277,26 +307,26 @@ setup the required settings below.
 Setup
 ~~~~~
 
-This backend is from Django-Storages with `paramiko`_ under. ::
+This backend is from Django-Storages with the `paramiko`_ backend. ::
 
     pip install paramiko django-storages
 
-.. _`paramiko`: http://www.paramiko.org/
+.. _`paramiko`: https://www.paramiko.org/
 
-The next configuration admit SSH server grant a the local user: ::
+The following configuration grants SSH server access to the local user: ::
 
     DBBACKUP_STORAGE = 'storages.backends.sftpstorage.SFTPStorage'
     DBBACKUP_STORAGE_OPTIONS = {'host': 'myserver'}
 
 
-.. _`paramiko SSHClient.connect() documentation`: http://docs.paramiko.org/en/latest/api/client.html#paramiko.client.SSHClient.connect
+.. _`paramiko SSHClient.connect() documentation`: https://docs.paramiko.org/en/latest/api/client.html#paramiko.client.SSHClient.connect
 
 Available settings
 ~~~~~~~~~~~~~~~~~~
 
 **host** - Required
 
-Hostname or adress of the SSH server
+Hostname or address of the SSH server
 
 **root_path** - Default ``~/``
 
@@ -322,4 +352,4 @@ GID of the group that should be set on the files on the remote host.
 
 **known_host_file**
 
-Absolute path of know host file, if it isn't set ``"~/.ssh/known_hosts"`` will be used.
+Absolute path of known_hosts file, if it isn't set ``"~/.ssh/known_hosts"`` will be used.

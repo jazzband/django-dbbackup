@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from django.db import models
 
 
@@ -19,4 +18,4 @@ class ManyToManyModel(models.Model):
 
 
 class FileModel(models.Model):
-    field = models.FileField(upload_to='.')
+    field = models.FileField(upload_to=".")

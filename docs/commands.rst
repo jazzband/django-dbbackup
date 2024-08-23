@@ -2,11 +2,11 @@
 Commands
 ========
 
-The primary usage of DBBackup is made with command line tools. By default,
+The primary usage of DBBackup is with command line tools. By default,
 commands will create backups and upload to your defined storage or download
-and restore the latest.
+and restore the latest backup.
 
-Commands provide arguments for compress/uncompress and encrypt/decrypt.
+Arguments can be passed to commands to compress/uncompress and encrypt/decrypt.
 
 dbbackup
 ========

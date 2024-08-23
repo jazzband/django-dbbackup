@@ -1,4 +1,0 @@
-Sphinx
-docutils
-sphinx-django-command
-python-dotenv

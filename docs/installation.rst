@@ -24,7 +24,7 @@ that are at least present when using PyPi repositories.
 
 ::
 
-    pip install -e git+https://github.com/mjs7231/django-dbbackup.git#egg=django-dbbackup
+    pip install -e git+https://github.com/jazzband/django-dbbackup.git#egg=django-dbbackup
 
 
 Add it in your project

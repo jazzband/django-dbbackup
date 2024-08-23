@@ -15,7 +15,7 @@ from ._base import BaseDbBackupCommand, make_option
 class Command(BaseDbBackupCommand):
     help = "Restore a database backup from storage, encrypted and/or compressed."
     content_type = "db"
-    nodrop = False
+    no_drop = False
 
     option_list = BaseDbBackupCommand.option_list + (
         make_option("-d", "--database", help="Database to restore"),
@@ -55,10 +55,10 @@ class Command(BaseDbBackupCommand):
         ),
         make_option(
             "-r",
-            "--nodrop",
+            "--no-drop",
             action="store_true",
             default=False,
-            help="Don't clean (drop) database",
+            help="Don't clean (drop) the database",
         ),
     )
 
@@ -82,7 +82,7 @@ class Command(BaseDbBackupCommand):
                 self.input_database_name
             )
             self.storage = get_storage()
-            self.nodrop = options.get("nodrop")
+            self.no_drop = options.get("no_drop")
             self.schemas = options.get("schema")
             self._restore_backup()
         except StorageError as err:
@@ -138,7 +138,7 @@ class Command(BaseDbBackupCommand):
 
         input_file.seek(0)
         self.connector = get_connector(self.database_name)
-        self.connector.drop = not self.nodrop
-        self.connector.restore_dump(input_file)
         if self.schemas:
             self.connector.schemas = self.schemas
+        self.connector.restore_dump(input_file)
+        self.connector.drop = not self.no_drop

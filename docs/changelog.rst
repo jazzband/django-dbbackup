@@ -4,7 +4,8 @@ Changelog
 Unreleased
 ----------
 
-* Add `--no-drop` option to `dbrestore` command to prevent dropping tables before restoring data.
+* Add --no-drop option to dbrestore command to prevent dropping tables before restoring data.
+* Fix bug where sqlite dbrestore would fail if field data contains the line break character.
 
 4.2.0 (2024-08-22)
 ------------------

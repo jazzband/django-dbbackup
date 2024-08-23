@@ -4,7 +4,7 @@ Changelog
 Unreleased
 ----------
 
-* Nothing (yet)!
+* Add `--no-drop` option to `dbrestore` command to prevent dropping tables before restoring data.
 
 4.2.0 (2024-08-22)
 ------------------

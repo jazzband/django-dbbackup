@@ -15,13 +15,6 @@ It is made to:
 - Keep your development database up to date
 - Use Crontab or Celery to setup automated backups
 
-.. warning::
-
-    Django DBBackup version 3 is very different to its predecessors.
-    See `Upgrade documentation`_ to help to get up to date.
-
-.. _`Upgrade documentation`: upgrade.html
-
 Contents:
 
 .. toctree::
@@ -33,7 +26,6 @@ Contents:
    storage
    commands
    integration
-   upgrade
    contributing
    changelog
 

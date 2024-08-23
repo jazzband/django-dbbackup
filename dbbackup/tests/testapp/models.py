@@ -7,7 +7,7 @@ class CharModel(models.Model):
 
 class TextModel(models.Model):
     field = models.TextField()
-    
+
 
 class ForeignKeyModel(models.Model):
     field = models.ForeignKey(CharModel, on_delete=models.CASCADE)

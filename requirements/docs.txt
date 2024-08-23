@@ -1,4 +1,6 @@
-sphinx
+.
 docutils
-sphinx-django-command
 python-dotenv
+sphinx
+sphinx-django-command
+sphinx-rtd-theme

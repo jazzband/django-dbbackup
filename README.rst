@@ -19,13 +19,13 @@ This Django application provides management commands to help backup and
 restore your project database and media files with various storages such as
 Amazon S3, Dropbox, local file storage or any Django storage.
 
-It is made for:
+It is made to:
 
-- Ensure your backup with GPG signature and encryption
+- Allow you to secure your backup with GPG signature and encryption
 - Archive with compression
 - Deal easily with remote archiving
-- Great to keep your development database up to date.
-- Use Crontab or Celery to setup automated backups.
+- Keep your development database up to date
+- Use Crontab or Celery to setup automated backups
 
 Docs
 ====
@@ -35,7 +35,7 @@ See our official documentation at `Read The Docs`_.
 Why use DBBackup
 ================
 
-This software doesn't reinvent the wheel, in few words it is a pipe between
+This software doesn't reinvent the wheel, in a few words it is a pipe between
 your Django project and your backup storage. It tries to use the traditional dump &
 restore mechanisms, apply compression and/or encryption and use the storage system you desire.
 
@@ -149,21 +149,21 @@ Restore media files from storage backup to your media storage. ::
 Tests
 =====
 
-Tests are stored in `dbbackup.tests` and for run them you must launch:
+Tests are stored in `dbbackup.tests` and to run them you must launch:
 
 ::
 
     python runtests.py
 
-In fact, ``runtests.py`` acts as a ``manage.py`` file and all Django command
+In fact, ``runtests.py`` acts as a ``manage.py`` file and all Django commands
 are available. So you could launch:
 
 ::
 
     python runtests.py shell
 
-For get a Python shell configured with the test project. Also all test
-command options are available and usable for run only some chosen tests.
+to get a Python shell configured with the test project. Also all test
+command options are available and usable to run only a selection of tests.
 See `Django test command documentation`_ for more information about it.
 
 .. _`Django test command documentation`: https://docs.djangoproject.com/en/stable/topics/testing/overview/#running-tests
@@ -172,7 +172,7 @@ There are even functional tests: ::
 
     ./functional.sh
 
-See documentation for details about
+See documentation for details.
 
 To run the tests across all supported versions of Django and Python, you
 can use Tox. Firstly install Tox:
@@ -188,7 +188,7 @@ Django3.2 you would run:
 
 ::
 
-    tox -e py3.9-django3.2
+    tox -e py39-django32
 
 The available test environments can be found in ``tox.ini``.
 

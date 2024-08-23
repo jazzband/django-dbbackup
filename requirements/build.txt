@@ -1,5 +1,5 @@
-setuptools
-wheel
 build
+setuptools
+tox>=4.0.0
 twine
-tox
+wheel

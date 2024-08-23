@@ -1,7 +1,6 @@
 """
 Utility functions for dbbackup.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import gzip
 import logging
@@ -13,6 +12,7 @@ import traceback
 from datetime import datetime
 from functools import wraps
 from getpass import getpass
+from shlex import quote
 from shutil import copyfileobj
 
 from django.core.mail import EmailMultiAlternatives
@@ -20,29 +20,24 @@ from django.db import connection
 from django.http import HttpRequest
 from django.utils import timezone
 
-try:
-    from pipes import quote
-except ImportError:
-    from shlex import quote
-
 from . import settings
 
 FAKE_HTTP_REQUEST = HttpRequest()
-FAKE_HTTP_REQUEST.META['SERVER_NAME'] = ''
-FAKE_HTTP_REQUEST.META['SERVER_PORT'] = ''
-FAKE_HTTP_REQUEST.META['HTTP_HOST'] = settings.HOSTNAME
-FAKE_HTTP_REQUEST.path = '/DJANGO-DBBACKUP-EXCEPTION'
+FAKE_HTTP_REQUEST.META["SERVER_NAME"] = ""
+FAKE_HTTP_REQUEST.META["SERVER_PORT"] = ""
+FAKE_HTTP_REQUEST.META["HTTP_HOST"] = settings.HOSTNAME
+FAKE_HTTP_REQUEST.path = "/DJANGO-DBBACKUP-EXCEPTION"
 
 BYTES = (
-    ('PiB', 1125899906842624.0),
-    ('TiB', 1099511627776.0),
-    ('GiB', 1073741824.0),
-    ('MiB', 1048576.0),
-    ('KiB', 1024.0),
-    ('B', 1.0)
+    ("PiB", 1125899906842624.0),
+    ("TiB", 1099511627776.0),
+    ("GiB", 1073741824.0),
+    ("MiB", 1048576.0),
+    ("KiB", 1024.0),
+    ("B", 1.0),
 )
 
-REG_FILENAME_CLEAN = re.compile(r'-+')
+REG_FILENAME_CLEAN = re.compile(r"-+")
 
 
 class EncryptionError(Exception):
@@ -67,11 +62,11 @@ def bytes_to_str(byteVal, decimals=1):
     :rtype: str
     """
     for unit, byte in BYTES:
-        if (byteVal >= byte):
+        if byteVal >= byte:
             if decimals == 0:
-                return '%s %s' % (int(round(byteVal / byte, 0)), unit)
-            return '%s %s' % (round(byteVal / byte, decimals), unit)
-    return '%s B' % byteVal
+                return f"{int(round(byteVal / byte, 0))} {unit}"
+            return f"{round(byteVal / byte, decimals)} {unit}"
+    return f"{byteVal} B"
 
 
 def handle_size(filehandle):
@@ -84,20 +79,29 @@ def handle_size(filehandle):
     :returns: File's size with the best unit of measure
     :rtype: str
     """
+    if hasattr(filehandle, "size"):
+        return bytes_to_str(filehandle.size)
+
     filehandle.seek(0, 2)
     return bytes_to_str(filehandle.tell())
 
 
-def mail_admins(subject, message, fail_silently=False, connection=None,
-                html_message=None):
+def mail_admins(
+    subject, message, fail_silently=False, connection=None, html_message=None
+):
     """Sends a message to the admins, as defined by the DBBACKUP_ADMINS setting."""
     if not settings.ADMINS:
         return
-    mail = EmailMultiAlternatives('%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
-                                  message, settings.SERVER_EMAIL, [a[1] for a in settings.ADMINS],
-                                  connection=connection)
+    mail = EmailMultiAlternatives(
+        f"{settings.EMAIL_SUBJECT_PREFIX}{subject}",
+        message,
+        settings.SERVER_EMAIL,
+        [a[1] for a in settings.ADMINS],
+        connection=connection,
+    )
+
     if html_message:
-        mail.attach_alternative(html_message, 'text/html')
+        mail.attach_alternative(html_message, "text/html")
     mail.send(fail_silently=fail_silently)
 
 
@@ -108,19 +112,21 @@ def email_uncaught_exception(func):
     (``settings.ADMINS`` if not defined). The message contains a traceback
     of error.
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             func(*args, **kwargs)
         except Exception:
-            logger = logging.getLogger('dbbackup')
+            logger = logging.getLogger("dbbackup")
             exc_type, exc_value, tb = sys.exc_info()
-            tb_str = ''.join(traceback.format_tb(tb))
-            msg = '%s: %s\n%s' % (exc_type.__name__, exc_value, tb_str)
+            tb_str = "".join(traceback.format_tb(tb))
+            msg = f"{exc_type.__name__}: {exc_value}\n{tb_str}"
             logger.error(msg)
             raise
         finally:
             connection.close()
+
     return wrapper
 
 
@@ -139,10 +145,10 @@ def create_spooled_temporary_file(filepath=None, fileobj=None):
     :rtype: :class:`tempfile.SpooledTemporaryFile`
     """
     spooled_file = tempfile.SpooledTemporaryFile(
-        max_size=settings.TMP_FILE_MAX_SIZE,
-        dir=settings.TMP_DIR)
+        max_size=settings.TMP_FILE_MAX_SIZE, dir=settings.TMP_DIR
+    )
     if filepath:
-        fileobj = open(filepath, 'r+b')
+        fileobj = open(filepath, "r+b")
     if fileobj is not None:
         fileobj.seek(0)
         copyfileobj(fileobj, spooled_file, settings.TMP_FILE_READ_SIZE)
@@ -163,20 +169,24 @@ def encrypt_file(inputfile, filename):
     :rtype: :class:`tempfile.SpooledTemporaryFile`, ``str``
     """
     import gnupg
+
     tempdir = tempfile.mkdtemp(dir=settings.TMP_DIR)
     try:
-        filename = '%s.gpg' % filename
+        filename = f"{filename}.gpg"
         filepath = os.path.join(tempdir, filename)
         try:
             inputfile.seek(0)
             always_trust = settings.GPG_ALWAYS_TRUST
             g = gnupg.GPG()
-            result = g.encrypt_file(inputfile, output=filepath,
-                                    recipients=settings.GPG_RECIPIENT,
-                                    always_trust=always_trust)
+            result = g.encrypt_file(
+                inputfile,
+                output=filepath,
+                recipients=settings.GPG_RECIPIENT,
+                always_trust=always_trust,
+            )
             inputfile.close()
             if not result:
-                msg = 'Encryption failed; status: %s' % result.status
+                msg = f"Encryption failed; status: {result.status}"
                 raise EncryptionError(msg)
             return create_spooled_temporary_file(filepath), filename
         finally:
@@ -207,19 +217,22 @@ def unencrypt_file(inputfile, filename, passphrase=None):
     import gnupg
 
     def get_passphrase(passphrase=passphrase):
-        return passphrase or getpass('Input Passphrase: ') or None
+        return passphrase or getpass("Input Passphrase: ") or None
 
     temp_dir = tempfile.mkdtemp(dir=settings.TMP_DIR)
     try:
-        new_basename = os.path.basename(filename).replace('.gpg', '')
+        new_basename = os.path.basename(filename).replace(".gpg", "")
         temp_filename = os.path.join(temp_dir, new_basename)
         try:
             inputfile.seek(0)
             g = gnupg.GPG()
-            result = g.decrypt_file(file=inputfile, passphrase=get_passphrase(),
-                                    output=temp_filename)
+            result = g.decrypt_file(
+                fileobj_or_path=inputfile,
+                passphrase=get_passphrase(),
+                output=temp_filename,
+            )
             if not result:
-                raise DecryptionError('Decryption failed; status: %s' % result.status)
+                raise DecryptionError("Decryption failed; status: %s" % result.status)
             outputfile = create_spooled_temporary_file(temp_filename)
         finally:
             if os.path.exists(temp_filename):
@@ -243,7 +256,7 @@ def compress_file(inputfile, filename):
     :rtype: :class:`tempfile.SpooledTemporaryFile`, ``str``
     """
     outputfile = create_spooled_temporary_file()
-    new_filename = filename + '.gz'
+    new_filename = f"{filename}.gz"
     zipfile = gzip.GzipFile(filename=filename, fileobj=outputfile, mode="wb")
     try:
         inputfile.seek(0)
@@ -268,10 +281,11 @@ def uncompress_file(inputfile, filename):
     """
     zipfile = gzip.GzipFile(fileobj=inputfile, mode="rb")
     try:
+        inputfile.seek(0)
         outputfile = create_spooled_temporary_file(fileobj=zipfile)
     finally:
         zipfile.close()
-    new_basename = os.path.basename(filename).replace('.gz', '')
+    new_basename = os.path.basename(filename).replace(".gz", "")
     return outputfile, new_basename
 
 
@@ -291,30 +305,30 @@ def timestamp(value):
 
 def filename_details(filepath):
     # TODO: What was this function made for ?
-    return ''
+    return ""
 
 
 PATTERN_MATCHNG = (
-    ('%a', r'[A-Z][a-z]+'),
-    ('%A', r'[A-Z][a-z]+'),
-    ('%w', r'\d'),
-    ('%d', r'\d{2}'),
-    ('%b', r'[A-Z][a-z]+'),
-    ('%B', r'[A-Z][a-z]+'),
-    ('%m', r'\d{2}'),
-    ('%y', r'\d{2}'),
-    ('%Y', r'\d{4}'),
-    ('%H', r'\d{2}'),
-    ('%I', r'\d{2}'),
+    ("%a", r"[A-Z][a-z]+"),
+    ("%A", r"[A-Z][a-z]+"),
+    ("%w", r"\d"),
+    ("%d", r"\d{2}"),
+    ("%b", r"[A-Z][a-z]+"),
+    ("%B", r"[A-Z][a-z]+"),
+    ("%m", r"\d{2}"),
+    ("%y", r"\d{2}"),
+    ("%Y", r"\d{4}"),
+    ("%H", r"\d{2}"),
+    ("%I", r"\d{2}"),
     # ('%p', r'(?AM|PM|am|pm)'),
-    ('%M', r'\d{2}'),
-    ('%S', r'\d{2}'),
-    ('%f', r'\d{6}'),
+    ("%M", r"\d{2}"),
+    ("%S", r"\d{2}"),
+    ("%f", r"\d{6}"),
     # ('%z', r'\+\d{4}'),
     # ('%Z', r'(?|UTC|EST|CST)'),
-    ('%j', r'\d{3}'),
-    ('%U', r'\d{2}'),
-    ('%W', r'\d{2}'),
+    ("%j", r"\d{3}"),
+    ("%U", r"\d{2}"),
+    ("%W", r"\d{2}"),
     # ('%c', r'[A-Z][a-z]+ [A-Z][a-z]{2} \d{2} \d{2}:\d{2}:\d{2} \d{4}'),
     # ('%x', r'd{2}/d{2}/d{4}'),
     # ('%X', r'd{2}:d{2}:d{2}'),
@@ -335,7 +349,7 @@ def datefmt_to_regex(datefmt):
     new_string = datefmt
     for pat, reg in PATTERN_MATCHNG:
         new_string = new_string.replace(pat, reg)
-    return re.compile(r'(%s)' % new_string)
+    return re.compile(f"({new_string})")
 
 
 def filename_to_datestring(filename, datefmt=None):
@@ -374,7 +388,7 @@ def filename_to_date(filename, datefmt=None):
 
 
 def filename_generate(
-    extension, database_name='', servername=None, content_type='db', wildcard=None
+    extension, database_name="", servername=None, content_type="db", wildcard=None
 ):
     """
     Create a new backup filename.
@@ -397,30 +411,30 @@ def filename_generate(
     :returns: Computed file name
     :rtype: ``str`
     """
-    if content_type == 'db':
-        if '/' in database_name:
+    if content_type == "db":
+        if "/" in database_name:
             database_name = os.path.basename(database_name)
-        if '.' in database_name:
-            database_name = database_name.split('.')[0]
+        if "." in database_name:
+            database_name = database_name.split(".")[0]
         template = settings.FILENAME_TEMPLATE
-    elif content_type == 'media':
+    elif content_type == "media":
         template = settings.MEDIA_FILENAME_TEMPLATE
     else:
         template = settings.FILENAME_TEMPLATE
 
     params = {
-        'servername': servername or settings.HOSTNAME,
-        'datetime': wildcard or datetime.now().strftime(settings.DATE_FORMAT),
-        'databasename': database_name,
-        'extension': extension,
-        'content_type': content_type
+        "servername": servername or settings.HOSTNAME,
+        "datetime": wildcard or datetime.now().strftime(settings.DATE_FORMAT),
+        "databasename": database_name,
+        "extension": extension,
+        "content_type": content_type,
     }
     if callable(template):
         filename = template(**params)
     else:
         filename = template.format(**params)
-        filename = REG_FILENAME_CLEAN.sub('-', filename)
-        filename = filename[1:] if filename.startswith('-') else filename
+        filename = REG_FILENAME_CLEAN.sub("-", filename)
+        filename = filename[1:] if filename.startswith("-") else filename
     return filename
 
 

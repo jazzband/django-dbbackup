@@ -15,7 +15,7 @@ Getting the latest release from trunk
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In general, you should not be downloading and installing stuff
-directly off repositories -- especially not if you are backing
+directly from repositories -- especially not if you are backing
 up sensitive data.
 
 Security is important, bypassing PyPi repositories is a bad habit,
@@ -24,7 +24,7 @@ that are at least present when using PyPi repositories.
 
 ::
 
-    pip install -e git+https://github.com/mjs7231/django-dbbackup.git#egg=django-dbbackup
+    pip install -e git+https://github.com/jazzband/django-dbbackup.git#egg=django-dbbackup
 
 
 Add it in your project
@@ -42,12 +42,14 @@ In your ``settings.py``, make sure you have the following things: ::
 
 Create the backup directory: ::
 
-    mkdir /var/backups
+    mkdir /my/backup/dir/
 
 .. note::
 
     This configuration uses filesystem storage, but you can use any storage
-    supported by Django API. See `storage` for more information about it.
+    supported by Django API. See `Storage settings`_ for more information about it.
+
+.. _`Storage settings`: storage.html
 
 
 Testing that everything worked

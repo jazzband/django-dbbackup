@@ -35,6 +35,7 @@ CONNECTOR_MAPPING = {
     "django_prometheus.db.backends.sqlite3": "dbbackup.db.sqlite.SqliteConnector",
     "django_prometheus.db.backends.mysql": "dbbackup.db.mysql.MysqlDumpConnector",
     "django_prometheus.db.backends.postgis": "dbbackup.db.postgresql.PgDumpGisConnector",
+    "django_s3_sqlite": "dbbackup.db.sqlite.SqliteConnector",
 }
 
 if settings.CUSTOM_CONNECTOR_MAPPING:

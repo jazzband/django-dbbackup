@@ -4,7 +4,7 @@ Changelog
 Unreleased
 ----------
 
-* Nothing (yet)!
+* Add option `--if-exists` for pg_dump command
 
 4.2.1 (2024-08-23)
 ----------

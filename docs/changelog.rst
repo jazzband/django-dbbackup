@@ -4,7 +4,7 @@ Changelog
 Unreleased
 ----------
 
-* Nothing (yet)!
+* Empty string as HOST for postgres unix domain socket connection is now supported.
 
 4.2.1 (2024-08-23)
 ----------

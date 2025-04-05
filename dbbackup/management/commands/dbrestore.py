@@ -140,5 +140,5 @@ class Command(BaseDbBackupCommand):
         self.connector = get_connector(self.database_name)
         if self.schemas:
             self.connector.schemas = self.schemas
-        self.connector.restore_dump(input_file)
         self.connector.drop = not self.no_drop
+        self.connector.restore_dump(input_file)

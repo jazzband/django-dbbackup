@@ -5,6 +5,8 @@ Unreleased
 ----------
 
 * Add option `--if-exists` for pg_dump command
+* Empty string as HOST for postgres unix domain socket connection is now supported.
+* Support Python 3.13 and Django 5.2
 
 4.2.1 (2024-08-23)
 ----------

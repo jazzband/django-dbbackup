@@ -8,10 +8,10 @@ logger = logging.getLogger("dbbackup.command")
 
 
 def create_postgres_uri(self):
-    host = self.settings.get("HOST") or "localhost"
-    dbname = self.settings.get("NAME") or ""
+    host = self.settings.get("HOST", "localhost")
+    dbname = self.settings.get("NAME", "")
     user = quote(self.settings.get("USER") or "")
-    password = self.settings.get("PASSWORD") or ""
+    password = self.settings.get("PASSWORD", "")
     password = f":{quote(password)}" if password else ""
     if not user:
         password = ""

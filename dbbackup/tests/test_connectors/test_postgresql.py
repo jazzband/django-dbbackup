@@ -1,6 +1,5 @@
 from io import BytesIO
 from unittest.mock import patch
-
 from django.test import TestCase
 
 from dbbackup.db.postgresql import (
@@ -222,6 +221,13 @@ class PgDumpBinaryConnectorTest(TestCase):
         self.connector.if_exists = True
         self.connector.restore_dump(dump)
         self.assertIn(" --if-exists", mock_run_command.call_args[0][0])
+
+    def test_pg_options(self,mock_run_command):
+        dump = self.connector.create_dump()
+        self.connector.pg_options = "--foo"
+        self.connector.restore_dump(dump)
+        cmd_args = mock_run_command.call_args[0][0]
+        self.assertIn("--foo", cmd_args)
 
     @patch(
         "dbbackup.db.postgresql.PgDumpBinaryConnector.run_command",

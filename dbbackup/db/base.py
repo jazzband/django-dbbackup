@@ -128,6 +128,7 @@ class BaseCommandDBConnector(BaseDBConnector):
     use_parent_env = True
     env = {}
     dump_env = {}
+    # use the environment from the shell that invoked dbbackup
     restore_env = {}
 
     def run_command(self, command, stdin=None, env=None):

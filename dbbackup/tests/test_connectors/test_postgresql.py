@@ -235,14 +235,14 @@ class PgDumpBinaryConnectorTest(TestCase):
         self.connector.restore_prefix = "foo"
         self.connector.restore_dump(dump)
         cmd_args = mock_run_command.call_args[0][0]
-        self.assertTrue( cmd_args.startswith('foo '))
+        self.assertTrue(cmd_args.startswith("foo "))
 
     def test_restore_suffix(self, mock_run_command):
         dump = self.connector.create_dump()
         self.connector.restore_suffix = "foo"
         self.connector.restore_dump(dump)
         cmd_args = mock_run_command.call_args[0][0]
-        self.assertTrue( cmd_args.endswith(' foo'))
+        self.assertTrue(cmd_args.endswith(" foo"))
 
     @patch(
         "dbbackup.db.postgresql.PgDumpBinaryConnector.run_command",

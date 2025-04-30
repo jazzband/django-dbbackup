@@ -166,6 +166,13 @@ This corresponds to ``--clean`` argument of ``pg_dump`` and ``pg_restore``.
 
 Default: ``True``
 
+IF_EXISTS
+~~~~
+
+Use DROP ... IF EXISTS commands to drop objects in ``--clean`` mode of ``pg_dump``.
+
+Default: ``False``
+
 PostGIS
 -------
 

@@ -130,7 +130,6 @@ class PgDumpBinaryConnector(PgDumpConnector):
         stdout, _ = self.run_command(cmd, env=self.dump_env)
         return stdout
 
-
     def _restore_dump(self, dump: str):
         """
         Restore a PostgreSQL dump using subprocess with argument list.
@@ -146,13 +145,25 @@ class PgDumpBinaryConnector(PgDumpConnector):
 
         # Flatten optional values
         if self.restore_prefix:
-            cmd += self.restore_prefix if isinstance(self.restore_prefix, list) else [self.restore_prefix]
+            cmd += (
+                self.restore_prefix
+                if isinstance(self.restore_prefix, list)
+                else [self.restore_prefix]
+            )
 
         if self.restore_cmd:
-            cmd += self.restore_cmd if isinstance(self.restore_cmd, list) else [self.restore_cmd]
+            cmd += (
+                self.restore_cmd
+                if isinstance(self.restore_cmd, list)
+                else [self.restore_cmd]
+            )
 
         if self.pg_options:
-            cmd += self.pg_options if isinstance(self.pg_options, list) else [self.pg_options]
+            cmd += (
+                self.pg_options
+                if isinstance(self.pg_options, list)
+                else [self.pg_options]
+            )
 
         cmd.append(dbname)
 
@@ -170,7 +181,11 @@ class PgDumpBinaryConnector(PgDumpConnector):
             cmd.append("--if-exists")
 
         if self.restore_suffix:
-            cmd += self.restore_suffix if isinstance(self.restore_suffix, list) else [self.restore_suffix]
+            cmd += (
+                self.restore_suffix
+                if isinstance(self.restore_suffix, list)
+                else [self.restore_suffix]
+            )
 
         cmd_str = " ".join(cmd)
         # TODO: ready to more safely execute with subprocess.run, rather than breaking apart a string with shlex.

@@ -145,51 +145,49 @@ class PgDumpBinaryConnector(PgDumpConnector):
 
         # Flatten optional values
         if self.restore_prefix:
-            cmd += (
+            cmd.extend (
                 self.restore_prefix
                 if isinstance(self.restore_prefix, list)
                 else [self.restore_prefix]
             )
 
         if self.restore_cmd:
-            cmd += (
+            cmd.extend (
                 self.restore_cmd
                 if isinstance(self.restore_cmd, list)
                 else [self.restore_cmd]
             )
 
         if self.pg_options:
-            cmd += (
+            cmd.extend (
                 self.pg_options
                 if isinstance(self.pg_options, list)
                 else [self.pg_options]
             )
 
-        cmd.append(dbname)
+        cmd.extend([dbname])
 
         if self.single_transaction:
-            cmd.append("--single-transaction")
+            cmd.extend(["--single-transaction"])
 
         if self.drop:
-            cmd.append("--clean")
+            cmd.extend(["--clean"])
 
         if self.schemas:
             for schema in self.schemas:
-                cmd += ["-n", schema]
+                cmd.extend(["-n", schema])
 
         if self.if_exists:
-            cmd.append("--if-exists")
+            cmd.extend(["--if-exists"])
 
         if self.restore_suffix:
-            cmd += (
+            cmd.extend(
                 self.restore_suffix
                 if isinstance(self.restore_suffix, list)
                 else [self.restore_suffix]
             )
 
         cmd_str = " ".join(cmd)
-        # TODO: ready to more safely execute with subprocess.run, rather than breaking apart a string with shlex.
-
         stdout, _ = self.run_command(cmd_str, stdin=dump, env=self.dump_env)
 
         return stdout

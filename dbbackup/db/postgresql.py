@@ -145,21 +145,21 @@ class PgDumpBinaryConnector(PgDumpConnector):
 
         # Flatten optional values
         if self.restore_prefix:
-            cmd.extend (
+            cmd.extend(
                 self.restore_prefix
                 if isinstance(self.restore_prefix, list)
                 else [self.restore_prefix]
             )
 
         if self.restore_cmd:
-            cmd.extend (
+            cmd.extend(
                 self.restore_cmd
                 if isinstance(self.restore_cmd, list)
                 else [self.restore_cmd]
             )
 
         if self.pg_options:
-            cmd.extend (
+            cmd.extend(
                 self.pg_options
                 if isinstance(self.pg_options, list)
                 else [self.pg_options]

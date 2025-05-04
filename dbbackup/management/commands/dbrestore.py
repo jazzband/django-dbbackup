@@ -16,6 +16,7 @@ class Command(BaseDbBackupCommand):
     help = "Restore a database backup from storage, encrypted and/or compressed."
     content_type = "db"
     no_drop = False
+    pg_options = ""
 
     option_list = BaseDbBackupCommand.option_list + (
         make_option("-d", "--database", help="Database to restore"),
@@ -60,6 +61,12 @@ class Command(BaseDbBackupCommand):
             default=False,
             help="Don't clean (drop) the database. This only works with mongodb and postgresql.",
         ),
+        make_option(
+            "--pg-options",
+            dest="pg_options",
+            default="",
+            help="Additional pg_restore options, e.g. '--if-exists --no-owner'. Use quotes.",
+        ),
     )
 
     def handle(self, *args, **options):
@@ -83,6 +90,7 @@ class Command(BaseDbBackupCommand):
             )
             self.storage = get_storage()
             self.no_drop = options.get("no_drop")
+            self.pg_options = options.get("pg_options", "")
             self.schemas = options.get("schema")
             self._restore_backup()
         except StorageError as err:
@@ -141,4 +149,5 @@ class Command(BaseDbBackupCommand):
         if self.schemas:
             self.connector.schemas = self.schemas
         self.connector.drop = not self.no_drop
+        self.connector.pg_options = self.pg_options
         self.connector.restore_dump(input_file)

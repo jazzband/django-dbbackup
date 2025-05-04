@@ -102,7 +102,11 @@ different server. You may also specify an explicit local file to backup from.
     -p PASSPHRASE, --passphrase=PASSPHRASE
                           Passphrase for decrypt file
     -z, --uncompress      Uncompress gzip data before restoring
-
+    -n SCHEMA, --schema SCHEMA
+                        Specify schema(s) to restore. Can be used multiple times.
+    -r, --no-drop         Don't clean (drop) the database. This only works with mongodb and postgresql.
+    --pg-options PG_OPTIONS
+                        Additional pg_restore options, e.g. '--if-exists --no-owner'. Use quotes.
 
 mediabackup
 -----------

@@ -113,6 +113,7 @@ class PgDumpBinaryConnector(PgDumpConnector):
     single_transaction = True
     drop = True
     if_exists = False
+    pg_options = None
 
     def _create_dump(self):
         cmd = f"{self.dump_cmd} "
@@ -129,22 +130,64 @@ class PgDumpBinaryConnector(PgDumpConnector):
         stdout, _ = self.run_command(cmd, env=self.dump_env)
         return stdout
 
-    def _restore_dump(self, dump):
+    def _restore_dump(self, dump: str):
+        """
+        Restore a PostgreSQL dump using subprocess with argument list.
+
+        Assumes that restore_prefix, restore_cmd, pg_options, and restore_suffix
+        are either None, strings (single args), or lists of strings.
+
+        Builds the command as a list.
+        """
+
         dbname = create_postgres_uri(self)
-        cmd = f"{self.restore_cmd} {dbname}"
+        cmd = []
+
+        # Flatten optional values
+        if self.restore_prefix:
+            cmd.extend(
+                self.restore_prefix
+                if isinstance(self.restore_prefix, list)
+                else [self.restore_prefix]
+            )
+
+        if self.restore_cmd:
+            cmd.extend(
+                self.restore_cmd
+                if isinstance(self.restore_cmd, list)
+                else [self.restore_cmd]
+            )
+
+        if self.pg_options:
+            cmd.extend(
+                self.pg_options
+                if isinstance(self.pg_options, list)
+                else [self.pg_options]
+            )
+
+        cmd.extend([dbname])
 
         if self.single_transaction:
-            cmd += " --single-transaction"
+            cmd.extend(["--single-transaction"])
 
         if self.drop:
-            cmd += " --clean"
+            cmd.extend(["--clean"])
 
         if self.schemas:
-            cmd += " -n " + " -n ".join(self.schemas)
+            for schema in self.schemas:
+                cmd.extend(["-n", schema])
 
         if self.if_exists:
-            cmd += " --if-exists"
+            cmd.extend(["--if-exists"])
 
-        cmd = f"{self.restore_prefix} {cmd} {self.restore_suffix}"
-        stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
-        return stdout, stderr
+        if self.restore_suffix:
+            cmd.extend(
+                self.restore_suffix
+                if isinstance(self.restore_suffix, list)
+                else [self.restore_suffix]
+            )
+
+        cmd_str = " ".join(cmd)
+        stdout, _ = self.run_command(cmd_str, stdin=dump, env=self.dump_env)
+
+        return stdout

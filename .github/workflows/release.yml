@@ -42,9 +42,6 @@ jobs:
 
 # Until we are transfered out of Jazzband, the workaround is releasing manually via personal PyPI accounts.
 # The following steps are required to release a new version of the package:
-# python -m pip install -U pip
-# python -m pip install -U -r requirements/build.txt
-# python -m pip install -U -r requirements.txt
-# python -m build --sdist --wheel --outdir dist .
-# twine check dist/*
+# python -m pip install -U pip && pip install -U -r requirements/build.txt && pip install -U -r requirements.txt
+# python -m build --sdist --wheel --outdir dist . && twine check dist/*
 # twine upload dist/*

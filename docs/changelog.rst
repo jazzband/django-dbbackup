@@ -4,6 +4,11 @@ Changelog
 Unreleased
 ----------
 
+* Nothing (yet)!
+
+4.3.0 (2025-05-09)
+----------
+
 * Add generic `--pg-options` to pass custom options to postgres.
 * Add option `--if-exists` for pg_dump command
 * Empty string as HOST for postgres unix domain socket connection is now supported.

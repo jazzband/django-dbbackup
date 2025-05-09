@@ -43,10 +43,11 @@ setup(
         "amazon",
         "s3",
         "dropbox",
+        "sqlite",
     ],
     packages=find_packages(),
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Environment :: Console",
         "Framework :: Django :: 3.2",

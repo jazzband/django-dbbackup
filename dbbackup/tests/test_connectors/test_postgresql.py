@@ -21,15 +21,10 @@ class PgDumpConnectorTest(TestCase):
         self.connector.settings["NAME"] = "dbname"
         self.connector.settings["HOST"] = "hostname"
 
-    def test_user_password_uses_special_characters(self, mock_dump_cmd):
-        self.connector.settings["PASSWORD"] = "@!"
+    def test_user_uses_special_characters(self, mock_dump_cmd):
         self.connector.settings["USER"] = "@"
-
         self.connector.create_dump()
-
-        self.assertIn(
-            "postgresql://%40:%40%21@hostname/dbname", mock_dump_cmd.call_args[0][0]
-        )
+        self.assertIn("postgresql://%40@hostname/dbname", mock_dump_cmd.call_args[0][0])
 
     def test_create_dump(self, mock_dump_cmd):
         dump = self.connector.create_dump()
@@ -166,6 +161,17 @@ class PgDumpConnectorTest(TestCase):
         self.assertIn(" -n public", mock_restore_cmd.call_args[0][0])
         self.assertIn(" -n foo", mock_restore_cmd.call_args[0][0])
 
+    def test_create_dump_password_excluded(self, mock_dump_cmd):
+        self.connector.settings["PASSWORD"] = "secret"
+        self.connector.create_dump()
+        self.assertNotIn("secret", mock_dump_cmd.call_args[0][0])
+
+    def test_restore_dump_password_excluded(self, mock_dump_cmd):
+        self.connector.settings["PASSWORD"] = "secret"
+        dump = self.connector.create_dump()
+        self.connector.restore_dump(dump)
+        self.assertNotIn("secret", mock_dump_cmd.call_args[0][0])
+
 
 @patch(
     "dbbackup.db.postgresql.PgDumpBinaryConnector.run_command",
@@ -289,6 +295,17 @@ class PgDumpBinaryConnectorTest(TestCase):
         self.assertIn(" -n public", mock_restore_cmd.call_args[0][0])
         self.assertIn(" -n foo", mock_restore_cmd.call_args[0][0])
 
+    def test_create_dump_password_excluded(self, mock_dump_cmd):
+        self.connector.settings["PASSWORD"] = "secret"
+        self.connector.create_dump()
+        self.assertNotIn("secret", mock_dump_cmd.call_args[0][0])
+
+    def test_restore_dump_password_excluded(self, mock_dump_cmd):
+        self.connector.settings["PASSWORD"] = "secret"
+        dump = self.connector.create_dump()
+        self.connector.restore_dump(dump)
+        self.assertNotIn("secret", mock_dump_cmd.call_args[0][0])
+
 
 @patch(
     "dbbackup.db.postgresql.PgDumpGisConnector.run_command",
@@ -365,6 +382,8 @@ class PgDumpConnectorRunCommandTest(TestCase):
         connector.settings["PASSWORD"] = "foo"
         connector.create_dump()
         self.assertEqual(mock_popen.call_args[0][0][0], "pg_dump")
+        self.assertNotIn("foo", " ".join(mock_popen.call_args[0][0]))
+        self.assertEqual("foo", mock_popen.call_args[1]["env"]["PGPASSWORD"])
 
     def test_run_command_with_password_and_other(self, mock_popen):
         connector = PgDumpConnector(env={"foo": "bar"})
@@ -374,3 +393,5 @@ class PgDumpConnectorRunCommandTest(TestCase):
         self.assertEqual(mock_popen.call_args[0][0][0], "pg_dump")
         self.assertIn("foo", mock_popen.call_args[1]["env"])
         self.assertEqual("bar", mock_popen.call_args[1]["env"]["foo"])
+        self.assertNotIn("foo", " ".join(mock_popen.call_args[0][0]))
+        self.assertEqual("foo", mock_popen.call_args[1]["env"]["PGPASSWORD"])

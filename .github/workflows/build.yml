@@ -12,7 +12,8 @@ jobs:
         runs-on: ubuntu-22.04
         strategy:
             matrix:
-                python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+                python-version:
+                    ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
         steps:
             - uses: actions/checkout@v4
             - name: Set up Python ${{ matrix.python-version }}
@@ -33,6 +34,8 @@ jobs:
             - name: Test with tox
               run: tox -r
             - name: Upload coverage
-              uses: codecov/codecov-action@v4
+              uses: codecov/codecov-action@v5
               with:
                   name: Python ${{ matrix.python-version }} Codecov
+                  fail_ci_if_error: true
+                  token: ${{ secrets.CODECOV_TOKEN }}

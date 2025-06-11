@@ -4,7 +4,7 @@ Changelog
 Unreleased
 ----------
 
-* Nothing (yet)!
+* Use environment variable for PostgreSQL password to prevent password leakage in logs/emails
 
 4.3.0 (2025-05-09)
 ----------

@@ -28,8 +28,4 @@ jobs:
                   twine check dist/*
 
             - name: Upload packages to PyPi
-              env:
-                  TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-                  TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-              run: |
-                  twine upload dist/*
+              uses: pypa/gh-action-pypi-publish@release/v1

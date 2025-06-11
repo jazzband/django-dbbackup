@@ -34,7 +34,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     license="BSD",
-    url="https://github.com/jazzband/django-dbbackup",
+    url="https://github.com/Archmonger/django-dbbackup",
     keywords=[
         "django",
         "database",

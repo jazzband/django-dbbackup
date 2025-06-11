@@ -46,12 +46,12 @@ Other Resources
 * `GitHub pull requests`_
 * `Coveralls`_
 
-.. _`GitHub repository`: https://github.com/jazzband/django-dbbackup
+.. _`GitHub repository`: https://github.com/Archmonger/django-dbbackup
 .. _`PyPI project`: https://pypi.python.org/pypi/django-dbbackup/
 .. _`Read The Docs`: https://django-dbbackup.readthedocs.org/
-.. _`GitHub issues`: https://github.com/jazzband/django-dbbackup/issues
-.. _`GitHub pull requests`: https://github.com/jazzband/django-dbbackup/pulls
-.. _`Coveralls`: https://coveralls.io/github/jazzband/django-dbbackup
+.. _`GitHub issues`: https://github.com/Archmonger/django-dbbackup/issues
+.. _`GitHub pull requests`: https://github.com/Archmonger/django-dbbackup/pulls
+.. _`Coveralls`: https://coveralls.io/github/Archmonger/django-dbbackup
 
 Indices and tables
 ==================

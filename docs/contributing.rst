@@ -16,7 +16,7 @@ issue if:
 - You've got a question
 - More generally something seems wrong for you
 
-.. _`GitHub issues`: https://github.com/jazzband/django-dbbackup/issues
+.. _`GitHub issues`: https://github.com/Archmonger/django-dbbackup/issues
 
 Make a patch
 ------------
@@ -36,7 +36,7 @@ of requests we advise you to:
     Travis. DBBackup uses a lot of file operations, so breaks between Python
     versions are easy.
 
-.. _`GitHub pull requests`: https://github.com/jazzband/django-dbbackup/pulls
+.. _`GitHub pull requests`: https://github.com/Archmonger/django-dbbackup/pulls
 
 Test environment
 ----------------
@@ -124,20 +124,20 @@ Online CI
 
 We use `Travis`_ which tests Dbbackup with a matrix of components' versions: Several versions of Django and several versions of Python including 2, 3 and PyPy.
 
-.. image:: https://api.travis-ci.org/jazzband/django-dbbackup.svg
-        :target: https://travis-ci.org/jazzband/django-dbbackup
+.. image:: https://api.travis-ci.org/Archmonger/django-dbbackup.svg
+        :target: https://travis-ci.org/Archmonger/django-dbbackup
 
 Code coverage is ensured with `Coveralls`_ and the project has not yet reached a minimum coverage limit.
 
-.. image:: https://coveralls.io/repos/jazzband/django-dbbackup/badge.svg?branch=master&service=github
-        :target: https://coveralls.io/github/jazzband/django-dbbackup?branch=master
+.. image:: https://coveralls.io/repos/Archmonger/django-dbbackup/badge.svg?branch=master&service=github
+        :target: https://coveralls.io/github/Archmonger/django-dbbackup?branch=master
 
 Code health is checked with `Landscape`_
 
-.. image:: https://landscape.io/github/jazzband/django-dbbackup/master/landscape.svg?style=flat
-        :target: https://landscape.io/github/jazzband/django-dbbackup/master
+.. image:: https://landscape.io/github/Archmonger/django-dbbackup/master/landscape.svg?style=flat
+        :target: https://landscape.io/github/Archmonger/django-dbbackup/master
         :alt: Code Health
 
-.. _Travis: https://travis-ci.org/jazzband/django-dbbackup
-.. _Coveralls: https://coveralls.io/github/jazzband/django-dbbackup
-.. _Landscape: https://landscape.io/github/jazzband/django-dbbackup/
+.. _Travis: https://travis-ci.org/Archmonger/django-dbbackup
+.. _Coveralls: https://coveralls.io/github/Archmonger/django-dbbackup
+.. _Landscape: https://landscape.io/github/Archmonger/django-dbbackup/

@@ -1,19 +1,15 @@
 Django Database Backup
 ======================
 
-.. image:: https://github.com/jazzband/django-dbbackup/actions/workflows/build.yml/badge.svg
-        :target: https://github.com/jazzband/django-dbbackup/actions
+.. image:: https://github.com/Archmonger/django-dbbackup/actions/workflows/build.yml/badge.svg
+        :target: https://github.com/Archmonger/django-dbbackup/actions
 
 .. image:: https://readthedocs.org/projects/django-dbbackup/badge/?version=stable
         :target: https://django-dbbackup.readthedocs.io/
         :alt: Documentation Status
 
-.. image:: https://codecov.io/gh/jazzband/django-dbbackup/branch/master/graph/badge.svg?token=zaYmStcsuX
-        :target: https://codecov.io/gh/jazzband/django-dbbackup
-
-.. image:: https://jazzband.co/static/img/badge.svg
-        :target: https://jazzband.co/
-        :alt: Jazzband
+.. image:: https://codecov.io/gh/Archmonger/django-dbbackup/branch/master/graph/badge.svg?token=zaYmStcsuX
+        :target: https://codecov.io/gh/Archmonger/django-dbbackup
 
 This Django application provides management commands to help backup and
 restore your project database and media files with various storages such as
@@ -46,14 +42,6 @@ files.
 Contributing
 ============
 
-.. image:: https://jazzband.co/static/img/jazzband.svg
-   :target: https://jazzband.co/
-   :alt: Jazzband
-
-This is a `Jazzband <https://jazzband.co>`_ project. By contributing you agree
-to abide by the `Contributor Code of Conduct <https://jazzband.co/about/conduct>`_
-and follow the `guidelines <https://jazzband.co/about/guidelines>`_.
-
 All contribution are very welcomed, propositions, problems, bugs and
 enhancement are tracked with `GitHub issues`_ system and patches are submitted
 via `pull requests`_.
@@ -61,6 +49,6 @@ via `pull requests`_.
 We use GitHub Actions as continuous integration tools.
 
 .. _`Read The Docs`: https://django-dbbackup.readthedocs.org/
-.. _`GitHub issues`: https://github.com/jazzband/django-dbbackup/issues
-.. _`pull requests`: https://github.com/jazzband/django-dbbackup/pulls
-.. _Coveralls: https://coveralls.io/github/jazzband/django-dbbackup
+.. _`GitHub issues`: https://github.com/Archmonger/django-dbbackup/issues
+.. _`pull requests`: https://github.com/Archmonger/django-dbbackup/pulls
+.. _Coveralls: https://coveralls.io/github/Archmonger/django-dbbackup

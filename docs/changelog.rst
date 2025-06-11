@@ -5,6 +5,7 @@ Unreleased
 ----------
 
 * Use environment variable for PostgreSQL password to prevent password leakage in logs/emails
+* This repository has been transferred out of Jazzband due to logistical concerns.
 
 4.3.0 (2025-05-09)
 ----------

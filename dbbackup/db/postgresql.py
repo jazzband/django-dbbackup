@@ -7,20 +7,18 @@ from .base import BaseCommandDBConnector
 logger = logging.getLogger("dbbackup.command")
 
 
-def create_postgres_uri(self):
+def create_postgres_dbname_and_env(self):
     host = self.settings.get("HOST", "localhost")
     dbname = self.settings.get("NAME", "")
     user = quote(self.settings.get("USER") or "")
-    password = self.settings.get("PASSWORD", "")
-    password = f":{quote(password)}" if password else ""
-    if not user:
-        password = ""
-    else:
+    if user:
         host = "@" + host
-
     port = ":{}".format(self.settings.get("PORT")) if self.settings.get("PORT") else ""
-    dbname = f"--dbname=postgresql://{user}{password}{host}{port}/{dbname}"
-    return dbname
+    dbname = f"--dbname=postgresql://{user}{host}{port}/{dbname}"
+    env = {}
+    if self.settings.get("PASSWORD"):
+        env["PGPASSWORD"] = self.settings.get("PASSWORD")
+    return dbname, env
 
 
 class PgDumpConnector(BaseCommandDBConnector):
@@ -38,7 +36,8 @@ class PgDumpConnector(BaseCommandDBConnector):
 
     def _create_dump(self):
         cmd = f"{self.dump_cmd} "
-        cmd = cmd + create_postgres_uri(self)
+        dbname, pg_env = create_postgres_dbname_and_env(self)
+        cmd = cmd + dbname
 
         for table in self.exclude:
             cmd += f" --exclude-table-data={table}"
@@ -52,12 +51,13 @@ class PgDumpConnector(BaseCommandDBConnector):
             cmd += " -n " + " -n ".join(self.schemas)
 
         cmd = f"{self.dump_prefix} {cmd} {self.dump_suffix}"
-        stdout, stderr = self.run_command(cmd, env=self.dump_env)
+        stdout, stderr = self.run_command(cmd, env={**self.dump_env, **pg_env})
         return stdout
 
     def _restore_dump(self, dump):
         cmd = f"{self.restore_cmd} "
-        cmd = cmd + create_postgres_uri(self)
+        dbname, pg_env = create_postgres_dbname_and_env(self)
+        cmd = cmd + dbname
 
         # without this, psql terminates with an exit value of 0 regardless of errors
         cmd += " --set ON_ERROR_STOP=on"
@@ -70,7 +70,9 @@ class PgDumpConnector(BaseCommandDBConnector):
 
         cmd += " {}".format(self.settings["NAME"])
         cmd = f"{self.restore_prefix} {cmd} {self.restore_suffix}"
-        stdout, stderr = self.run_command(cmd, stdin=dump, env=self.restore_env)
+        stdout, stderr = self.run_command(
+            cmd, stdin=dump, env={**self.restore_env, **pg_env}
+        )
         return stdout, stderr
 
 
@@ -117,7 +119,8 @@ class PgDumpBinaryConnector(PgDumpConnector):
 
     def _create_dump(self):
         cmd = f"{self.dump_cmd} "
-        cmd = cmd + create_postgres_uri(self)
+        dbname, pg_env = create_postgres_dbname_and_env(self)
+        cmd = cmd + dbname
 
         cmd += " --format=custom"
         for table in self.exclude:
@@ -127,7 +130,7 @@ class PgDumpBinaryConnector(PgDumpConnector):
             cmd += " -n " + " -n ".join(self.schemas)
 
         cmd = f"{self.dump_prefix} {cmd} {self.dump_suffix}"
-        stdout, _ = self.run_command(cmd, env=self.dump_env)
+        stdout, _ = self.run_command(cmd, env={**self.dump_env, **pg_env})
         return stdout
 
     def _restore_dump(self, dump: str):
@@ -140,7 +143,7 @@ class PgDumpBinaryConnector(PgDumpConnector):
         Builds the command as a list.
         """
 
-        dbname = create_postgres_uri(self)
+        dbname, pg_env = create_postgres_dbname_and_env(self)
         cmd = []
 
         # Flatten optional values
@@ -188,6 +191,8 @@ class PgDumpBinaryConnector(PgDumpConnector):
             )
 
         cmd_str = " ".join(cmd)
-        stdout, _ = self.run_command(cmd_str, stdin=dump, env=self.dump_env)
+        stdout, _ = self.run_command(
+            cmd_str, stdin=dump, env={**self.dump_env, **pg_env}
+        )
 
         return stdout

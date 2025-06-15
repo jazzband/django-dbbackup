@@ -1,6 +1,5 @@
-name: Bug Report
-description: Create a report to help us improve.
-labels: ["bug"]
+name: Report a Bug
+description: Report an issue or problem with this package.
 body:
     - type: textarea
       attributes:
@@ -11,7 +10,7 @@ body:
     - type: textarea
       attributes:
           label: Proposed Actions
-          description: Describe what ought to be done, and why that will address the reasons for action mentioned above.
+          description: Describe what the proper behavior should be and how to resolve the problem.
       validations:
           required: false
     - type: textarea

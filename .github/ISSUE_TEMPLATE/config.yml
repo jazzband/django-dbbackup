@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+    - name: Request a Feature
+      url: https://github.com/Archmonger/django-dbbackup/discussions
+      about: Use GitHub Discussions to request features.
+    - name: Ask a Question
+      url: https://github.com/Archmonger/django-dbbackup/discussions
+      about: Use GitHub Discussions to ask questions.
+    - name: General Discussion
+      url: https://github.com/Archmonger/django-dbbackup/discussions
+      about: Use GitHub Discussions to any other topics.

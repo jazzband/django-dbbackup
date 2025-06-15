@@ -50,7 +50,6 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Environment :: Console",
-        "Framework :: Django :: 3.2",
         "Framework :: Django :: 4.2",
         "Framework :: Django :: 5.0",
         "Framework :: Django :: 5.1",

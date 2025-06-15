@@ -48,6 +48,16 @@ W008 = Warning(
     "Did you mean to change the value for 'location'?",
     id="dbbackup.W007",
 )
+W009 = Warning(
+    "Using removed DBBACKUP_STORAGE parameter",
+    hint="settings.DBBACKUP_STORAGE has been removed in favor of settings.STORAGES['dbbackup']",
+    id="dbbackup.W009",
+)
+W010 = Warning(
+    "Using removed DBBACKUP_STORAGE_OPTIONS parameter",
+    hint="settings.DBBACKUP_STORAGE_OPTIONS has been removed in favor of settings.STORAGES['dbbackup']['OPTIONS']",
+    id="dbbackup.W010",
+)
 
 
 def check_filename_templates():
@@ -106,5 +116,11 @@ def check_settings(app_configs, **kwargs):
         errors.append(W006)
 
     errors += check_filename_templates()
+
+    if getattr(settings, "DBBACKUP_STORAGE", None) is not None:
+        errors.append(W009)
+
+    if getattr(settings, "DBBACKUP_STORAGE_OPTIONS", None) is not None:
+        errors.append(W010)
 
     return errors

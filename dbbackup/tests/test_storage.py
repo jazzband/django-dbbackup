@@ -26,15 +26,14 @@ class Get_StorageTest(TestCase):
         storage = get_storage(options=STORAGE_OPTIONS)
         self.assertIn(
             storage.storage.__module__,
-            # TODO: Remove "django.core.files.storage" case when dropping support for Django < 4.2.
-            ("django.core.files.storage", "django.core.files.storage.filesystem"),
+            {"django.core.files.storage.filesystem"},
         )
 
     def test_get_storage_class(self):
         storage_class = get_storage_class(DEFAULT_STORAGE_PATH)
         self.assertIn(
             storage_class.__module__,
-            ("django.core.files.storage", "django.core.files.storage.filesystem"),
+            {"django.core.files.storage.filesystem"},
         )
         self.assertIn(storage_class.__name__, ("FileSystemStorage", "DefaultStorage"))
 
@@ -46,7 +45,7 @@ class Get_StorageTest(TestCase):
         storage_class = get_storage_class()
         self.assertIn(
             storage_class.__module__,
-            ("django.core.files.storage", "django.core.files.storage.filesystem"),
+            {"django.core.files.storage"},
         )
         self.assertIn(storage_class.__name__, ("FileSystemStorage", "DefaultStorage"))
 

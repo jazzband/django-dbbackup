@@ -55,24 +55,20 @@ SERVER_EMAIL = "dbbackup@test.org"
 DBBACKUP_GPG_RECIPIENT = "test@test"
 DBBACKUP_GPG_ALWAYS_TRUST = (True,)
 
-DBBACKUP_STORAGE = os.environ.get("STORAGE", "dbbackup.tests.utils.FakeStorage")
-DBBACKUP_STORAGE_OPTIONS = dict(
-    [
-        keyvalue.split("=")
-        for keyvalue in os.environ.get("STORAGE_OPTIONS", "").split(",")
-        if keyvalue
-    ]
-)
-
-# For testing the new storages setting introduced in Django 4.2
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
         "OPTIONS": {},
     },
     "dbbackup": {
-        "BACKEND": DBBACKUP_STORAGE,
-        "OPTIONS": DBBACKUP_STORAGE_OPTIONS,
+        "BACKEND": os.environ.get("STORAGE", "dbbackup.tests.utils.FakeStorage"),
+        "OPTIONS": dict(
+            [
+                keyvalue.split("=")
+                for keyvalue in os.environ.get("STORAGE_OPTIONS", "").split(",")
+                if keyvalue
+            ]
+        ),
     },
 }
 

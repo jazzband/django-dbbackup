@@ -4,13 +4,13 @@ body:
     - type: textarea
       attributes:
           label: Current Situation
-          description: Discuss what the current issue is, how to reproduce, and link to any relevant prior discussion/context.
+          description: Describe the current issue, how to reproduce, and link to any relevant prior discussions.
       validations:
           required: true
     - type: textarea
       attributes:
           label: Proposed Actions
-          description: Describe what the proper behavior should be and how to resolve the problem.
+          description: If possible, describe how to resolve the problem.
       validations:
           required: false
     - type: textarea

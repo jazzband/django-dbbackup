@@ -4,7 +4,7 @@ body:
     - type: textarea
       attributes:
           label: Current Situation
-          description: Describe the current issue, how to reproduce, and link to any relevant prior discussions.
+          description: Describe the current issue, how to reproduce, and link to any prior discussions.
       validations:
           required: true
     - type: textarea

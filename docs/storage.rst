@@ -178,13 +178,15 @@ exist before attempting to create your first backup.
 
 **region_name** - Optional
 
-Specify the Amazon region, e.g. ``'us-east-1'``
+Specify the Amazon region, e.g. ``'us-east-1'``.
 
 **endpoint_url** - Optional
 
 Set this to fully override the endpoint, e.g. to use an alternative S3 service,
 which is compatible with AWS S3.  The value must contain the protocol, e.g.
 ``'https://compatible-s3-service.example.com'``.
+
+If setting this, it is mandatory to also configure **region_name**.
 
 **default_acl** - Required
 

@@ -7,6 +7,8 @@ Unreleased
 * Use environment variable for PostgreSQL password to prevent password leakage in logs/emails
 * This repository has been transferred out of Jazzband due to logistical concerns.
 * Drop support for end-of-life Python 3.7 and 3.8.
+* Drop support for end-of-life Django 3.2.
+* Drop support for ``DBBACKUP_STORAGE`` AND  ``DBBACKUP_STORAGE_OPTIONS`` settings, use Django's ``STORAGES['dbbackup']`` setting instead.
 
 4.3.0 (2025-05-09)
 ----------

@@ -5,16 +5,14 @@ One of the most helpful features of django-dbbackup is the ability to store
 and retrieve backups from a local or a remote storage. This functionality is
 mainly based on Django Storage API and extends its possibilities.
 
-You can choose your backup storage backend by setting ``settings.DBBACKUP_STORAGE``,
+You can choose your backup storage backend by setting ``settings.STORAGES['dbbackup']``,
 it must be the full path of a storage class. For example:
 ``django.core.files.storage.FileSystemStorage`` to use file system storage. 
 Below, we'll list some of the available solutions and their options.
 
 
-The storage's option are gathered in ``settings.DBBACKUP_STORAGE_OPTIONS`` which
+The storage's option are gathered in ``settings.STORAGES['dbbackup']['OPTIONS']`` which
 is a dictionary of keywords representing how to configure it.
-
-Since Django 4.2 there is a new way to configure storages using the STORAGES setting. E.g.:::
 
     STORAGES = {
         "default": {
@@ -27,10 +25,6 @@ Since Django 4.2 there is a new way to configure storages using the STORAGES set
             ...
         },
     }
-
-instead of the previous DEFAULT_FILE_STORAGE and STATICFILES_STORAGE settings. 
-If ``settings.DBBACKUP_STORAGE`` is not set, django-dbbackup will look for the ``dbbackup`` key in the ``STORAGES`` dictionary setting.
-Otherwise, the default storage will be used.
 
 
 .. warning::
@@ -59,11 +53,6 @@ Setup
 
 To store your backups on the local file system, simply setup the required
 settings below. ::
-
-    DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    DBBACKUP_STORAGE_OPTIONS = {'location': '/my/backup/dir/'}
-
-Alternatively, starting from Django 4.2, you can use the STORAGES setting: ::
 
     STORAGES = {
         "dbbackup": {
@@ -107,11 +96,15 @@ In order to backup to Google cloud storage, you'll first need to create an accou
 
 Add the following to your project's settings. Strictly speaking only `bucket_name` is required, but we'd recommend to add the other two as well. You can also find more settings in the readme for `django-storages`_ ::
 
-    DBBACKUP_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-    DBBACKUP_STORAGE_OPTIONS = {
-        "bucket_name": "your_bucket_name",
-        "project_id": "your_project_id",
-        "blob_chunk_size": 1024 * 1024
+    STORAGES = {
+        "dbbackup": {
+            "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
+            "OPTIONS": {
+                "bucket_name": "your_bucket_name",
+                "project_id": "your_project_id",
+                "blob_chunk_size": 1024 * 1024,
+            },
+        },
     }
 
 .. _`django-storages`: https://django-storages.readthedocs.io/en/latest/backends/gcloud.html
@@ -134,12 +127,16 @@ complete, you can follow the required setup below. ::
 
 Add the following to your project's settings: ::
 
-    DBBACKUP_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    DBBACKUP_STORAGE_OPTIONS = {
-        'access_key': 'my_id',
-        'secret_key': 'my_secret',
-        'bucket_name': 'my_bucket_name',
-        'default_acl': 'private',
+    STORAGES = {
+        "dbbackup": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "access_key": "my_id",
+                "secret_key": "my_secret",
+                "bucket_name": "my_bucket_name",
+                "default_acl": "private",
+            },
+        }
     }
 
 Available settings
@@ -233,11 +230,13 @@ Setup your Django project
 
 ...And make sure you have the following required settings: ::
 
-
-    DBBACKUP_STORAGE = 'storages.backends.dropbox.DropBoxStorage'
-    DBBACKUP_STORAGE_OPTIONS = {
-        'oauth2_access_token': 'my_token',
-    }
+    STORAGES = {
+        "dbbackup": {
+            "BACKEND": "storages.backends.dropbox.DropBoxStorage",
+            "OPTIONS": {
+                "oauth2_access_token": "my_token",
+            },
+        },
 
 Available settings
 ~~~~~~~~~~~~~~~~~~
@@ -276,9 +275,13 @@ Setup
 
 ::
 
-    DBBACKUP_STORAGE = 'storages.backends.ftp.FTPStorage
-    DBBACKUP_STORAGE_OPTIONS = {
-        'location': 'ftp://user:pass@server:21'
+    STORAGES = {
+        "dbbackup": {
+            "BACKEND": "storages.backends.ftp.FTPStorage",
+            "OPTIONS": {
+                "location": "ftp://user:pass@server:21",
+            },
+        },
     }
 
 Settings
@@ -297,8 +300,14 @@ We use FTP backend from Django-Storages (again). ::
 
 Here a simple configuration: ::
 
-    DBBACKUP_STORAGE = 'storages.backends.ftp.FTPStorage'
-    DBBACKUP_STORAGE_OPTIONS = {'location': ftp://myftpserver/}
+    STORAGES = {
+        "dbbackup": {
+            "BACKEND": "storages.backends.ftp.FTPStorage",
+            "OPTIONS": {
+                "location": "ftp://myftpserver/",
+            },
+        },
+    }
 
 SFTP
 ----
@@ -317,8 +326,15 @@ This backend is from Django-Storages with the `paramiko`_ backend. ::
 
 The following configuration grants SSH server access to the local user: ::
 
-    DBBACKUP_STORAGE = 'storages.backends.sftpstorage.SFTPStorage'
-    DBBACKUP_STORAGE_OPTIONS = {'host': 'myserver'}
+    STORAGES = {
+        "dbbackup": {
+            "BACKEND": "storages.backends.sftpstorage.SFTPStorage",
+            "OPTIONS": {
+                'host': 'myserver',
+            },
+        },
+    }
+
 
 
 .. _`paramiko SSHClient.connect() documentation`: https://docs.paramiko.org/en/latest/api/client.html#paramiko.client.SSHClient.connect

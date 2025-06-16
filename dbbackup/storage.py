@@ -14,11 +14,11 @@ def get_storage(path=None, options=None):
     Get the specified storage configured with options.
 
     :param path: Path in Python dot style to module containing the storage
-                 class. If empty settings.DBBACKUP_STORAGE will be used.
+                 class. If empty settings.STORAGES["dbbackup"] will be used.
     :type path: ``str``
 
     :param options: Parameters for configure the storage, if empty
-                    settings.DBBACKUP_STORAGE_OPTIONS will be used.
+                    settings.STORAGES["dbbackup"]["OPTIONS"] will be used.
     :type options: ``dict``
 
     :return: Storage configured
@@ -28,7 +28,7 @@ def get_storage(path=None, options=None):
     options = options or settings.STORAGE_OPTIONS
     if not path:
         raise ImproperlyConfigured(
-            "You must specify a storage class using " "DBBACKUP_STORAGE settings."
+            'You must specify a storage class using settings.STORAGES["dbbackup"] settings.'
         )
     return Storage(path, **options)
 
@@ -59,7 +59,7 @@ class Storage:
         Initialize a Django Storage instance with given options.
 
         :param storage_path: Path to a Django Storage class with dot style
-                             If ``None``, ``settings.DBBACKUP_STORAGE`` will
+                             If ``None``, ``settings.STORAGES["dbbackup"]`` will
                              be used.
         :type storage_path: str
         """

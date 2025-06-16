@@ -8,9 +8,6 @@ Django Database Backup
         :target: https://django-dbbackup.readthedocs.io/
         :alt: Documentation Status
 
-.. image:: https://codecov.io/gh/Archmonger/django-dbbackup/branch/master/graph/badge.svg?token=zaYmStcsuX
-        :target: https://codecov.io/gh/Archmonger/django-dbbackup
-
 This Django application provides management commands to help backup and
 restore your project database and media files with various storages such as
 Amazon S3, Dropbox, local file storage or any Django storage.
@@ -51,4 +48,3 @@ We use GitHub Actions as continuous integration tools.
 .. _`Read The Docs`: https://django-dbbackup.readthedocs.org/
 .. _`GitHub issues`: https://github.com/Archmonger/django-dbbackup/issues
 .. _`pull requests`: https://github.com/Archmonger/django-dbbackup/pulls
-.. _Coveralls: https://coveralls.io/github/Archmonger/django-dbbackup

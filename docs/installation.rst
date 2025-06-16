@@ -37,8 +37,14 @@ In your ``settings.py``, make sure you have the following things: ::
         'dbbackup',  # django-dbbackup
     )
 
-    DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    DBBACKUP_STORAGE_OPTIONS = {'location': '/my/backup/dir/'}
+    STORAGES = {
+        'dbbackup': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+            'OPTIONS': {
+                'location': '/my/backup/dir/',
+            },
+        },
+    }
 
 Create the backup directory: ::
 
